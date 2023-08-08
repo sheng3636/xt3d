@@ -4506,7 +4506,7 @@
         }, {
             'key': 'addModelPrimitive',
             'value': function () {
-                this.moveModel = this.viewer.scene.primitives.add(Cesium.Modeld.fromGltf({
+                this.moveModel = this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
                     'url': this.modelUrl,
                     'modelMatrix': Cesium.Transforms.headingPitchRollToFixedFrame(this.position, this.hpRoll, Cesium.Ellipsoid.WGS84, this.fixedFrameTransforms),
                     'scale': this.options.scale,
@@ -20210,7 +20210,7 @@
                             _0x15e772 = new Cesium.Cartesian3(0, 0, _0x2519be * this.style.spacing),
                             _0x15e772 = Cesium.Matrix4.fromTranslation(_0x15e772, _0x15e772);
                         Cesium.Matrix4.multiply(_0x3a314a, _0x15e772, _0x3a314a),
-                            _0xaba7ac = this.viewer.scene.primitives.add(Cesium.Modeld.fromGltf({
+                            _0xaba7ac = this.viewer.scene.primitives.add(Cesium.Model.fromGltf({
                                 'url': _0xaba7ac,
                                 'modelMatrix': _0x3a314a
                             })),
@@ -20232,8 +20232,8 @@
                                 _0x1d4009.currentOpenHeight = 0;
                         }
                         var _0x4a777a = setInterval(function (_0x367600) {
-                            for (var _0x55edc3 = 1; _0x55edc3 < _0xc2252ed.models.length; _0x55edc3++) {
-                                var _0x3bc35a = _0xc2252ed.models[_0x55edc3],
+                            for (var _0x55edc3 = 1; _0x55edc3 < _0xc2252e.models.length; _0x55edc3++) {
+                                var _0x3bc35a = _0xc2252e.models[_0x55edc3],
                                     _0x4c6901 = _0x3bc35a.primitive.modelMatrix,
                                     _0x1a548f = new Cesium.Cartesian3(0, 0, _0x3bc35a.increment),
                                     _0x1a548f = Cesium.Matrix4.fromTranslation(_0x1a548f, _0x1a548f);
@@ -20255,8 +20255,8 @@
                     var _0x455441,
                         _0x4b99f4 = this;
                     this.isOpened && (_0x455441 = setInterval(function (_0x1b90bf) {
-                        for (var _0x309194 = 1; _0x309194 < _0x4b99f4d.models.length; _0x309194++) {
-                            var _0x553607 = _0x4b99f4d.models[_0x309194],
+                        for (var _0x309194 = 1; _0x309194 < _0x4b99f4.models.length; _0x309194++) {
+                            var _0x553607 = _0x4b99f4.models[_0x309194],
                                 _0x196f38 = _0x553607.primitive.modelMatrix,
                                 _0x27b393 = new Cesium.Cartesian3(0, 0, -_0x553607.increment),
                                 _0x27b393 = Cesium.Matrix4.fromTranslation(_0x27b393, _0x27b393);
@@ -20438,10 +20438,10 @@
             'value': function () {
                 var _0x3496c2 = this;
                 this.eventHandler.setInputAction(function (_0x185180) {
-                    !_0x3496c2d.gltfPlotLayer.selectedPlot || (_0x185180 = _0x3496c2.viewer.scene.pick(_0x185180.position)) && _0x185180.id && `GltfPlot` === _0x185180.id.type && _0x3496c2d.gltfPlotLayer.selectedPlot.properties.plotCode == _0x185180.id.plotCode && (_0x3496c2.viewer.enableCursorStyle = !1,
+                    !_0x3496c2.gltfPlotLayer.selectedPlot || (_0x185180 = _0x3496c2.viewer.scene.pick(_0x185180.position)) && _0x185180.id && `GltfPlot` === _0x185180.id.type && _0x3496c2.gltfPlotLayer.selectedPlot.properties.plotCode == _0x185180.id.plotCode && (_0x3496c2.viewer.enableCursorStyle = !1,
                         document.body.style.cursor = `move`,
                         _0x3496c2.moveing = !0,
-                        _0x3496c2d.gltfPlotLayer.selectedPlot.setVisible(!1),
+                        _0x3496c2.gltfPlotLayer.selectedPlot.setVisible(!1),
                         _0x3496c2.mousePoint = new _0x450ebc(_0x3496c2.viewer),
                         _0x3496c2.viewer.scene.screenSpaceCameraController.enableRotate = !1);
                 }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
