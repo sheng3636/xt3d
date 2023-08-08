@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>雷达遮罩扫描</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addScanEllipsoid();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+
+            },
+
+            //添加雷达遮罩
+            addScanEllipsoid() {
+                let p = Cesium.Cartesian3.fromDegrees(108.64985, 25.02, 0);
+                let s = new xt3d.SpacePlugin.ScanEllipsoid(this.viewer, p, {
+                    color: Cesium.Color.AQUA.withAlpha(0.2),
+                    radii: new Cesium.Cartesian3(500, 500, 450)
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(108.64985, 25.03, 0);
+                s = new xt3d.SpacePlugin.ScanEllipsoid(this.viewer, p, {
+                    color: Cesium.Color.RED.withAlpha(0.2),
+                    radii: new Cesium.Cartesian3(500, 500, 400),
+                    scanDirection: 2
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(108.63035, 25.02, 0);
+                s = new xt3d.SpacePlugin.ScanEllipsoid(this.viewer, p, {
+                    color: Cesium.Color.CORNFLOWERBLUE.withAlpha(0.2),
+                    radii: new Cesium.Cartesian3(500, 500, 450),
+                    scanType: 2
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(108.63035, 25.03, 0);
+                s = new xt3d.SpacePlugin.ScanEllipsoid(this.viewer, p, {
+                    radii: new Cesium.Cartesian3(500, 500, 450),
+                    scanType: 2,
+                    scanSpeed: 1,
+                    scanDirection: 2,
+                    color: Cesium.Color.AQUAMARINE.withAlpha(0.2),
+                    fanBladColor: Cesium.Color.YELLOW.withAlpha(0.3),
+                });
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1849884.1444671673,
+                        y: 5484423.03855543,
+                        z: 2679355.825794378
+                    },
+                    orientation: {
+                        heading: 0.00595205006228916,
+                        pitch: -0.7815029734105425,
+                        roll: 0.000021572052703255906
+                    }
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

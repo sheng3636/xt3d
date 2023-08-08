@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cesium点聚合5</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initCluster();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+                this.viewer.selectedEntityChanged.addEventListener(this.selectedEntityChanged);
+            },
+
+
+            //初始化聚合
+            initCluster() {
+                let colors = [{
+                    value: 100, //聚合数大于等于100 红色
+                    color: "rgb(255,0,0)"
+                }, {
+                    value: 50, //聚合数大于等于50 橙色
+                    color: "rgb(255,215,0)"
+                }, {
+                    value: 10, //聚合数大于等于10 蓝色
+                    color: "rgb(51, 133, 255)"
+                }, {
+                    value: 1, //聚合数大于等于1 绿
+                    color: "rgb(0,255,0)"
+                }];
+
+                let pointcluster = new xt3d.PointObject.PointCluster5(this.viewer, "https://www.fastmock.site/mock/78f35070091223cf982af0eafed1e784/addons/cluserPoint", {
+                    pixelRange: 100, //聚合像素
+                    minimumClusterSize: 3, //最低聚合数
+                    billboardImg: "/static/images/marker/bluecamera.png", //单个点的图片
+                    colors: colors, //聚合图标的颜色 
+                });
+
+                //数据加载完成事件
+                pointcluster.DataLoadedEvent.addEventListener(dataSource => {
+                    this.viewer.flyTo(dataSource.entities.values);
+                })
+
+                // pointcluster.remove();
+            },
+
+            selectedEntityChanged(e) {
+                // console.log(e)能够拿到选中的实体 如果是聚合对象 e.id为一个entity数组 个数为聚合个数
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

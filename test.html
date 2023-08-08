@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./ddd.js"></script>
+    <script src="./constant.js"></script>
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        // let str = `_0x4ec804(_0x9b1e8,[{'key':_0xa969f2(0x249),'value':function(_0x197cdc){var _0x3d2491=_0xa969f2;this[_0x3d2491(0x1c7)]=_0x197cdc}},{'key':_0xa969f2(0xba5),'value':function(_0x231a0a){}}])`
+        // let result = str.replace(/(\(0x\w{3}\))/gi, function (value) {
+        //     let shiLiu = value.slice(1, value.length - 1)
+        //     let shi = parseInt(shiLiu, 16)
+        //     let index = shi + 62
+        //     if (index <= 2835) {
+        //         return `(${constant[index]})`
+        //     } else {
+        //         return `(${shi})`
+        //     }
+        //     // console.log(value, shiLiu, shi);
+        // })
+        function aaa(val) {
+            let shiLiuStr = val.slice(-6, -1)
+            let shiStr = parseInt(shiLiuStr, 16)
+            let shi = parseInt(shiStr)
+            let index = shi + 62
+            return index
+        }
+        let result = str.replace(/_0x\w{5,6}\(0x\w{3}\)/gi, function (value) {
+            // console.log(value);
+            let index = aaa(value)
+            if (index <= 2835) {
+                // return `"${constant[index]}"`
+                return '`' + constant[index] + '`'
+            } else {
+                return `${value}`
+            }
+        })
+        console.log(result.replace(/(^\s*)|(\s*$)/g, ""));
+    </script>
+</body>
+
+</html>

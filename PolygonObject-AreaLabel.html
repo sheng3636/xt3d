@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>区域标注</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+                this.colors = this.generateColors();
+                this.labels = this.generateLabels();
+                this.loadRegions();
+            },
+
+            //颜色
+            generateColors() {
+                return [
+                    Cesium.Color.AQUA,
+                    // Cesium.Color.fromCssColorString("rgb(15, 100, 157)"),
+                    Cesium.Color.GREEN,
+                    //Cesium.Color.fromCssColorString("rgb(0, 69, 154)"),
+                    Cesium.Color.YELLOW,
+                    //Cesium.Color.fromCssColorString("rgb(2, 165, 181)"),
+                    Cesium.Color.RED,
+                ]
+            },
+
+            //标签
+            generateLabels() {
+                return [{
+                    position: Cesium.Cartesian3.fromDegrees(103.88545983932153, 36.033216960244246, 0),
+                    name: "沿河区"
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(103.87214667212257, 36.038301982724796, 0),
+                    name: "环城区"
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(103.86194888078703, 36.03969446525105, 0),
+                    name: "封控区"
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(103.85091307483806, 36.041102519445715, 0),
+                    name: "核心区"
+                }]
+            },
+
+            //初始化viewer
+            initViewer(el) {
+
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = false; //默认为false  
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件 
+
+                // 亮度设置
+                let stages = this.viewer.scene.postProcessStages;
+                this.viewer.scene.brightness = this.viewer.scene.brightness || stages.add(Cesium.PostProcessStageLibrary.createBrightnessStage());
+                this.viewer.scene.brightness.enabled = true;
+                this.viewer.scene.brightness.uniforms.brightness = 1.2;
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //区域
+            loadRegions() {
+                fetch("/static/data/arealabel.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach((item, index) => {
+                        this.addRegion(item, index);
+                    });
+                })
+            },
+
+            addRegion(feature, index) {
+                let degreesArrayHeights = this.getDegreesArrayHeights(feature);
+                let positions = Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights);
+                let polygon = new Cesium.PolygonGeometry({
+                    polygonHierarchy: new Cesium.PolygonHierarchy(positions),
+                    vertexFormat: Cesium.VertexFormat.ALL
+                });
+                let geometry = Cesium.PolygonGeometry.createGeometry(polygon);
+                let instance = new Cesium.GeometryInstance({
+                    geometry: geometry
+                });
+
+                this.viewer.scene.primitives.add(new Cesium.Primitive({
+                    geometryInstances: instance,
+                    appearance: new xt3d.PolygonObject.PrimitiveGradientAppearance(this.colors[index]),
+                }));
+
+                this.addOutLine(positions, this.colors[index]);
+                this.addLabel(index, this.colors[index]);
+            },
+
+            //添加边线
+            addOutLine(positions, color) {
+                this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 2,
+                        material: new Cesium.PolylineDashMaterialProperty({
+                            color: color.withAlpha(1)
+                        })
+                    }
+                })
+            },
+
+            //标签
+            addLabel(index, color) {
+                this.viewer.entities.add({
+                    position: this.labels[index].position,
+                    label: {
+                        text: this.labels[index].name,
+                        fillColor: color,
+                        scale: 0.5,
+                        font: 'normal 45px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 9000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 10,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //获取坐标串
+            getDegreesArrayHeights(feature) {
+                let degreesArrayHeights = [];
+                let coordinates;
+                if (feature.geometry.type == "MultiPolygon") {
+                    coordinates = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type == "Polygon") {
+                    coordinates = feature.geometry.coordinates[0];
+                }
+                //坐标串转为需要的格式[x,y,z,x,y,z....]
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    degreesArrayHeights.push(element[0]);
+                    degreesArrayHeights.push(element[1]);
+                    degreesArrayHeights.push(100);
+                }
+                return degreesArrayHeights;
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1238875.9606814845,
+                        y: 5021694.589907374,
+                        z: 3731291.006898492
+                    },
+                    orientation: {
+                        heading: 6.2243565276080295,
+                        pitch: -0.9203738754493909,
+                        roll: 6.282874205266332
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

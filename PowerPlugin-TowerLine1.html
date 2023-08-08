@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>高压线（自动计算方向）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadData();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            loadData() {
+                fetch("/static/data/tower.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let data = res.data;
+                    this.handleData(data);
+
+                    this.viewer.flyTo(this.viewer.entities);
+                })
+            },
+
+            //处理数据
+            handleData(points) {
+                let polylines1 = [];
+                let polylines2 = [];
+                let polylines3 = [];
+                let polylines4 = [];
+                let polylines5 = [];
+
+                let labels = this.viewer.scene.primitives.add(new Cesium.LabelCollection());
+
+                let angle = 0;
+                for (let i = 0; i < points.length; i++) {
+                    const item = points[i];
+                    const item1 = points[i + 1];
+                    let position = Cesium.Cartesian3.fromDegrees(item.longitude, item.latitude, item.height);
+                    if (item1) {
+                        let position1 = Cesium.Cartesian3.fromDegrees(item1.longitude, item1.latitude, item1.height);
+                        angle = xt3d.PowerPlugin.getTowerAngle(position, position1);
+                    }
+
+                    this.addLabel(labels, position, i + 1);
+                    // const tower = new xt3d.PowerPlugin.Tower(this.viewer, position, item.degree);
+                    const tower = new xt3d.PowerPlugin.Tower(this.viewer, position, angle);
+
+                    let linkedPoints = tower.getLinkedPositions();
+                    let offsetP1 = linkedPoints[0];
+                    let offsetP2 = linkedPoints[1];
+                    let offsetP3 = linkedPoints[2];
+                    let offsetP4 = linkedPoints[3];
+                    let offsetP5 = linkedPoints[4];
+
+                    if (i === 0) {
+                        polylines1.push(offsetP1);
+                        polylines2.push(offsetP2);
+                        polylines3.push(offsetP3);
+                        polylines4.push(offsetP4);
+                        polylines5.push(offsetP5);
+                    } else {
+                        let positions = xt3d.PowerPlugin.generateCurve(polylines1[polylines1.length - 1], offsetP1);
+                        polylines1 = polylines1.concat(positions);
+
+                        positions = xt3d.PowerPlugin.generateCurve(polylines2[polylines2.length - 1], offsetP2);
+                        polylines2 = polylines2.concat(positions);
+
+                        positions = xt3d.PowerPlugin.generateCurve(polylines3[polylines3.length - 1], offsetP3);
+                        polylines3 = polylines3.concat(positions);
+
+                        positions = xt3d.PowerPlugin.generateCurve(polylines4[polylines4.length - 1], offsetP4);
+                        polylines4 = polylines4.concat(positions);
+
+                        positions = xt3d.PowerPlugin.generateCurve(polylines5[polylines5.length - 1], offsetP5);
+                        polylines5 = polylines5.concat(positions);
+                    }
+                }
+
+                // 绘制路线
+                this.drawGuideLine(polylines1, "#ffff00");
+                this.drawGuideLine(polylines2, "#ffffff");
+                this.drawGuideLine(polylines3, "#ffffff");
+                this.drawGuideLine(polylines4, "#ff0000");
+                this.drawGuideLine(polylines5, "#0000ff");
+            },
+
+            addLabel(labels, position, index) {
+                labels.add({
+                    position: position,
+                    text: index + '',
+                    font: '32px Helvetica',
+                    horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(90, 50000),
+                    eyeOffset: new Cesium.Cartesian3(0.0, 80.0, 0.0),
+                })
+            },
+
+            //绘制电线
+            drawGuideLine(positions, color) {
+                this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 3.0,
+                        material: Cesium.Color.fromCssColorString(color)
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

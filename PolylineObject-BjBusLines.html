@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>北京公交线路（entity 自定义材质）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadLinesData();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                let singleTileImageryProvider = new Cesium.SingleTileImageryProvider({
+                    url: "/static/images/earth/earth_1.jpg",
+                });
+                singleTileImageryProvider.defaultBrightness = 0.01;
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: singleTileImageryProvider
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //加载数据
+            loadLinesData() {
+                let url = 'http://earthsdk.com/v/last/Apps/assets/odlines/lines-bus.json';
+                Cesium.Resource.fetchJson(url).then((data) => {
+                    var busLines = [];
+                    data.map(function(busLine, idx) {
+                        var prevPt;
+                        var points = [];
+                        for (var i = 0; i < busLine.length; i += 2) {
+                            var pt = [busLine[i], busLine[i + 1]];
+                            if (i > 0) {
+                                pt = [
+                                    prevPt[0] + pt[0],
+                                    prevPt[1] + pt[1]
+                                ];
+                            }
+                            prevPt = pt;
+
+                            var longitude = pt[0] / 1e4;
+                            var latitude = pt[1] / 1e4;
+                            // points.push([longitude, latitude]);
+                            points.push(longitude);
+                            points.push(latitude);
+                        }
+
+                        busLines.push({
+                            positions: points,
+                            color: new Cesium.Color(Math.random() * 0.5 + 0.5, Math.random() * 0.8 + 0.2, 0.0, 1.0),
+                            width: 2.0,
+                        });
+                    });
+                    this.addLineDatas(busLines);
+                });
+            },
+
+            //添加到场景
+            addLineDatas(busLines) {
+                busLines.forEach(line => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: Cesium.Cartesian3.fromDegreesArray(line.positions),
+                            width: line.width,
+                            material: new xt3d.PolylineObject.PolylineTrailMaterialProperty({
+                                speed: 3 * Math.random(),
+                                color: line.color,
+                                percent: 0.01,
+                                gradient: 0.2,
+                            })
+                        }
+                    })
+                })
+            },
+
+            //设置默认视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    destination: {
+                        x: -2264713.773444937,
+                        y: 4437097.6365463445,
+                        z: 4052169.8549779626
+                    },
+                    orientation: {
+                        heading: 5.625615618387119,
+                        pitch: -0.5513619022102629,
+                        roll: 0.00001297575603054213
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

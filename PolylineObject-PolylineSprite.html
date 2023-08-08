@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>精灵线</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addData();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                });
+                this.viewer.imageryLayers.removeAll(true); //删除所有底图 
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //添加数据
+            addData() {
+                // this.loadBuildData();
+                this.addPolyline1();
+                this.addPolyline2();
+                this.addPolyline3();
+            },
+
+            addPolyline1() {
+                var promise = Cesium.GeoJsonDataSource.load('/static/data/nanshan/nanshan-road1.geojson');
+                promise.then((dataSource) => {
+                    this.viewer.dataSources.add(dataSource);
+                    let values = dataSource.entities.values;
+
+                    for (var i = 0; i < values.length; i++) {
+                        var line = values[i];
+                        line.polyline.material = new xt3d.PolylineObject.PolylineSpriteMaterialProperty({
+                            duration: 2000, //控制速度
+                            url: "/static/images/polylinematerial/spriteline1.png" //材质路径
+                        });
+                        line.polyline.width = 2;
+                    }
+                }).otherwise(function(error) {
+                    console.log(error)
+                });
+            },
+
+            addPolyline2() {
+                var promise = Cesium.GeoJsonDataSource.load('/static/data/nanshan/nanshan-road2.geojson');
+                promise.then((dataSource) => {
+                    this.viewer.dataSources.add(dataSource);
+                    let values = dataSource.entities.values;
+
+                    for (var i = 0; i < values.length; i++) {
+                        var line = values[i];
+                        line.polyline.material = new xt3d.PolylineObject.PolylineSpriteMaterialProperty({
+                            duration: 2000, //控制速度
+                            url: "/static/images/polylinematerial/spriteline2.png" //材质路径
+                        });
+                        line.polyline.width = 2;
+                    }
+                }).otherwise(function(error) {
+                    console.log(error)
+                });
+            },
+
+            addPolyline3() {
+                var promise = Cesium.GeoJsonDataSource.load('/static/data/nanshan/nanshan-road3.geojson');
+                promise.then((dataSource) => {
+                    this.viewer.dataSources.add(dataSource);
+                    let values = dataSource.entities.values;
+
+                    for (var i = 0; i < values.length; i++) {
+                        var line = values[i];
+                        line.polyline.material = new xt3d.PolylineObject.PolylineSpriteMaterialProperty({
+                            duration: 2000, //控制速度
+                            url: "/static/images/polylinematerial/spriteline3.png" //材质路径
+                        });
+                        line.polyline.width = 2;
+                    }
+                }).otherwise(function(error) {
+                    console.log(error)
+                });
+            },
+
+            //加载建筑物数据
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+                    url: "/static/data/nanshan/nanshan_buildings/tileset.json"
+                }));
+                tileset.readyPromise.then((tileset) => {
+                    let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                        color: '0.3, 0.1, 1.0, 1.0', //颜色 rgba 浮点型 
+                        glowRange: true, //是否显示光环
+                        glowRangeHeight: '100.0', //光环范围 浮点型
+                    });
+                }).otherwise(function(error) {
+                    console.error(error);
+                });
+            },
+
+
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -2391725.8817978012,
+                        y: 5389105.463719199,
+                        z: 2426579.1981711932
+                    },
+                    orientation: {
+                        heading: 0.026182155417799002,
+                        pitch: -0.514785700228952,
+                        roll: 0.00007136798630469343
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>军事标绘编辑</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src="./libs/turf.min.js"></script>
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('polygon')">面</button>
+        <button onclick="drawActivate('circle')">正圆</button>
+        <button onclick="drawActivate('ellipse')">椭圆</button>
+        <button onclick="drawActivate('sector')">扇形</button>
+        <button onclick="drawActivate('rectangle')">矩形</button>
+        <button onclick="drawActivate('closedcurve')">曲线面</button>
+        <button onclick="drawActivate('finearrow')">直箭头</button>
+        <button onclick="drawActivate('assaultdirection')">突击方向</button>
+        <button onclick="drawActivate('attackarrow')">进攻方向</button>
+        <button onclick="drawActivate('tailedattackarrow')">进攻方向尾</button>
+        <button onclick="drawActivate('gatheringplace')">集结地</button>
+        <button onclick="drawActivate('doublearrow')">钳击</button>
+        <button onclick="drawActivate('squadcombat')">分队战斗</button>
+        <button onclick="drawActivate('tailedsquadcombat')">分队战斗尾</button>
+        <div>
+            <button onclick="clearDraw()">清空</button>
+            <button onclick="save()">保存</button>
+            <div class="tip-item">绘制完成后点击“保存”按钮将绘制的内容保存到json文件（支持从json文件加载标绘内容）</div>
+        </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initPlot();
+                this.initDatas();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //初始化标绘
+            initPlot() {
+                this.militaryPlotLayer = new xt3d.LabelPlotting.MilitaryPlot.PlotLayer(this.viewer);
+                this.militaryPlotLayer.setPlotSelectable(true);
+
+                this.plotDraw = new xt3d.LabelPlotting.MilitaryPlot.PlotDraw(this.viewer);
+                this.plotDraw.PlotDrawEndEvent.addEventListener((drawPlot, plotType) => {
+                    drawPlot.remove();
+                    this.militaryPlotLayer.addPlot(drawPlot.toGeoJson());
+                });
+
+                this.plotEdit = new xt3d.LabelPlotting.MilitaryPlot.PlotEdit(this.viewer, this.militaryPlotLayer);
+                this.plotEdit.activate();
+
+                this.plotEdit.PlotEditEndEvent.addEventListener(editPlot => {
+                    console.log(editPlot); //编辑结束
+                    console.log("编辑结束");
+                });
+            },
+
+            //激活绘制
+            drawActivate(plotType) {
+                this.plotDraw.activate(plotType);
+            },
+
+            //加载数据
+            initDatas() {
+                fetch("/data/labelplotting/1602419460829.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach(feature => {
+                        this.militaryPlotLayer.addPlot(feature);
+                    })
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+            //保存数据
+            savePlots() {
+                const features = [];
+                this.militaryPlotLayer.plots.forEach(plot => {
+                    features.push(plot.toGeoJson());
+                })
+                let geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                let data = JSON.stringify(geojson);
+
+                var blob = new Blob([data], {
+                    type: 'text/json'
+                });
+                var e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = new Date().getTime() + ".json";
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+
+            //清空
+            clear() {
+                this.militaryPlotLayer.clear();
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://localhost:9003/model/XUNICt4K/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        function clearDraw() {
+            xt3dInit.clear();
+        }
+
+        function save() {
+            xt3dInit.savePlots();
+        }
+    </script>
+</body>
+
+</html>

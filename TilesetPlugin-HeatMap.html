@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>模型热力图</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src="./libs/heatmap.min.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initHeatMap();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+            },
+
+            initHeatMap() {
+                var data = [{
+                    x: 106.4539017008,
+                    y: 29.5027558947,
+                    z: 1, // Math.random()
+                }, {
+                    x: 106.4551132292,
+                    y: 29.5034262296,
+                    z: 1 // Math.random()
+                }, {
+                    x: 106.4560860455,
+                    y: 29.5029204495,
+                    z: Math.random()
+                }, {
+                    x: 106.4567780225,
+                    y: 29.5054223234,
+                    z: Math.random()
+                }, {
+                    x: 106.4565609600,
+                    y: 29.5069330499,
+                    z: Math.random()
+                }, {
+                    x: 106.4561247201,
+                    y: 29.5065141442,
+                    z: Math.random()
+                }]
+
+                let bbox = [106.4519988952, 29.5021084567, 106.4590407287, 29.5092024712];
+                let heatmap = new xt3d.TilesetPlugin.Heatmap(
+                    this.viewer,
+                    data,
+                    bbox
+                )
+            },
+
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

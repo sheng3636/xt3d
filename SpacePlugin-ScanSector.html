@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>扇形扫描</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addScanSectors();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            addScanSectors() {
+                let p = Cesium.Cartesian3.fromDegrees(113.33064692739758, 29.42468454197111, 0);
+                let scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 500,
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(113.33064692739758, 29.42468454197111, 0);
+                scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 400,
+                    heading: 90,
+                    color: Cesium.Color.FUCHSIA
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(113.33064692739758, 29.42468454197111, 0);
+                scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 300,
+                    heading: 180,
+                    color: Cesium.Color.LAWNGREEN
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(113.33064692739758, 29.42468454197111, 0);
+                scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 300,
+                    heading: 280,
+                    color: Cesium.Color.YELLOW
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(113.31955715061368, 29.421321932728247, 0);
+                scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 600,
+                    heading: 0,
+                    verticalAngle: 5,
+                    color: Cesium.Color.AQUA
+                });
+
+                p = Cesium.Cartesian3.fromDegrees(113.32291235313042, 29.418785415614263, 0)
+                scanSector = new xt3d.SpacePlugin.ScanSector(this.viewer, p, {
+                    radius: 400,
+                    heading: 180,
+                    horizontalAngle: 60,
+                    color: Cesium.Color.LIME
+                });
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2203207.5760643617,
+                        y: 5107736.409239938,
+                        z: 3114422.3704934674
+                    },
+                    orientation: {
+                        heading: 5.948710953445387,
+                        pitch: -0.9634073682091246,
+                        roll: 6.281529119851315
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

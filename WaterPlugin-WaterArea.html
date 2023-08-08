@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态水域</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                //存储所有水面数据
+                this.waterPrimitives = [];
+                this.addHeliuRegion();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+            },
+
+            //添加河流水面
+            addHeliuRegion() {
+                //内
+                fetch("/static/data/hedao-nei.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    let coordinates, positions;
+                    features.map(feature => {
+                        coordinates = feature.geometry.coordinates[0];
+                        positions = this.coordinatesToPositions(coordinates);
+                        this.addWaterRegion(positions);
+                    })
+                })
+
+                //外
+                fetch("/static/data/hedao-wai.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    let coordinates, positions;
+                    features.map(feature => {
+                        coordinates = feature.geometry.coordinates[0];
+                        positions = this.coordinatesToPositions(coordinates);
+                        this.addWaterRegion(positions);
+                    })
+                })
+            },
+
+            //添加水面
+            addWaterRegion(positions) {
+                let waterPrimitive = new xt3d.WaterPlugin.WaterPrimitive(positions, {
+                    baseWaterColor: Cesium.Color.AQUA.withAlpha(0.6),
+                    normalMap: '/static/images/polygon/waterNormalsSmall.jpg',
+                    frequency: 1000.0,
+                    animationSpeed: 0.01,
+                    amplitude: 10,
+                    specularIntensity: 10
+                });
+                this.viewer.scene.primitives.add(waterPrimitive); //添加到场景
+                this.waterPrimitives.push(waterPrimitive);
+            },
+
+            //坐标串转为笛卡尔坐标数组
+            coordinatesToPositions(coordinates) {
+                let positions = [];
+                coordinates.map(c => {
+                    positions.push(Cesium.Cartesian3.fromDegrees(c[0], c[1], 0))
+                });
+                return positions;
+            },
+
+            //设置视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -2901323.897389136,
+                        y: 4722193.391311397,
+                        z: 3157579.014684669
+                    },
+                    orientation: {
+                        heading: 6.1552778668430514,
+                        pitch: -0.774444999584774,
+                        roll: 6.282667953914245
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

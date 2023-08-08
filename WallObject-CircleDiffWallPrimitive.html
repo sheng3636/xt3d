@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>圆形扩散墙(Primitive)</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addWallPrimitives();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://a.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=sk.eyJ1IjoibWFyc2dpcyIsImEiOiJjbDFhYXQ3a2EwaHF6M2NvdnhmdjR6ajZ2In0.-sahm9R0QuPP3pAihJHC4A"
+                    })
+                });
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            addWallPrimitives() {
+                let position = Cesium.Cartesian3.fromDegrees(108, 32, 0);
+                let primitive = new xt3d.WallObject.CircleDiffWallPrimitive(position, {
+                    radius: 800,
+                    wallHeight: 200,
+                    slips: 128,
+                    speed: 20,
+                    wallColor: Cesium.Color.AQUA
+                });
+                this.viewer.scene.primitives.add(primitive);
+
+
+                position = Cesium.Cartesian3.fromDegrees(108, 32.01, 150);
+                primitive = new xt3d.WallObject.CircleDiffWallPrimitive(position, {
+                    radius: 800,
+                    wallHeight: 200,
+                    slips: 128,
+                    speed: 20,
+                    wallColor: Cesium.Color.LIME
+                });
+                this.viewer.scene.primitives.add(primitive);
+
+
+                position = Cesium.Cartesian3.fromDegrees(108.01, 32.005, 300);
+                primitive = new xt3d.WallObject.CircleDiffWallPrimitive(position, {
+                    radius: 800,
+                    wallHeight: 200,
+                    slips: 128,
+                    speed: 20,
+                    wallColor: Cesium.Color.YELLOW
+                });
+                this.viewer.scene.primitives.add(primitive);
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1677123.3956089206,
+                        y: 5153744.001212728,
+                        z: 3360188.948894433
+                    },
+                    orientation: {
+                        heading: 5.761971963369986,
+                        pitch: -0.8194235678234061,
+                        roll: 6.283163654276189
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

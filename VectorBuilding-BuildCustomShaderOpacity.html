@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>cesium|xt3d</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuildData();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //加载建筑物数据
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+                    url: "https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/sz_ns2/tileset.json"
+                }));
+
+                tileset.readyPromise.then((tileset) => {
+                    let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                        color: '0.2, 0.5, 1.0, 1.0', //颜色 rgba 浮点型 
+                        glowRange: true, //是否显示光环
+                        glowRangeHeight: '100.0', //光环范围 浮点型
+                    });
+                }).otherwise(function(error) {
+                    console.error(error);
+                });
+                this.viewer.flyTo(tileset);
+            },
+
+            //设置初始视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2393550.3357974524,
+                        y: 5386606.88313247,
+                        z: 2429438.0059398483
+                    },
+                    orientation: {
+                        heading: 4.17468662924847,
+                        pitch: -0.4589809883380527,
+                        roll: 6.280914142666823
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

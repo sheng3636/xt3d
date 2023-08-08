@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>光晕线</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+
+                this.loadBuildData();
+                this.loadLines();
+                this.loadHelius();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                // 亮度设置
+                var stages = this.viewer.scene.postProcessStages;
+                this.viewer.scene.brightness = this.viewer.scene.brightness || stages.add(Cesium.PostProcessStageLibrary.createBrightnessStage());
+                this.viewer.scene.brightness.enabled = true;
+                this.viewer.scene.brightness.uniforms.brightness = 2;
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //加载建筑物数据
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+                    url: "http://www.xt3d.cn/data/country_build/chengdu_ajust_clip/tileset.json"
+                }));
+
+                // tileset.readyPromise.then((tileset) => {
+                //     let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                //         color: '0.2, 0.5, 1.0, 1.0', //颜色 rgba 浮点型 
+                //         glowRange: true, //是否显示光环
+                //         glowRangeHeight: '100.0', //光环范围 浮点型
+                //     });
+                // }).otherwise(function(error) {
+                //     console.error(error);
+                // });
+            },
+
+            //加载线数据
+            loadLines() {
+                var promise = Cesium.GeoJsonDataSource.load('/static/data/chendu-daolu.json');
+                promise.then((dataSource) => {
+                    this.viewer.dataSources.add(dataSource);
+                    let values = dataSource.entities.values;
+
+                    for (var i = 0; i < values.length; i++) {
+                        var line = values[i];
+                        line.polyline.material = new Cesium.PolylineGlowMaterialProperty({ //设置Glow材质
+                            color: Cesium.Color.fromCssColorString('#FF4500'),
+                            glowPower: 0.2,
+                            opacity: 0.8,
+                        });
+                        line.polyline.width = 12;
+                    }
+                }).otherwise(function(error) {
+                    console.log(error)
+                });
+            },
+
+            //添加水体数据
+            loadHelius() {
+                fetch("/static/data/chendu-heliu.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    let coordinates, positions;
+                    features.map(feature => {
+                        coordinates = feature.geometry.coordinates[0];
+                        positions = this.coordinatesToPositions(coordinates);
+                        this.addHeliu(positions);
+                    })
+                })
+            },
+
+            //添加一条河流
+            addHeliu(positions) {
+                let waterPrimitive = new xt3d.PolygonObject.WaterPrimitive(positions, {
+                    baseWaterColor: Cesium.Color.AQUA.withAlpha(0.3),
+                    normalMap: '/static/images/polygon/waterNormalsSmall.jpg',
+                    frequency: 1000.0,
+                    animationSpeed: 0.03,
+                    amplitude: 10.0,
+                    specularIntensity: 5,
+                });
+                this.viewer.scene.primitives.add(waterPrimitive); //添加到场景 
+            },
+
+            //坐标串转为笛卡尔坐标数组
+            coordinatesToPositions(coordinates) {
+                let positions = [];
+                coordinates.map(c => {
+                    positions.push(Cesium.Cartesian3.fromDegrees(c[0], c[1], 0))
+                });
+                return positions;
+            },
+
+            //设置视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -1337790.7881094853,
+                        y: 5330396.094162445,
+                        z: 3231621.5380446212
+                    },
+                    orientation: {
+                        heading: 6.010538181825211,
+                        pitch: -0.6819480997380261,
+                        roll: 6.282163306739159,
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

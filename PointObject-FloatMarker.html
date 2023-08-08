@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>cesium|xt3d</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.addFloatMarkers();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //添加FloatMarker
+            addFloatMarkers() {
+                let position = Cesium.Cartesian3.fromDegrees(108.95850065559718, 34.21944714452281, 15);
+                let fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.95909494633781, 34.219537169430744, 15);
+                fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.95966728565314, 34.219028011091496, 15);
+                fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.95941801151338, 34.21876373222085, 15);
+                fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.95976447924141, 34.219705361971975, 15);
+                fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.9604459582188, 34.219064731198834, 15);
+                fMarker = new xt3d.PointObject.FloatMarker(this.viewer, position, {
+                    image: "/static/images/poi/float.png", //图标
+                    lineHeight: 16, //线高
+                    bounceHeight: 1, //高度
+                    increment: 0.008, //增量
+                });
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 20);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1715488.629630625,
+                        y: 4993401.336087519,
+                        z: 3566444.367892081
+                    },
+                    orientation: {
+                        heading: 6.0670220338065795,
+                        pitch: -0.4462883152360564,
+                        roll: 6.282442495722684
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

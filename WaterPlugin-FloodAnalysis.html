@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>淹没效果</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="start()">开始</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true; //默认为false 
+            },
+
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1219553.1426580662,
+                        y: 5088879.774137929,
+                        z: 3650395.3915013713
+                    },
+                    orientation: {
+                        heading: 4.822504848967739,
+                        pitch: -0.785644703783916,
+                        roll: 6.279535082818018
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        let ps = [{
+            x: -1208904.4948378925,
+            y: 5087786.643569729,
+            z: 3645099.438981848
+        }, {
+            x: -1213974.433907447,
+            y: 5086491.813731489,
+            z: 3644903.6954907263
+        }, {
+            x: -1214440.6903185616,
+            y: 5084044.615386633,
+            z: 3649546.881213718
+        }, {
+            x: -1209084.151379822,
+            y: 5084835.208335386,
+            z: 3649896.04975294
+        }];
+
+        let color = Cesium.Color.fromCssColorString("#007FFF").withAlpha(0.3);
+        let floodAnalysis = new xt3d.WaterPlugin.FloodAnalysis(xt3dInit.viewer, ps, {
+            color: color, //颜色
+            minHeight: 2900, //最大值
+            maxHeight: 3900, //最小值
+            speed: 100 //速度
+        });
+
+        function start() {
+            floodAnalysis.start();
+        }
+    </script>
+</body>
+
+</html>

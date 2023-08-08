@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>鼠标按下效果</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+                let mouseDownView = new xt3d.SceneDominate.MouseDownView(this.viewer);
+                // mouseDownView.remove();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false, //关闭地球光环
+                    orderIndependentTranslucency: false,
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+            },
+
+            //设置默认视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1244121.9426581487,
+                        y: 5085439.458440664,
+                        z: 3654926.4730463736
+                    },
+                    orientation: {
+                        heading: 4.788047581496534,
+                        pitch: -0.4322797689024851,
+                        roll: 6.27971882399201
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

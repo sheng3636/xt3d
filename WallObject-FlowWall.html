@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>高级动态墙</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                // this.setView();
+                this.addWall1();
+                this.addWall2();
+                this.addRegion();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //墙体1
+            addWall1() {
+                let ps = [{
+                    x: -2474889.688032698,
+                    y: 4824960.400990192,
+                    z: 3346614.48985844
+                }, {
+                    x: -2474959.112277405,
+                    y: 4825272.063037195,
+                    z: 3346117.112050627
+                }, {
+                    x: -2474939.1810194487,
+                    y: 4825404.969460795,
+                    z: 3345941.373409761
+                }, {
+                    x: -2474820.374826624,
+                    y: 4825655.0848918725,
+                    z: 3345670.0249841893
+                }, {
+                    x: -2474843.7659115475,
+                    y: 4825747.278287367,
+                    z: 3345521.071249182
+                }, {
+                    x: -2475040.2968019145,
+                    y: 4825831.891434628,
+                    z: 3345254.417419442
+                }, {
+                    x: -2475473.209816208,
+                    y: 4825960.80360176,
+                    z: 3344752.4666252937
+                }, {
+                    x: -2477532.4158931,
+                    y: 4824887.94326429,
+                    z: 3344775.4429073003
+                }, {
+                    x: -2477541.3292041654,
+                    y: 4824715.925108329,
+                    z: 3345015.3520040256
+                }, {
+                    x: -2477729.6032597255,
+                    y: 4824404.662660069,
+                    z: 3345322.7504442455
+                }, {
+                    x: -2477696.14832603,
+                    y: 4824303.597160613,
+                    z: 3345492.131472891
+                }, {
+                    x: -2477338.4608761664,
+                    y: 4824051.183092954,
+                    z: 3346116.7295456477
+                }, {
+                    x: -2477102.505171502,
+                    y: 4823769.316606554,
+                    z: 3346693.825706187
+                }, {
+                    x: -2474887.535021391,
+                    y: 4824959.289977459,
+                    z: 3346617.6624656776
+                }, {
+                    x: -2474889.688032698,
+                    y: 4824960.400990192,
+                    z: 3346614.48985844
+                }];
+
+                let wall = new xt3d.WallObject.FlowWall(
+                    this.viewer,
+                    ps, {
+                        wallHeight: 800,
+                        wallColor: Cesium.Color.LIME,
+                        duration: 1000,
+                        materialType: xt3d.WallObject.MaterialTypes.LINEFLOW,
+                    }
+                );
+
+                ps = [ {
+                    x: -2478447.17080598,
+                    y: 4831557.146644312,
+                    z: 3334506.1226337403
+                }, {
+                    x: -2480787.0201762747,
+                    y: 4821660.851263834,
+                    z: 3346990.726326899
+                }, {
+                    x: -2474062.5162910437,
+                    y: 4823110.367259704,
+                    z: 3349859.5029249857
+                }, {
+                    x: -2467178.109099282,
+                    y: 4827663.208404705,
+                    z: 3348386.2184367767
+                }, {
+                    x: -2468122.4976675673,
+                    y: 4836466.567306413,
+                    z: 3335041.7993537257
+                }, {
+                    x: -2478447.17080598,
+                    y: 4831557.146644312,
+                    z: 3334506.1226337403
+                }];
+                wall = new xt3d.WallObject.FlowWall(
+                    this.viewer,
+                    ps, {
+                        wallHeight: 800,
+                        wallColor: Cesium.Color.RED,
+                        duration: 1000,
+                        materialType: xt3d.WallObject.MaterialTypes.LINEARGRADIENT,
+                        colorStops: [{
+                            stop: 0,
+                            color: "rgba(220,168,24,0.5)"
+                        }, {
+                            stop: 1,
+                            color: "rgba(255,0,0,0.5)"
+                        }]
+                    }
+                );
+            },
+
+            //墙体2
+            addWall2() {
+                let ps = [{
+                    x: -2472746.317645412,
+                    y: 4827440.497417323,
+                    z: 3344635.0383727686
+                }, {
+                    x: -2473924.83663286,
+                    y: 4826329.797883995,
+                    z: 3345361.4869923065
+                }, {
+                    x: -2473227.8781009037,
+                    y: 4825844.349650365,
+                    z: 3346568.7831696123
+                }, {
+                    x: -2471128.5540824533,
+                    y: 4826930.959796889,
+                    z: 3346552.6072027795
+                }, {
+                    x: -2471138.95000219,
+                    y: 4827726.807578295,
+                    z: 3345404.4772703657
+                }, {
+                    x: -2472746.317645412,
+                    y: 4827440.497417323,
+                    z: 3344635.0383727686
+                }];
+
+                let wall = new xt3d.WallObject.FlowWall(
+                    this.viewer,
+                    ps, {
+                        wallHeight: 800,
+                        wallColor: Cesium.Color.YELLOW,
+                        duration: 1000,
+                        materialType: xt3d.WallObject.MaterialTypes.SCROLL,
+                    }
+                );
+            },
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                    x: -1573921.5764383215,
+                    y: 5327789.140594587,
+                    z: 3122883.3852528557
+                    },
+                    orientation: {
+                        heading: 2.437181922085081,
+                        pitch: -0.47972457133242763,
+                        roll: 0.0021918829067129053
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            //行政边界  
+            addRegion() {
+                fetch("/static/data/hefei_bianjie.json")
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(res => {
+                        let coordinates = res.geometry.coordinates[0];
+                        let ps = this.coordinateToPositions(coordinates);
+                        let regionWall = new xt3d.WallObject.FlowWall(this.viewer, ps, {
+                            wallHeight: 800,
+                            wallColor: Cesium.Color.YELLOW,
+                            duration: 1000,
+                            materialType: xt3d.WallObject.MaterialTypes.LINEFLOW,
+                        });
+                    });
+            },
+
+            //坐标转换
+            coordinateToPositions(coordinates) {
+                let positions = [];
+                coordinates.map(c => {
+                    positions.push(Cesium.Cartesian3.fromDegrees(c[0], c[1], 0));
+                });
+                return positions;
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2476803.194269737,
+                        y: 4822850.889125045,
+                        z: 3364779.000587992
+                    },
+                    orientation: {
+                        heading: 3.384793240534525,
+                        pitch: -0.3895587871147317,
+                        roll: 6.282401674798557
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

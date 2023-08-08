@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>边界围栏</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+    <script src='./libs/turf.min.js'></script>
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+                // this.load3dtiles();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false, //关闭地球光环
+                    orderIndependentTranslucency: false,
+                    contextOptions: {
+                        webgl: {
+                            alpha: true
+                        }
+                    }
+                });
+
+                //场景设置
+                this.viewer.scene.skyBox.show = false;
+                this.viewer.scene.backgroundColor = new Cesium.Color(0.0, 0.0, 0.0, 0.0);
+                this.viewer.scene.sun.show = false; //隐藏太阳
+                this.viewer.scene.moon.show = false; //隐藏月亮 
+
+
+                //地球设置
+                let globe = this.viewer.scene.globe;
+                globe.depthTestAgainstTerrain = true;
+                globe.showGroundAtmosphere = false;
+                globe.baseColor = Cesium.Color.TRANSPARENT;
+                globe.translucency.enabled = true;
+                globe.undergroundColor = undefined;
+                this.viewer.imageryLayers.removeAll(true); //删除所有底图  
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+                let customBgImage = new xt3d.SceneDominate.CustomBgImage(this.viewer, "/static/images/20211124161941.png");
+            },
+
+            //底面圆
+            addBottomPolygon() {
+                let position = [
+                    [121.92103025110953, 40.89734335293406, 0],
+                    [121.9225766718703, 40.894839782489825, 0],
+                    [121.92391417504646, 40.895374538393305, 0],
+                    [121.92358544934727, 40.89587226364337, 0],
+                    [121.9268629430762, 40.89708418197949, 0],
+                    [121.92549224786829, 40.899278965933256, 0],
+                    [121.92255195684477, 40.8981503642774, 0],
+                    [121.92259995564194, 40.89792641051201, 0]
+                ];
+                let ps = [];
+                position.forEach(item => {
+                    ps.push(Cesium.Cartesian3.fromDegrees(item[0], item[1], item[2]));
+                })
+
+                this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: ps,
+                        height: -2,
+                        extrudedHeight: -1.9,
+                        material: Cesium.Color.fromCssColorString("#05fbf6").withAlpha(0.4)
+                    }
+                })
+            },
+
+            //墙体
+            addWall() {
+                let position = [
+                    [121.92103025110953, 40.89734335293406, -20],
+                    [121.9225766718703, 40.894839782489825, -20],
+                    [121.92391417504646, 40.895374538393305, -20],
+                    [121.92358544934727, 40.89587226364337, -20],
+                    [121.9268629430762, 40.89708418197949, -20],
+                    [121.92549224786829, 40.899278965933256, -20],
+                    [121.92255195684477, 40.8981503642774, -20],
+                    [121.92259995564194, 40.89792641051201, -20],
+                    [121.92103025110953, 40.89734335293406, -20],
+                ];
+                let ps = [];
+                position.forEach(item => {
+                    ps.push(Cesium.Cartesian3.fromDegrees(item[0], item[1], item[2]));
+                });
+
+                let wall = new xt3d.WallObject.FlowWall(
+                    this.viewer,
+                    ps, {
+                        wallHeight: 80,
+                        wallColor: Cesium.Color.fromCssColorString("#05fbf6").withAlpha(0.6),
+                        materialType: xt3d.WallObject.MaterialTypes.BaseGradient,
+                    }
+                );
+            },
+
+
+
+            //加载3dtiles数据
+            load3dtiles() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/3dtiles/gongchang/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.setView();
+                        this.addBottomPolygon();
+                        this.addWall();
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置默认视角
+            setView() {
+                this.viewer.scene.camera.flyTo({
+                    destination: {
+                        x: -2552741.949497928,
+                        y: 4097961.1985365124,
+                        z: 4154156.8020691318
+                    },
+                    orientation: {
+                        heading: 2.2825784454346065,
+                        pitch: -0.4656422218647047,
+                        roll: 0.002812490471258755
+                    },
+                    duration: 3
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

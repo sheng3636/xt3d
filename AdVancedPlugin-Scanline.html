@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>扫描线</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuildData();
+                this.addScanline();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //添加扫描圆
+            addScanline() {
+                let position = Cesium.Cartesian3.fromDegrees(104.06189741822169, 30.654531056877673, 13.315777390549759);
+                let scanline = new xt3d.AdvancedPlugin.Scanline(this.viewer, position, {
+                    color: Cesium.Color.YELLOW,
+                    radius: 1200
+                });
+            },
+
+            //加载建筑物数据
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+                    url: "https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/chengdu/tileset.json"
+                }));
+                tileset.readyPromise.then((tileset) => {
+                    let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                        color: '0.2, 0.5, 1.0, 1.0', //颜色 rgba 浮点型 
+                        glowRange: true, //是否显示光环
+                        glowRangeHeight: '100.0', //光环范围 浮点型
+                    });
+                }).otherwise(function(error) {
+                    console.error(error);
+                });
+            },
+
+            //设置视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -1335579.228143601,
+                        y: 5328935.263663113,
+                        z: 3232288.29351318
+                    },
+                    orientation: {
+                        heading: 5.848404708640302,
+                        pitch: -0.6704827782244815,
+                        roll: 6.281601192691522
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

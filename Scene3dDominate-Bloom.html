@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>场景泛光</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        .form-container span {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="form-container" id="formContainer">
+        <span>contrast：{{contrast}}</span>
+        <el-slider v-model="contrast" :step="0.02" :show-tooltip="true" @input="valueChange" :min="0" :max="500"></el-slider>
+        <span>brightness：{{brightness}}</span>
+        <el-slider v-model="brightness" :show-tooltip="true" @input="valueChange" :min="-10" :max="20" :step="0.2"></el-slider>
+        <span>delta：{{delta}}</span>
+        <el-slider v-model="delta" :step="0.02" :show-tooltip="true" @input="valueChange" :min="-10" :max="20"></el-slider>
+        <span>sigma：{{sigma}}</span>
+        <el-slider v-model="sigma" :show-tooltip="true" @input="valueChange" :min="0" :max="5" :step="0.02"></el-slider>
+        <span>stepSize：{{stepSize}}</span>
+        <el-slider v-model="stepSize" :step="0.02" :show-tooltip="true" @input="valueChange" :min="0" :max="20"></el-slider>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+
+
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件
+                // 亮度设置
+                var stages = this.viewer.scene.postProcessStages;
+                this.viewer.scene.brightness =
+                    this.viewer.scene.brightness ||
+                    stages.add(Cesium.PostProcessStageLibrary.createBrightnessStage());
+                this.viewer.scene.brightness.enabled = true;
+                this.viewer.scene.brightness.uniforms.brightness = Number(2);
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/house3dtiles/house/tileset.json" // "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 20);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1640818.8972526276,
+                        y: 5467689.9927234035,
+                        z: 2837147.4144279435
+                    },
+                    orientation: {
+                        heading: 0.8563545130120094,
+                        pitch: -0.9895168422798717,
+                        roll: 0.0037000598964986864
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    brightness: -0.2,
+                    contrast: 182.68,
+                    delta: -0.32,
+                    sigma: 1.44,
+                    stepSize: 1.78
+                }
+            },
+            methods: {
+                //绑定的值改变
+                valueChange() {
+                    let bloom = xt3dInit.viewer.scene.postProcessStages.bloom;
+                    bloom.enabled = true;
+                    bloom.uniforms.glowOnly = false;
+                    bloom.uniforms.contrast = Number(this.contrast);
+                    bloom.uniforms.brightness = Number(this.brightness);
+                    bloom.uniforms.delta = Number(this.delta);
+                    bloom.uniforms.sigma = Number(this.sigma);
+                    bloom.uniforms.stepSize = Number(this.stepSize);
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

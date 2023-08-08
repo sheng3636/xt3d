@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>发光柱体</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addCylinderGlow();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //添加光柱
+            addCylinderGlow() {
+                let position = Cesium.Cartesian3.fromDegrees(108, 32, 0);
+                let cylinderGlow = new xt3d.AdvancedPlugin.CylinderGlow(this.viewer, position, {
+                    radius: 1300, //半径
+                    cylinderHeight: 10000, //高度
+                    fillColor: Cesium.Color.YELLOW, //填充色
+                    bottomCircleHeight: 10, //底部圆高度
+                    bottomInnerCircleColor: Cesium.Color.YELLOW, //内圆颜色
+                    bottomOuterCircleColor: Cesium.Color.YELLOW, //外圆颜色
+                    TexureUrl: "/data.xt3d.cn/assets/images/cylinderglow" //材质路径
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.08, 32, 0);
+                cylinderGlow = new xt3d.AdvancedPlugin.CylinderGlow(this.viewer, position, {
+                    radius: 1300,
+                    cylinderHeight: 10000,
+                    fillColor: Cesium.Color.CYAN,
+                    bottomCircleHeight: 10,
+                    bottomInnerCircleColor: Cesium.Color.CYAN,
+                    bottomOuterCircleColor: Cesium.Color.CYAN,
+                    TexureUrl: "/data.xt3d.cn/assets/images/cylinderglow"
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.08, 32.08, 0);
+                cylinderGlow = new xt3d.AdvancedPlugin.CylinderGlow(this.viewer, position, {
+                    radius: 1300,
+                    cylinderHeight: 10000,
+                    fillColor: Cesium.Color.RED,
+                    bottomCircleHeight: 10,
+                    bottomInnerCircleColor: Cesium.Color.RED,
+                    bottomOuterCircleColor: Cesium.Color.RED,
+                    TexureUrl: "/data.xt3d.cn/assets/images/cylinderglow"
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108, 32.08, 0);
+                cylinderGlow = new xt3d.AdvancedPlugin.CylinderGlow(this.viewer, position, {
+                    radius: 1300,
+                    cylinderHeight: 10000,
+                    fillColor: Cesium.Color.LIME,
+                    bottomCircleHeight: 10,
+                    bottomInnerCircleColor: Cesium.Color.LIME,
+                    bottomOuterCircleColor: Cesium.Color.LIME,
+                    TexureUrl: "/data.xt3d.cn/assets/images/cylinderglow"
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(108.08, 32.18, 0);
+                cylinderGlow = new xt3d.AdvancedPlugin.CylinderGlow(this.viewer, position, {
+                    radius: 1300,
+                    cylinderHeight: 10000,
+                    fillColor: Cesium.Color.BLUE,
+                    bottomCircleHeight: 10,
+                    bottomInnerCircleColor: Cesium.Color.LIME,
+                    bottomOuterCircleColor: Cesium.Color.CYAN,
+                    TexureUrl: "/data.xt3d.cn/assets/images/cylinderglow"
+                });
+            },
+
+            //设置默认视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1708907.2047925794,
+                        y: 5162559.015194856,
+                        z: 3362222.2184426477
+                    },
+                    orientation: {
+                        heading: 5.302497923351305,
+                        pitch: -0.5804019694718008,
+                        roll: 0.000008089460393101433
+                    },
+                    duration: 3
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

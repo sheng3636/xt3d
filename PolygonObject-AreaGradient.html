@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>区域渐变</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+                this.colors = this.generateColors();
+                this.loadRegions();
+            },
+
+            //颜色
+            generateColors() {
+                return [{
+                    red: 0.9241914821323007,
+                    green: 0.14811147609725595,
+                    blue: 0.10094762383960187,
+                    alpha: 1
+                },   {
+                    red: 0.7963780285790563,
+                    green: 0.6395023239310831,
+                    blue: 0.9787364862859249,
+                    alpha: 1
+                },   {
+                    red: 0.4586647879332304,
+                    green: 0.430744196055457,
+                    blue: 0.502092931419611,
+                    alpha: 1
+                },   {
+                    red: 0.9653698855545372,
+                    green: 0.8546239410061389,
+                    blue: 0.51183609245345,
+                    alpha: 1
+                },   {
+                    red: 0.4312268609646708,
+                    green: 0.1864424708765,
+                    blue: 0.05196451395750046,
+                    alpha: 1
+                },   {
+                    red: 0.3777390772011131,
+                    green: 0.8024065932258964,
+                    blue: 0.0040897647850215435,
+                    alpha: 1
+                },   {
+                    red: 0.8198004397563636,
+                    green: 0.28089828067459166,
+                    blue: 0.6307988537009805,
+                    alpha: 1
+                },   {
+                    red: 0.6834919245447963,
+                    green: 0.2145030931569636,
+                    blue: 0.13857422955334187,
+                    alpha: 1
+                },   {
+                    red: 0.8914629314094782,
+                    green: 0.3068999752867967,
+                    blue: 0.13412595400586724,
+                    alpha: 1
+                },   {
+                    red: 0.6117538032121956,
+                    green: 0.8942867759615183,
+                    blue: 0.044336034916341305,
+                    alpha: 1
+                },   {
+                    red: 0.6212216904386878,
+                    green: 0.8808413927908987,
+                    blue: 0.8357504867017269,
+                    alpha: 1
+                }]
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = false; //默认为false  
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件 
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //区域
+            loadRegions() {
+                fetch("/static/data/huaihai.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach((item, index) => {
+                        this.addRegion(item, index);
+                    });
+                })
+            },
+
+            addRegion(feature, index) {
+                let degreesArrayHeights = this.getDegreesArrayHeights(feature);
+                let height = 10000 * Math.random();
+                let polygon = new Cesium.PolygonGeometry({
+                    polygonHierarchy: new Cesium.PolygonHierarchy(
+                        Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights)),
+                    perPositionHeight: true,
+                    extrudedHeight: height,
+                    vertexFormat: Cesium.VertexFormat.ALL
+                });
+                let geometry = Cesium.PolygonGeometry.createGeometry(polygon);
+                //primitive方式
+                let instance = new Cesium.GeometryInstance({
+                    geometry: geometry
+                });
+
+                this.viewer.scene.primitives.add(new Cesium.Primitive({
+                    geometryInstances: instance,
+                    appearance: new xt3d.PolygonObject.PrimitiveGradientAppearance(this.colors[index]),
+                }));
+
+                let center = turf.center(feature);
+                let point = center.geometry.coordinates;
+                let position = Cesium.Cartesian3.fromDegrees(point[0], point[1], height);
+                this.addLabel(position, feature.properties.Name);
+            },
+
+            //添加标签
+            addLabel(position, label) {
+                this.viewer.entities.add({
+                    position: position,
+                    label: {
+                        text: label,
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 60px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 9000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //获取坐标串
+            getDegreesArrayHeights(feature) {
+                let degreesArrayHeights = [];
+                let coordinates;
+                if (feature.geometry.type == "MultiPolygon") {
+                    coordinates = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type == "Polygon") {
+                    coordinates = feature.geometry.coordinates[0];
+                }
+                //坐标串转为需要的格式[x,y,z,x,y,z....]
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    degreesArrayHeights.push(element[0]);
+                    degreesArrayHeights.push(element[1]);
+                    degreesArrayHeights.push(100);
+                }
+                return degreesArrayHeights;
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2659793.1084915083,
+                        y: 5005564.655194677,
+                        z: 3457595.8612058493
+                    },
+                    orientation: {
+                        heading: 6.07963394571652,
+                        pitch: -0.756689752527441,
+                        roll: 0.0021174860976609367
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>行驶方向</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initAnimate();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                let imageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+                    url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                });
+
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: imageryProvider
+                });
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            initAnimate() {
+                let p1 = [
+                    [111.37995855308192, 26.37400570021948],
+                    [111.3877192968057, 26.37186809274635],
+                    [111.39331573032993, 26.373823423848776],
+                    [111.39531730317077, 26.376874912607843]
+                ];
+
+                let p2 = [ 
+                    [111.38611524528163, 26.37733643372196],  
+                    [111.38718341108515, 26.371621398565917],  
+                    [111.38306959369217, 26.371448711957818],  
+                    [111.38174028880921, 26.374221973381026]
+                ];
+
+                let start = Cesium.JulianDate.fromDate(new Date(2015, 2, 25, 16));
+                let stop = Cesium.JulianDate.addSeconds(
+                    start,
+                    30,
+                    new Cesium.JulianDate()
+                );
+
+
+                //设置时钟属性
+                this.viewer.clock.startTime = start.clone();
+                this.viewer.clock.stopTime = stop.clone();
+                this.viewer.clock.currentTime = start.clone();
+                this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+
+                if (this.viewer.timeline) {
+                    this.viewer.timeline.zoomTo(start, stop);
+                }
+
+                let property = this.createProperty(p1, 200, start);
+                this.addVisualField(property, {
+                    uri: "/static/glb/Cesium_Air.glb",
+                    scale: 1.5,
+                    minimumPixelSize: 24,
+                }, Cesium.Color.YELLOW);
+
+                property = this.createProperty(p2, 2, start);
+                this.addVisualField(property, {
+                    uri: "/static/gltf/redCar.glb",
+                    scale: 0.3,
+                    minimumPixelSize: 24,
+                }, Cesium.Color.LAWNGREEN);
+
+            },
+
+            addVisualField(property, model, color) {
+                let s = new xt3d.SpacePlugin.SectorVisualField(this.viewer, property, {
+                    radius: 100,
+                    color: color
+                });
+
+                let entity = this.viewer.entities.add({
+                    position: property,
+                    orientation: new Cesium.VelocityOrientationProperty(property),
+                    model: model,
+                    path: new Cesium.PathGraphics({
+                        show: true,
+                        width: 3,
+                        leadTime: 0,
+                        trailTime: 30,
+                        material: color,
+                    }),
+                });
+            },
+
+            createProperty(ps, height, start) {
+                let property = new Cesium.SampledPositionProperty();
+                for (let i = 0; i < ps.length; i++) {
+                    const item = ps[i];
+                    let time = Cesium.JulianDate.addSeconds(
+                        start,
+                        i * 10,
+                        new Cesium.JulianDate()
+                    );
+                    let position = Cesium.Cartesian3.fromDegrees(item[0], item[1], height);
+                    property.addSample(time, position);
+                }
+                return property;
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2086010.2650658868,
+                        y: 5325464.186461057,
+                        z: 2815541.1018734756
+                    },
+                    orientation: {
+                        heading: 6.010934642868569,
+                        pitch: -0.644368008485809,
+                        roll: 6.283170246011576
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

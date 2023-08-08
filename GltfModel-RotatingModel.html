@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>模型自旋转</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+
+                let position = Cesium.Cartesian3.fromDegrees(117.220897, 31.833569, 10);
+                let rModel = new xt3d.GltfModel.RotatingModel(this.viewer, position, {
+                    modelUrl: "/static/glb/Cesium_Air.glb",
+                    speed: 0.1
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(117.220897, 31.833879, 15);
+                rModel = new xt3d.GltfModel.RotatingModel(this.viewer, position, {
+                    modelUrl: "/static/glb/pyramid.glb",
+                    speed: -0.5,
+                    scale: 10
+                })
+
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: true,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2481036.87502368,
+                        y: 4823262.975967688,
+                        z: 3344695.295366472
+                    },
+                    orientation: {
+                        heading: 0.1125170896340606,
+                        pitch: -0.49591236958988194,
+                        roll: 0.0003842833485672159
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

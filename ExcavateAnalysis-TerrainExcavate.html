@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>cesium|xt3d</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src='./bbb1.js'></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('Polygon')">绘制开挖</button>
+        <button onclick="clearExcavate()">清除</button>
+        <div class="tip-item">仅支持凸多边形</div>
+    </div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initExcavate();
+                this.initEntityDraw();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: Cesium.createWorldTerrain(),
+                    // terrainProvider: new Cesium.CesiumTerrainProvider({
+                    //     url: "http://data.xtgis.cn/terrain",
+                    //     requestVertexNormals: true
+                    // }),
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //初始化开挖
+            initExcavate() {
+                this.terrainExcavate = new xt3d.ExcavateAnalysis.TerrainExcavate(this.viewer);
+            },
+
+            //初始化绘制
+            initEntityDraw() {
+                this.entityDraw = new xt3d.Map3dTools.EntityDraw(this.viewer);
+                this.entityDraw.DrawEndEvent.addEventListener((result, positions) => {
+                    result.remove();
+                    this.terrainExcavate.add(positions, {
+                        excavateDepth: this.excavateDepth,
+                        bottomImage: '/static/images/excavate/excavate_bottom_min.jpg',
+                        sideImage: '/static/images/excavate/excavate_side_min.jpg'
+                    });
+                })
+            },
+
+            //激活绘制
+            drawActivate(type, excavateDepth) {
+                this.entityDraw.activate(type);
+                this.excavateDepth = excavateDepth;
+                this.clear();
+            },
+
+            //清空
+            clear() {
+                this.terrainExcavate.clear();
+            },
+
+            //设置初始视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2047155.0648887777,
+                        y: 5427911.513159129,
+                        z: 2644869.9468807583
+                    },
+                    orientation: {
+                        heading: 3.0617280509395037,
+                        pitch: -0.8122279167480544,
+                        roll: 0.0002939111051949439
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //绘制
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        //清空
+        function clearExcavate() {
+            xt3dInit.clear();
+        }
+    </script>
+</body>
+
+</html>

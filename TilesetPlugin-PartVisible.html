@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>部分可见</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            max-width: 380px;
+            min-width: 300px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .el-slider__runway {
+            margin: 9px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="form-container" id="formContainer">
+        <div style="margin:10px 0px;">
+            <el-checkbox @change="checkChange" v-model="checked">开启部分模型可见</el-checkbox>
+        </div>
+        <div>
+            <span>不可见模型透明度：{{alpha}}</span>
+            <el-slider v-model="alpha" :disabled="!checked" :step="0.02" :show-tooltip="true" @input="valueChange" :min="0" :max="1"></el-slider>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1715048.5015330964,
+                        y: 4993428.051876499,
+                        z: 3566901.757189067
+                    },
+                    orientation: {
+                        heading: 1.9744144158894645,
+                        pitch: -0.735331262511083,
+                        roll: 0.0038642719425885375
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 10);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+
+
+        //添加显示区域 
+        let ds = [ //要显示的区域经纬度数组
+            [108.95834323038942, 34.220279142458054, -10],
+            [108.95835048213736, 34.21925607159882, -10],
+            [108.95911717724837, 34.21921784664639, -10],
+            [108.95910223018241, 34.21952154556355, -10],
+            [108.95976802391588, 34.219519367132946, -10],
+            [108.95980046052249, 34.22025698002478, -10]
+        ];
+        let degreesArrayHeights = getDegreesArrayHeights(ds);
+        let positions = Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights);
+        let partVisible = new xt3d.TilesetPlugin.PartVisible(xt3dInit.viewer);
+        partVisible.addVisibleRegion(positions);
+
+
+        //格式转换
+        function getDegreesArrayHeights(ds) {
+            let degreesArrayHeights = [];
+            ds.forEach(item => {
+                degreesArrayHeights.push(item[0]);
+                degreesArrayHeights.push(item[1]);
+                degreesArrayHeights.push(item[2]);
+            });
+            return degreesArrayHeights;
+        }
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    alpha: 1,
+                    checked: true
+                }
+            },
+            methods: {
+                valueChange() {
+                    partVisible.setInvisibleColorAlpha(this.alpha);
+                },
+
+                checkChange() {
+                    if (this.checked) {
+                        partVisible.activate();
+                    } else {
+                        partVisible.deactivate();
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

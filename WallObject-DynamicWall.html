@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>普通动态墙</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                // this.load3dtiles();
+                this.setView();
+                this.addRedDynamicWall();
+                this.addGreenDynamicWall();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+
+            },
+
+
+
+            addGreenDynamicWall() {
+                let positions = [{
+                    x: -1573635.6071447732,
+                    y: 5327876.906231757,
+                    z: 3122878.928250711
+                }, {
+                    x: -1573943.459924136,
+                    y: 5327645.711941848,
+                    z: 3123094.5285245045
+                }, {
+                    x: -1574009.0770215357,
+                    y: 5327673.147886553,
+                    z: 3123045.671607318
+                }, {
+                    x: -1574013.902494587,
+                    y: 5327679.950759558,
+                    z: 3123022.801053999
+                }, {
+                    x: -1573831.4438271062,
+                    y: 5327916.489753731,
+                    z: 3122723.9583727047
+                }, {
+                    x: -1573635.4421579556,
+                    y: 5327876.21513823,
+                    z: 3122880.20724414
+                }]
+                let greenDynamicWall = new xt3d.WallObject.DynamicWall(this.viewer, positions, {
+                    wallHeight: 20,
+                    wallColor: Cesium.Color.fromCssColorString("#0BFF0D")
+                });
+            },
+
+            addRedDynamicWall() {
+                let positions = [{
+                    x: -1573733.8681838464,
+                    y: 5327891.690280139,
+                    z: 3122807.3135355837
+                }, {
+                    x: -1573844.670695646,
+                    y: 5327784.092327943,
+                    z: 3122927.0154715613
+                }, {
+                    x: -1573921.5764383215,
+                    y: 5327789.140594587,
+                    z: 3122883.3852528557
+                }, {
+                    x: -1573829.0323274087,
+                    y: 5327912.274138674,
+                    z: 3122731.583446209
+                }, {
+                    x: -1573733.6414963433,
+                    y: 5327890.835694463,
+                    z: 3122808.84515286
+                }]
+                let redDynamicWall = new xt3d.WallObject.DynamicWall(this.viewer, positions, {
+                    wallHeight: 30,
+                    wallColor: Cesium.Color.RED
+                });
+            },
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                    x: -1573921.5764383215,
+                    y: 5327789.140594587,
+                    z: 3122883.3852528557
+                    },
+                    orientation: {
+                        heading: 2.437181922085081,
+                        pitch: -0.47972457133242763,
+                        roll: 0.0021918829067129053
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

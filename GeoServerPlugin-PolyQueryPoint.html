@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>面查点</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('Polygon')">绘制面</button>
+        <button onclick="clearResult()">清除结果</button>
+        <!-- <button @click="pickCamera">视角</button> -->
+        <div class="tip-item">在边界内绘制面对象，边界外无数据</div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+
+                this.queryResults = []; //查询结果
+                this.addBoundary();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //构造面
+            generatePolygon(positions) {
+                this.drawPoly = this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: positions,
+                        material: Cesium.Color.RED.withAlpha(0.4),
+                        classificationType: Cesium.ClassificationType.BOTH
+                    },
+                    polyline: {
+                        positions: positions.concat(positions[0]),
+                        clampToGround: true,
+                        width: 1,
+                        material: new Cesium.PolylineDashMaterialProperty({
+                            color: Cesium.Color.YELLOW,
+                        })
+                    }
+                })
+            },
+
+            //面查询
+            queryByPoly(positions) {
+                //geoserver数据服务的地址
+                let url = "http://42.192.134.169:8090/geoserver/xt3d/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=xt3d:querypoint&maxFeatures=50&outputFormat=json"
+                xt3d.GeoServerPlugin.polyQueryPoint(positions, url).then(res => {
+                    this.handleQueryResult(res);
+                })
+            },
+
+            //处理查询结果
+            handleQueryResult(res) {
+                //如果查询成功 那么返回的结果应该是一个geojson对象 类型为FeatureCollection
+                res.features.forEach(item => {
+                    let coordinates = item.geometry.coordinates;
+                    const e = this.viewer.entities.add({
+                        position: Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1], 0),
+                        billboard: {
+                            image: "/static/images/marker/mark3.png",
+                            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                            height: 44,
+                            width: 32,
+                        }
+                    });
+                    this.queryResults.push(e);
+                })
+            },
+
+            //清除查询结果
+            clearQueryResult() {
+                this.queryResults.forEach(item => {
+                    this.viewer.entities.remove(item);
+                });
+                this.queryResults = [];
+                this.viewer.entities.remove(this.drawPoly);
+            },
+
+            //添加点数据的边界
+            addBoundary() {
+                //geoserver数据服务的地址
+                let url = "http://42.192.134.169:8090/geoserver/xt3d/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=xt3d%3Aquerypoint&maxFeatures=50&outputFormat=application%2Fjson"
+
+                //发送get请求
+                fetch(url).then(res => {
+                    return res.json();
+                }).then(res => {
+                    let bbox = turf.bbox(res);
+                    let feature = turf.bboxPolygon(bbox);
+                    feature = turf.buffer(feature, 1000, {
+                        units: 'meters'
+                    });
+                    let geometry = feature.geometry; //取要素的几何对象 
+                    let coordinates;
+                    let pointArr = [];
+                    if (geometry.type == "MultiPolygon") {
+                        coordinates = geometry.coordinates[0][0];
+                    } else if (geometry.type == "Polygon") {
+                        coordinates = geometry.coordinates[0];
+                    }
+
+                    for (let i = 0; i < coordinates.length; i++) {
+                        const element = coordinates[i];
+                        pointArr.push(element[0]);
+                        pointArr.push(element[1]);
+                        pointArr.push(0);
+                    }
+                    this.viewer.entities.add({
+                        polygon: {
+                            hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights(pointArr),
+                            material: Cesium.Color.AQUA.withAlpha(0.2),
+                            classificationType: Cesium.ClassificationType.BOTH
+                        },
+                        polyline: {
+                            positions: Cesium.Cartesian3.fromDegreesArrayHeights(pointArr),
+                            material: new Cesium.PolylineDashMaterialProperty({
+                                color: Cesium.Color.YELLOW.withAlpha(0.2),
+                            }),
+                        }
+                    });
+
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1643515.3101493272,
+                        y: 5413631.788991673,
+                        z: 2941396.9764366997
+                    },
+                    orientation: {
+                        heading: 6.117840062895327,
+                        pitch: -0.9635859408702814,
+                        roll: 6.282387780506557
+                    }
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //绘制工具
+        let drawTool = new xt3d.Map3dTools.EntityDraw(xt3dInit.viewer);
+        drawTool.DrawEndEvent.addEventListener((result, positions, drawType) => {
+            result.remove();
+            //处理绘制结果
+            //清除上一次结果
+            xt3dInit.clearQueryResult();
+            xt3dInit.generatePolygon(positions);
+            xt3dInit.queryByPoly(positions);
+        })
+
+        //激活绘制工具
+        function drawActivate(type) { //type in Point Polyline Polygon
+            drawTool.activate(type);
+        }
+
+        //清除结果
+        function clearResult() {
+            xt3dInit.clearQueryResult();
+        }
+    </script>
+</body>
+
+</html>

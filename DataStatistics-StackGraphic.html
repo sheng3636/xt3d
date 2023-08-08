@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>堆叠图形</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadData();
+                this.initPopup();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    }),
+                });
+            },
+
+            loadData() {
+                //城市坐标
+                this.cityPosition = [{
+                    name: '亳州',
+                    jwd: [116.203602, 33.496075]
+                }, {
+                    name: '商丘',
+                    jwd: [115.871509, 34.297084]
+                }, {
+                    name: '淮北',
+                    jwd: [116.688413, 33.689214]
+                }, {
+                    name: '宿州',
+                    jwd: [117.234682, 33.740035]
+                }, {
+                    name: '徐州',
+                    jwd: [117.70509, 34.350708]
+                }, {
+                    name: '宿迁',
+                    jwd: [118.559349, 33.807355]
+                }, {
+                    name: '连云港',
+                    jwd: [118.875445, 34.619808]
+                }, {
+                    name: '临沂',
+                    jwd: [118.026908, 35.262767]
+                }, {
+                    name: '枣庄',
+                    jwd: [117.320268, 35.072555]
+                }, {
+                    name: '济宁',
+                    jwd: [116.856599, 35.500232]
+                }, {
+                    name: '菏泽',
+                    jwd: [115.716086, 35.05629]
+                }, ];
+
+                fetch("/static/data/huaihai-jj.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    this.initGraphic(res.data["2015"]);
+                })
+
+                //加载面数据
+                let promise = Cesium.GeoJsonDataSource.load(
+                    "/static/data/huaihai.json"
+                );
+                promise.then((dataSource) => {
+                        this.viewer.dataSources.add(dataSource);
+                        let entities = dataSource.entities.values;
+                        for (let i = 0; i < entities.length; i++) {
+                            let entity = entities[i];
+                            let color = new Cesium.Color.fromRandom({
+                                alpha: 0.5
+                            })
+                            entity.polygon.material = color
+                            entity.polygon.outline = false
+                        }
+                    })
+                    .otherwise(function(error) {
+
+                    });
+            },
+
+            initPopup() {
+                new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas).setInputAction((movement) => {
+                    let pickedFeature = this.viewer.scene.pick(movement.endPosition);
+                    if (this.popup) {
+                        this.popup.remove();
+                        this.popup = undefined;
+                    }
+                    if (Cesium.defined(pickedFeature) && pickedFeature.id) {
+                        pickedFeature = pickedFeature.id
+                        if (pickedFeature.name && pickedFeature.name === 'cylinder') {
+                            this.popup = new xt3d.DataStatistics.Popup(this.viewer, pickedFeature.position._value, pickedFeature.html)
+                        }
+                    }
+
+                }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+            },
+
+            initGraphic(data) {
+                for (let i = 0; i < data.length; i += 1) {
+                    const attr = data[i];
+                    const jwd = this.getJWDByName(attr['name']);
+
+                    const num1 = attr['第一产业'];
+                    const num2 = attr['第二产业'];
+                    const num3 = attr['第三产业'];
+                    const numall = Number(num1 + num2 + num3).toFixed(2);
+                    const html = `${attr['name']}<br/>
+                        <span style="color:#63AEFF">第一产业：${num1}</span><br/>
+                        <span style="color:#FFB861">第二产业：${num2}</span><br/>
+                        <span style="color:#FF6D5D">第三产业：${num3}</span>`;
+
+                    let height1 = Math.floor(num1 * 10);
+                    let height2 = Math.floor(num2 * 10);
+                    let height3 = Math.floor(num3 * 10);
+
+                    let p1 = Cesium.Cartesian3.fromDegrees(jwd[0], jwd[1], height1 / 2);
+                    let p2 = Cesium.Cartesian3.fromDegrees(jwd[0], jwd[1], height1 + height2 / 2);
+                    let p3 = Cesium.Cartesian3.fromDegrees(jwd[0], jwd[1], height1 + height2 + height3 / 2);
+
+                    // 添加柱体
+                    this.createZTGraphic(p1, height1, '#63AEFF', html);
+                    this.createZTGraphic(p2, height2, '#FFB861', html);
+                    this.createZTGraphic(p3, height3, '#FF6D5D', html);
+
+                    let p4 = Cesium.Cartesian3.fromDegrees(jwd[0], jwd[1], height1 + height2 + height3);
+                    this.createLabelGraphic(p4, numall);
+                }
+            },
+
+            createZTGraphic(position, height, color, html) {
+                let cylinder = new xt3d.DataStatistics.CylinderEntity(this.viewer, position, {
+                    topRadius: 6000,
+                    bottomRadius: 6000,
+                    length: height,
+                    color: Cesium.Color.fromCssColorString(color),
+                    html: html
+                });
+            },
+
+            createLabelGraphic(position, label) {
+                let labelGraphic = new xt3d.DataStatistics.LabelEntity(this.viewer, position, label, {
+                    color: Cesium.Color.fromCssColorString("#00ff00"),
+                    font: 'normal 64px MicroSoft YaHei'
+                });
+            },
+
+            getJWDByName(name) {
+                for (let i = 0; i < this.cityPosition.length; i += 1) {
+                    const item = this.cityPosition[i]
+                    if (item.name === name) {
+                        return item.jwd
+                    }
+                }
+                return [];
+            },
+
+            //设置视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2665573.0945463474,
+                        y: 5101391.473681941,
+                        z: 3438748.0492212414
+                    },
+                    orientation: {
+                        heading: 6.232887933200438,
+                        pitch: -0.7789376671739978,
+                        roll: 0.000007636813575295776
+                    }
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

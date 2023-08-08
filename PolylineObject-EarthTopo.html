@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>地球拓扑</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addPolylines();
+                this.addNetwork();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false,
+                    imageryProvider: new Cesium.SingleTileImageryProvider({
+                        url: "/static/images/earth/earth_3.jpg",
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            addPolylines() {
+                //空间站 129.577679,45.070432
+                //福州 119.296389,26.074268
+                //武汉 114.305215,30.592935
+                //南京 118.772601,31.963382
+                let kjzP = Cesium.Cartesian3.fromDegrees(129.577679, 45.070432, 1000000);
+                let dmzPs = [
+                    Cesium.Cartesian3.fromDegrees(119.296389, 26.074268, 100),
+                    Cesium.Cartesian3.fromDegrees(114.305215, 30.592935, 100),
+                    Cesium.Cartesian3.fromDegrees(118.772601, 31.963382, 100)
+                ]
+
+                dmzPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [kjzP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: kjzP,
+                    label: {
+                        text: "internet",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            addNetwork() {
+                this.taiYuanP = Cesium.Cartesian3.fromDegrees(112.549717, 37.87046, 100);
+                this.wuHanP = Cesium.Cartesian3.fromDegrees(114.305215, 30.592935, 100);
+                this.nanJingP = Cesium.Cartesian3.fromDegrees(118.772601, 31.963382, 100);
+                this.huaiHuaP = Cesium.Cartesian3.fromDegrees(110.001705, 27.569679, 100);
+                this.xiangGangP = Cesium.Cartesian3.fromDegrees(114.171202, 22.277469, 100);
+                this.fuZhouP = Cesium.Cartesian3.fromDegrees(119.296389, 26.074268, 100);
+                this.addTaiYuan();
+                this.addWuHan();
+                this.addHuaiHua();
+                this.addNanJing();
+                this.addFuZhou();
+
+                this.viewer.entities.add({
+                    position: this.xiangGangP,
+                    label: {
+                        text: "香港",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //太原
+            addTaiYuan() {
+                let endPs = [
+                    this.wuHanP,
+                    this.nanJingP,
+                    this.fuZhouP,
+                    this.xiangGangP
+                ];
+
+                endPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [this.taiYuanP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: this.taiYuanP,
+                    label: {
+                        text: "太原",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //武汉
+            addWuHan() {
+                let endPs = [
+                    this.huaiHuaP,
+                    this.nanJingP,
+                    this.fuZhouP,
+                    this.xiangGangP
+                ];
+
+                endPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [this.wuHanP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: this.wuHanP,
+                    label: {
+                        text: "武汉",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //怀化
+            addHuaiHua() {
+                let endPs = [
+                    this.wuHanP,
+                    this.nanJingP,
+                    this.fuZhouP,
+                ];
+
+                endPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [this.huaiHuaP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: this.huaiHuaP,
+                    label: {
+                        text: "怀化",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //南京
+            addNanJing() {
+                let endPs = [
+                    this.wuHanP,
+                    this.huaiHuaP,
+                    this.fuZhouP,
+                ];
+
+                endPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [this.nanJingP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: this.nanJingP,
+                    label: {
+                        text: "南京",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            //福州
+            addFuZhou() {
+                let endPs = [
+                    this.wuHanP,
+                    this.huaiHuaP,
+                    this.nanJingP,
+                ];
+
+                endPs.forEach(item => {
+                    this.viewer.entities.add({
+                        polyline: {
+                            positions: [this.fuZhouP, item],
+                            width: 2,
+                            material: new xt3d.PolylineObject.PolylineLinkPulseMaterialProperty({
+                                color: Cesium.Color.CYAN, //颜色
+                                duration: 5000, //时间 控制速度
+                                url: "/static/images/polylinematerial/LinkPulse.png", //材质图片
+                            })
+                        }
+                    });
+                })
+
+                this.viewer.entities.add({
+                    position: this.fuZhouP,
+                    label: {
+                        text: "福州",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 84px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 25000000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.5),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -5138527.387065904,
+                        y: 12707573.111384086,
+                        z: 5127296.438906498
+                    },
+                    orientation: {
+                        heading: 6.237472281578625,
+                        pitch: -1.3908744159112634,
+                        roll: 6.2830068206666105
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

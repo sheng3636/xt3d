@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>天际线描边</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="btn-container">
+        <button onclick="setView1()">模型</button>
+        <button onclick="setView2()">山地</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView1();
+
+                let skyline = new xt3d.SpatialAnalysis.Skyline(this.viewer);
+                // skyline.remove();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: true,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    // terrainProvider: new Cesium.CesiumTerrainProvider({
+                    //     url: "http://data.xtgis.cn/terrain",
+                    //     requestWaterMask: true,
+                    //     requestVertexNormals: true
+                    // }),
+
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true
+
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                    })
+                );
+            },
+
+            setView1() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1715260.9708456888,
+                        y: 4993445.640702364,
+                        z: 3567073.8897858607
+                    },
+                    orientation: {
+                        heading: 2.565266199040367,
+                        pitch: -0.06226465027776573,
+                        roll: 0.0017030848042018931
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            setView2() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1731516.952556005,
+                        y: 5000554.064862779,
+                        z: 3551686.190718555
+                    },
+                    orientation: {
+                        heading: 3.17212723570733,
+                        pitch: 0.011782999947999029,
+                        roll: 6.283090262017353
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function setView1() {
+            xt3dInit.setView1();
+        }
+
+        function setView2() {
+            xt3dInit.setView2();
+        }
+    </script>
+</body>
+
+</html>

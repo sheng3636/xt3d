@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图表窗口</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src="./libs/highcharts/highcharts.js"></script>
+    <script src="./libs/highcharts/highcharts-3d.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="btn1Click()">柱状图</button>
+        <button onclick="btn2Click()">饼图</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+
+                this.highlightFeature = undefined; //高亮区域
+                this.chartType = 1; //图表类型
+                this.loadRegions();
+
+                this.initEventHandler();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = false; //默认为false  
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件  
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //点击事件
+            initEventHandler() {
+                new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas).setInputAction(e => {
+                    let pickId = this.viewer.scene.pick(e.position);
+                    this.closeWindow();
+                    if (pickId && pickId.id && pickId.id.type == "region") {
+                        let position = this.viewer.scene.pickPosition(e.position);
+                        //标题
+                        let title = pickId.id.properties.Name + " 近6年税收（亿元）";
+                        //图表参数
+                        let option = this.chartType == "2" ? this.getPieOption(pickId.id.properties) : this.getBarOption(pickId.id.properties);
+                        this.pWindow = new xt3d.DataStatistics.ChartWindow(this.viewer, position, title, option);
+
+                        //设置高亮
+                        this.highlightFeature = {
+                            polygon: pickId.id.polygon,
+                            material: pickId.id.polygon.material
+                        }
+                        pickId.id.polygon.material = Cesium.Color.RED.withAlpha(0.5);
+                    }
+                }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+            },
+
+            //获取图表option
+            getPieOption(properties) {
+                //根据properties设置相关参数 
+                let colors = ['#f86531', '#fdca01', '#14f7fe', '#007aff', '#5ac8fb', '#23dc53'];
+                let xValues = ['15年', '16年', '17年', '18年', '19年', '20年'];
+                let yValues = [150, 50, 300, 100, 160, 200];
+                let option = {
+                    chart: {
+                        type: 'pie',
+                        backgroundColor: 'rgba(0,0,0,0)',
+                        options3d: {
+                            enabled: true,
+                            alpha: 55
+                        },
+                        width: 420,
+                        height: 200
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    title: null,
+                    plotOptions: {
+                        pie: {
+                            size: 140,
+                            innerSize: 60,
+                            depth: 35
+                        }
+                    },
+                    series: [{
+                        name: "税收",
+                        data: []
+                    }]
+                }
+                let data = [];
+                yValues.forEach((element, i) => {
+                    data.push({
+                        name: xValues[i],
+                        y: element,
+                        color: colors[i],
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                color: colors[i],
+                                fontSize: 16,
+                                textOutline: 'none',
+                            }
+                        }
+                    })
+                });
+                option.series[0].data = data;
+                return option;
+            },
+
+            //柱状图参数
+            getBarOption(properties) {
+                let option = {
+                    chart: {
+                        type: "column",
+                        backgroundColor: "rgba(0,0,0,0)",
+                        width: 420,
+                        height: 240,
+                        options3d: {
+                            enabled: true,
+                            alpha: 5,
+                            beta: 2,
+                            depth: 30,
+                            viewDistance: 100,
+                            frame: {
+                                side: {
+                                    size: 3,
+                                    color: "transparent"
+                                },
+                                bottom: {
+                                    size: 1,
+                                    color: "rgba(255,255,255,0.5)"
+                                },
+                                back: {
+                                    size: 1,
+                                    color: "transparent"
+                                }
+                            }
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 65,
+                            dataLabels: {
+                                enabled: true,
+                                crop: true,
+                                overflow: "none",
+                                style: {
+                                    textOutline: "none",
+                                    color: "#ffffff"
+                                },
+                            }
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        gridLineColor: "transparent",
+                        labels: {
+                            style: {
+                                color: "#fff",
+                                fontSize: 12
+                            }
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: "税收",
+                            style: {
+                                color: "#fff",
+                                fontSize: 12
+                            }
+                        },
+                        visible: true,
+                        labels: {
+                            style: {
+                                color: "#fff",
+                                fontSize: 12
+                            }
+                        }
+                    },
+                    series: [{
+                        name: "税收",
+                        data: []
+                    }]
+                }
+
+                let colors = ["#188cf3", '#51ecf1', '#ffd425', '#ffd425', '#ff9501'];
+                let xValues = ['15年', '16年', '17年', '18年', '19年', '20年'];
+                let yValues = [150, 50, 300, 100, 160, 200];
+                let data = [];
+                yValues.forEach((item, i) => {
+                    data.push({
+                        y: item,
+                        color: colors[i]
+                    })
+                })
+                option.xAxis.categories = xValues;
+                option.series[0].data = data;
+                return option;
+            },
+
+            //关闭窗口
+            closeWindow() {
+                if (this.pWindow) {
+                    this.pWindow.close();
+                    this.pWindow = undefined;
+                }
+
+                if (this.highlightFeature) {
+                    this.highlightFeature.polygon.material = this.highlightFeature.material;
+                    this.highlightFeature = undefined;
+                }
+            },
+
+            //区域
+            loadRegions() {
+                fetch("static/data/huaihai.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    this.colors = [];
+                    features.forEach((item, index) => {
+                        this.colors[index] = Cesium.Color.fromRandom({
+                            alpha: 1
+                        });
+                        this.addRegion(item, index);
+                    });
+                })
+            },
+
+            //添加区域
+            addRegion(feature, index) {
+                let degreesArrayHeights = this.getDegreesArrayHeights(feature);
+                this.viewer.entities.add({
+                    type: "region",
+                    properties: feature.properties,
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights)),
+                        perPositionHeight: true,
+                        extrudedHeight: 50,
+                        material: this.colors[index].withAlpha(0.3),
+                    }
+                });
+            },
+
+            //获取坐标串
+            getDegreesArrayHeights(feature) {
+                let degreesArrayHeights = [];
+                let coordinates;
+                if (feature.geometry.type == "MultiPolygon") {
+                    coordinates = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type == "Polygon") {
+                    coordinates = feature.geometry.coordinates[0];
+                }
+                //坐标串转为需要的格式[x,y,z,x,y,z....]
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    degreesArrayHeights.push(element[0]);
+                    degreesArrayHeights.push(element[1]);
+                    degreesArrayHeights.push(feature.properties.BaseHeight);
+                }
+                return degreesArrayHeights;
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2659793.1084915083,
+                        y: 5005564.655194677,
+                        z: 3457595.8612058493
+                    },
+                    orientation: {
+                        heading: 6.07963394571652,
+                        pitch: -0.756689752527441,
+                        roll: 0.0021174860976609367
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function btn1Click() {
+            xt3dInit.chartType = 1;
+            xt3dInit.closeWindow();
+        }
+
+        function btn2Click() {
+            xt3dInit.chartType = 2;
+            xt3dInit.closeWindow();
+        }
+    </script>
+</body>
+
+</html>

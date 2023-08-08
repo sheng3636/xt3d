@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width_0x4fa8f3d , initial-scale=1.0">
+
+    <title>百度地图（偏移）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="changeMap('vec')">矢量</button>
+        <button onclick="changeMap('img_d')">影像</button>
+        <button onclick="changeMap('img_z')">路网</button>
+        <button onclick="changeMap('custom')">自定义样式</button>
+        <button onclick="changeMap('time')">实时路况</button>
+    </div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new xt3d.ImageProvider.BaiduMapImageryProvider({
+                        viewer: this.viewer,
+                        layer: "vec"
+                    })
+                });
+            },
+
+            //改变底图
+            changeBaseMap(layer) {
+                this.viewer.imageryLayers.removeAll(true); //删除所有底图
+                let imageProvider = new xt3d.ImageProvider.BaiduMapImageryProvider({
+                    viewer: this.viewer,
+                    layer: layer
+                })
+                this.viewer.imageryLayers.addImageryProvider(imageProvider);
+            },
+
+            load3dtiles() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 20);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1715841.3831016577,
+                        y: 4994577.197159691,
+                        z: 3567197.3508283896
+                    },
+                    orientation: {
+                        heading: 0.0017152397352511173,
+                        pitch: -1.3684829958213167,
+                        roll: 0.00001633010703372406
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+        xt3dInit.init("map3d");
+
+        function changeMap(layer) {
+            xt3dInit.changeBaseMap(layer);
+        }
+    </script>
+</body>
+
+</html>

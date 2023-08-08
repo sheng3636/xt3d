@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>火焰粒子</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initPlot();
+                this.initDatas();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+            },
+
+            //初始化标绘
+            initPlot() {
+                this.particlePlotLayer = new xt3d.ParticleSystem.PlotLayer(this.viewer);
+                this.particlePlotLayer.setPlotSelectable(true);
+            },
+
+            //初始化数据
+            initDatas() {
+                fetch("/static/data/labelplotting/1618991999513.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach(feature => {
+                        this.particlePlotLayer.addPlot(feature);
+                    })
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+            //添加火焰
+            addFire(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.ParticleSystem.getPlotCode(),
+                        plotType: "fire",
+                        style: undefined,
+                        attr: {
+                            name: "火焰"
+                        }
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: this.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.particlePlotLayer.addPlot(geoFeature);
+            },
+
+            //保存数据
+            savePlots() {
+                const features = [];
+                this.particlePlotLayer.plots.forEach(plot => {
+                    features.push(plot.toGeoJson());
+                })
+                let geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                let data = JSON.stringify(geojson);
+
+                var blob = new Blob([data], {
+                    type: 'text/json'
+                });
+                var e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = new Date().getTime() + ".json";
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+
+            //清空
+            clear() {
+                this.particlePlotLayer.clear();
+            },
+
+            cartesian3ToCoordinates(position) {
+                const c = Cesium.Cartographic.fromCartesian(position);
+                return [
+                    Cesium.Math.toDegrees(c.longitude),
+                    Cesium.Math.toDegrees(c.latitude),
+                    c.height
+                ];
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        // this.viewer.zoomTo(
+                        //     tileset,
+                        // ); 
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1573737.956068116,
+                        y: 5327951.437687817,
+                        z: 3123162.9016424906
+                    },
+                    orientation: {
+                        heading: 4.174266587881421,
+                        pitch: -0.5667606619360193,
+                        roll: 6.280262590959833
+                    }
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>属性查询</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            width: 360px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        input {
+            width: 140px;
+            background: transparent;
+            height: 31px;
+            border: 1px solid #009ac0;
+            color: white;
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="form-container">
+        <div>
+            楼栋名称：
+            <input id="buildName" placeholder value="虹北花苑-东区1栋"></input>
+            <button onclick="queryByEqual()">等值查询</button>
+        </div>
+        <div>
+            人员名称：
+            <input id="leaderName" placeholder value="李"></input>
+            <button onclick="queryByLike()">模糊查询</button>
+        </div>
+        <div class="tip-item">
+            所有可用楼栋名称：
+            <br />虹北花苑-东区1栋
+            <br />虹北花苑-东区2栋
+            <br />虹北花苑-东区3栋
+            <br />虹北花苑-东区4栋
+            <br />虹北花苑-东区5栋
+            <br />虹北花苑-东区5栋
+            <br />虹北花苑-东区6栋
+            <br />虹北花苑-东区7栋
+            <br />虹北花苑-东区8栋
+            <br />虹北花苑-东区9栋
+            <br />虹北花苑-东区10栋
+            <br />虹北花苑-东区11栋
+            <br />虹北花苑-东区12栋
+            <br />虹北花苑-东区13栋
+            <br />
+        </div>
+        <div class="tip-item">
+            所有可用人员名称：
+            <br />李敏
+            <br />赵华菊
+            <br />张晓红
+            <br />王珊珊
+            <br />吴丹
+            <br />李永柳
+            <br />刘三强
+            <br />吴晓磊
+            <br />谢思思
+            <br />张佳琪
+            <br />李佳芮
+            <br />万琪琪
+            <br />李晓红
+            <br />王思思
+        </div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //模糊查询
+            queryByLike(value) {
+                let url = "http://42.192.134.169:8090/geoserver/xt3d/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=xt3d:build_offset&maxFeatures=50&&outputFormat=json"
+                let fileter = "cql_filter=leaderName like '%" + value + "%'";
+                this.clearQueryResult();
+
+                xt3d.GeoServerPlugin.sqlQuery(url, fileter).then(res => {
+                    this.handleQueryResult(res);
+                })
+            },
+
+            //等值查询
+            queryByEqual(value) {
+                let url = "http://42.192.134.169:8090/geoserver/xt3d/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=xt3d:build_offset&maxFeatures=50&&outputFormat=json"
+                let fileter = "cql_filter=buildName='" + value + "'";
+                this.clearQueryResult();
+                xt3d.GeoServerPlugin.sqlQuery(url, fileter).then(res => {
+                    this.handleQueryResult(res);
+                })
+            },
+
+            //处理查询结果
+            handleQueryResult(result) {
+                //如果查询成功 那么返回的结果应该是一个geojson对象 类型为FeatureCollection 
+                let features = result.features;
+                features.forEach(feature => {
+                    this.handleFeature(feature);
+                })
+            },
+
+            handleFeature(feature) {
+                let geometry = feature.geometry; //取要素的几何对象
+                let properties = feature.properties; //取要素的属性信息
+                let coordinates;
+                let pointArr = [];
+                if (geometry.type == "MultiPolygon") {
+                    coordinates = geometry.coordinates[0][0];
+                } else if (geometry.type == "Polygon") {
+                    coordinates = geometry.coordinates[0];
+                }
+
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    pointArr.push(element[0]);
+                    pointArr.push(element[1]);
+                    pointArr.push(0);
+                }
+                this.addClampFeature(pointArr);
+            },
+
+            //添加贴地对象
+            addClampFeature(pointArr) {
+                this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArrayHeights(pointArr)),
+                        classificationType: Cesium.ClassificationType.BOTH,
+                        material: Cesium.Color.RED.withAlpha(0.5)
+                    },
+                    polyline: {
+                        positions: Cesium.Cartesian3.fromDegreesArrayHeights(pointArr),
+                        width: 1,
+                        clampToGround: true,
+                        material: Cesium.Color.YELLOW,
+                    }
+                })
+            },
+
+            //清除查询结果
+            clearQueryResult() {
+                this.viewer.entities.removeAll(this.drawPoint);
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1574002.8718775597,
+                        y: 5328527.134376182,
+                        z: 3123468.0905757784
+                    },
+                    orientation: {
+                        heading: 0.052201550724358725,
+                        pitch: -1.5371303131940741,
+                        roll: 0
+                    }
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function queryByEqual() {
+            let value = document.getElementById("buildName").value;
+            if (value == "") {
+                alert("值不能为空！")
+                return;
+            }
+
+            xt3dInit.queryByEqual(value);
+        }
+
+        function queryByLike() {
+            let value = document.getElementById("leaderName").value;
+            if (value == "") {
+                alert("值不能为空！")
+                return;
+            }
+
+            xt3dInit.queryByLike(value);
+        }
+    </script>
+</body>
+
+</html>

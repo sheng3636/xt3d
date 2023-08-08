@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>鹰眼地图（基于openlayers）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- openlayers -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.6.1/css/ol.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.6.1/build/ol.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        #map2d {
+            position: absolute;
+            bottom: 10px;
+            right: 30px;
+            height: 280px;
+            width: 300px;
+            border-radius: 8px;
+            padding: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.637);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div id="map2d"></div>
+    <script>
+        let xt3dInit = {
+            init(viewerContainer, mapContainer) {
+                this.initViewer(viewerContainer);
+                this.load3dtiles();
+                this.initMap(mapContainer);
+                this.overviewMap = new xt3d.SceneControl.OverviewMap(this.viewer, this.map);
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            initMap(el) {
+                this.map = new ol.Map({
+                    target: el,
+                    layers: [
+                        new ol.layer.Tile({
+                            source: new ol.source.XYZ({
+                                url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                            })
+                        }),
+                        new ol.layer.Tile({
+                            source: new ol.source.XYZ({
+                                url: "https://webst02.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scale=1&style=8"
+                            })
+                        })
+                    ],
+                    view: new ol.View({
+                        center: [108.41, 34],
+                        zoom: 4,
+                        projection: 'EPSG:4326'
+                    }),
+                    controls: ol.control.defaults({
+                        zoom: false
+                    })
+                });
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(tileset);
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 20);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d", "map2d");
+    </script>
+</body>
+
+</html>

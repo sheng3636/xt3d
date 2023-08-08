@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态水面</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.addHeliuRegion();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+
+            },
+
+            //添加河流水面
+            addHeliuRegion() {
+                const positions = [{
+                    x: -1573646.574385626,
+                    y: 5327862.998114007,
+                    z: 3122882.0126497806
+                }, {
+                    x: -1573674.4927850217,
+                    y: 5327841.079208016,
+                    z: 3122905.0853668815
+                }, {
+                    x: -1573697.300247773,
+                    y: 5327824.154858261,
+                    z: 3122922.2296030447
+                }, {
+                    x: -1573723.2566743596,
+                    y: 5327804.220696046,
+                    z: 3122942.8339925
+                }, {
+                    x: -1573758.6792294222,
+                    y: 5327780.238635048,
+                    z: 3122965.933496034
+                }, {
+                    x: -1573782.7955957302,
+                    y: 5327764.660988683,
+                    z: 3122980.284263632
+                }, {
+                    x: -1573802.0711376078,
+                    y: 5327753.162159477,
+                    z: 3122989.961597303
+                }, {
+                    x: -1573818.2256981286,
+                    y: 5327743.702623943,
+                    z: 3122997.8881463786
+                }, {
+                    x: -1573836.390515118,
+                    y: 5327730.24093674,
+                    z: 3123011.720182871
+                }, {
+                    x: -1573853.867715565,
+                    y: 5327716.870771106,
+                    z: 3123025.672760408
+                }, {
+                    x: -1573881.363708308,
+                    y: 5327696.189850067,
+                    z: 3123046.939113487
+                }, {
+                    x: -1573917.6152507644,
+                    y: 5327669.018123424,
+                    z: 3123074.966586196
+                }, {
+                    x: -1573926.9820208312,
+                    y: 5327662.461066732,
+                    z: 3123081.351110614
+                }, {
+                    x: -1573938.1098204239,
+                    y: 5327654.702930395,
+                    z: 3123088.759295021
+                }, {
+                    x: -1573954.0176107218,
+                    y: 5327644.379581239,
+                    z: 3123098.291348635
+                }, {
+                    x: -1573964.7512216873,
+                    y: 5327635.925342955,
+                    z: 3123104.6748915347
+                }, {
+                    x: -1573984.9669868168,
+                    y: 5327619.909903474,
+                    z: 3123116.289125795
+                }, {
+                    x: -1573968.8319637552,
+                    y: 5327616.4065885795,
+                    z: 3123130.7026131423
+                }, {
+                    x: -1573944.0563865206,
+                    y: 5327639.361826853,
+                    z: 3123111.33203873
+                }, {
+                    x: -1573927.7554437916,
+                    y: 5327650.519985489,
+                    z: 3123100.7197816116
+                }, {
+                    x: -1573904.7711183839,
+                    y: 5327666.247100797,
+                    z: 3123085.6995552983
+                }, {
+                    x: -1573900.0844216363,
+                    y: 5327669.12337478,
+                    z: 3123083.13969443
+                }, {
+                    x: -1573882.656988854,
+                    y: 5327682.386903352,
+                    z: 3123069.5155642116
+                }, {
+                    x: -1573852.8168025815,
+                    y: 5327705.006477089,
+                    z: 3123045.985478789
+                }, {
+                    x: -1573826.1044827306,
+                    y: 5327724.060820944,
+                    z: 3123027.076716561
+                }, {
+                    x: -1573797.9909229,
+                    y: 5327743.687548958,
+                    z: 3123008.816503377
+                }, {
+                    x: -1573768.141830067,
+                    y: 5327762.834272328,
+                    z: 3122990.471647622
+                }, {
+                    x: -1573740.1560181207,
+                    y: 5327780.735847701,
+                    z: 3122974.151395415
+                }, {
+                    x: -1573710.2984952328,
+                    y: 5327801.620498089,
+                    z: 3122953.746622961
+                }, {
+                    x: -1573666.9494654608,
+                    y: 5327834.72201891,
+                    z: 3122919.660895541
+                }, {
+                    x: -1573633.8838709379,
+                    y: 5327860.265334742,
+                    z: 3122893.1117008366
+                }]
+                this.addWaterRegion(positions);
+            },
+
+
+            //添加水面
+            addWaterRegion(positions) {
+                let waterPrimitive = new xt3d.PolygonObject.WaterPrimitive(positions, {
+                    baseWaterColor: Cesium.Color.AQUA.withAlpha(0.3),
+                    normalMap: '/static/images/polygon/waterNormalsSmall.jpg',
+                    frequency: 1000.0,
+                    animationSpeed: 0.03,
+                    amplitude: 10.0,
+                    specularIntensity: 5,
+                });
+                this.viewer.scene.primitives.add(waterPrimitive); //添加到场景
+                // this.viewer.scene.primitives.remove(waterPrimitive); //从场景移除 
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -1573619.6471639725,
+                        y: 5328105.434513959,
+                        z: 3123157.3345488473
+                    },
+                    orientation: {
+                        heading: 1.769495648542554,
+                        pitch: -0.885008929765446,
+                        roll: 0.004446235155041833
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>视频贴图参数调整</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .el-form-item__label {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="form-container" id="formContainer">
+        <video id="video" muted="muted" width="300" height="220" src="/static/lukou.mp4" autoplay="autoplay" loop></video>
+
+        <div class="tip-item">拖动滑块进行材质方向调整，点击面对象编辑节点，点击“获取参数”按钮打印调整后的参数。</div>
+        <el-form ref="form" :model="form" label-width="70px">
+            <el-form-item label="视频角度">
+                <el-slider v-model="form.stRotation" :show-tooltip="false" @input="valueChange" :min="0" :max="360"></el-slider>
+            </el-form-item>
+        </el-form>
+        <button @click="getParams">获取参数</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true; //默认为false
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1573945.6641479672,
+                        y: 5328097.759567323,
+                        z: 3122663.665384485
+                    },
+                    orientation: {
+                        heading: 6.0339033541872675,
+                        pitch: -0.6157449486079702,
+                        roll: 6.2823150452131475
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //创建多边形
+        let positions = [{
+            x: -1573799.2415401086,
+            y: 5327922.240904413,
+            z: 3122749.3887000578
+        }, {
+            x: -1573794.3118143044,
+            y: 5327921.335518321,
+            z: 3122744.7344062133
+        }, {
+            x: -1573809.8067735473,
+            y: 5327924.73463202,
+            z: 3122721.3949625622
+        }, {
+            x: -1573812.9883513628,
+            y: 5327922.442747317,
+            z: 3122723.51010485
+        }, {
+            x: -1573823.2090096928,
+            y: 5327914.678773423,
+            z: 3122733.0927493796
+        }, {
+            x: -1573826.8395776816,
+            y: 5327909.88053902,
+            z: 3122736.798227939
+        }, {
+            x: -1573825.432025198,
+            y: 5327905.581082746,
+            z: 3122744.4121885784
+        }, {
+            x: -1573820.0546888283,
+            y: 5327911.606606755,
+            z: 3122745.6105908584
+        }, {
+            x: -1573805.4179177827,
+            y: 5327915.239309875,
+            z: 3122763.8471152373
+        }];
+
+        let videoRegionEntity = xt3dInit.viewer.entities.add({
+            Type: "EditablePolygon",
+            polygon: {
+                hierarchy: positions,
+                material: document.getElementById("video"), // Cesium.Color.RED.withAlpha(0.4),
+                perPositionHeight: true,
+                stRotation: 0
+            },
+        })
+
+        //多边形编辑
+        let edit = new xt3d.Map3dTools.EntityEdit(xt3dInit.viewer);
+        edit.activate();
+        edit.EditEndEvent.addEventListener((result) => {
+            console.log(result)
+        })
+
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    form: {
+                        stRotation: 0
+                    }
+                }
+            },
+            methods: {
+                //绑定的值改变
+                valueChange() {
+                    videoRegionEntity.polygon.stRotation = new Cesium.CallbackProperty(e => {
+                        return Cesium.Math.toRadians(this.form.stRotation);
+                    }, false);
+                    videoRegionEntity.polygon.material = document.getElementById("video");
+                },
+                //获取参数
+                getParams() {
+                    this.form.positions = videoRegionEntity.polygon.hierarchy;;
+                    console.log(this.form);
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

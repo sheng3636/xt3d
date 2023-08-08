@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>纯色地球</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="btn-container">
+        <button onclick="changeColor()">换个颜色</button>
+        <button onclick="randomColor()">随机颜色</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+
+                //可用颜色
+                this.colors = [
+                    Cesium.Color.WHITE,
+                    Cesium.Color.AQUA,
+                    Cesium.Color.CORNFLOWERBLUE,
+                    Cesium.Color.YELLOW,
+                    Cesium.Color.LIME,
+                ];
+                this.colorIndex = 0;
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                });
+
+                this.viewer.imageryLayers.removeAll(true); //删除所有底图 
+                this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString("#001B47");
+            },
+
+            //换个颜色
+            changeColor() {
+                this.colorIndex++;
+                if (this.colorIndex > this.colors.length - 1) this.colorIndex = 0;
+                this.viewer.scene.globe.baseColor = this.colors[this.colorIndex];
+            },
+
+            //随机颜色
+            randomColor() {
+                this.viewer.scene.globe.baseColor = Cesium.Color.fromRandom();
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function changeColor() {
+            xt3dInit.changeColor();
+        }
+
+        function randomColor() {
+            xt3dInit.randomColor();
+        }
+    </script>
+</body>
+
+</html>

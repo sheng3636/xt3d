@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>柱状人口统计（动画）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadRegions();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = false; //默认为false  
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件  
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+
+            //行政区划
+            loadRegions() {
+                fetch("static/data/huaihai.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    this.colors = [];
+                    features.forEach((item, index) => {
+                        this.colors[index] = Cesium.Color.fromRandom({
+                            alpha: 1
+                        });
+                        this.addRegion(item, index);
+                    });
+                    setTimeout(() => {
+                        this.showDemographic(features);
+                    }, 2000);
+                })
+            },
+
+            addRegion(feature, index) {
+                let degreesArrayHeights = this.getDegreesArrayHeights(feature);
+                let e = this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights)),
+                        perPositionHeight: true,
+                        extrudedHeight: 50,
+                        material: this.colors[index].withAlpha(0.3),
+                    }
+                });
+            },
+
+            //获取坐标串
+            getDegreesArrayHeights(feature) {
+                let degreesArrayHeights = [];
+                let coordinates;
+                if (feature.geometry.type == "MultiPolygon") {
+                    coordinates = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type == "Polygon") {
+                    coordinates = feature.geometry.coordinates[0];
+                }
+                //坐标串转为需要的格式[x,y,z,x,y,z....]
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    degreesArrayHeights.push(element[0]);
+                    degreesArrayHeights.push(element[1]);
+                    degreesArrayHeights.push(feature.properties.BaseHeight);
+                }
+                return degreesArrayHeights;
+            },
+
+            //显示统计图
+            showDemographic(features) {
+                let c;
+                features.forEach((feature, index) => {
+                    let center = turf.center(feature);
+                    let num = this.getRandomIntInclusive(20, 50); //随机数据（虚拟）
+                    let point = center.geometry.coordinates;
+                    let position = Cesium.Cartesian3.fromDegrees(point[0], point[1], 50);
+                    c = new xt3d.DataStatistics.GrowthCylinder(this.viewer, position, {
+                        height: num * 1000,
+                        radius: 2000,
+                        color: this.colors[index],
+                        label: num + "万"
+                    });
+                })
+            },
+
+            //随机数
+            getRandomIntInclusive(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min; //含最大值，含最小值 
+            },
+
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2659793.1084915083,
+                        y: 5005564.655194677,
+                        z: 3457595.8612058493
+                    },
+                    orientation: {
+                        heading: 6.07963394571652,
+                        pitch: -0.756689752527441,
+                        roll: 0.0021174860976609367
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

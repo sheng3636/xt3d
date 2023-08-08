@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>旋转刻度盘</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addPeripheryRegion();
+                this.addRd();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.SingleTileImageryProvider({
+                        url: "/static/images/earth/earth_3.jpg",
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //周边省份
+            addPeripheryRegion() {
+                fetch("/static/data/kedu/region.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    for (let i = 0; i < features.length; i++) {
+                        const feature = features[i];
+                        let degreesArrayHeights = this.getDegreesArrayHeights(feature);
+                        let e = this.viewer.entities.add({
+                            polyline: {
+                                positions: Cesium.Cartesian3.fromDegreesArrayHeights(this.getDegreesArrayHeights(feature, 500)),
+                                width: 3,
+                                material: Cesium.Color.fromCssColorString("#1a2933")
+                            },
+                            polygon: {
+                                hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights(degreesArrayHeights),
+                                height: 0,
+                                extrudedHeight: feature.properties.height,
+                                material: new Cesium.ImageMaterialProperty({
+                                    image: "/static/images/polygon/beij.083ca80f.png",
+                                    repeat: new Cesium.Cartesian2(10, 10),
+                                    color: new Cesium.Color(.15, .15, .15)
+                                })
+                            }
+                        });
+                    }
+                })
+            },
+
+            //刻度
+            addRd() {
+                let position = Cesium.Cartesian3.fromDegrees(112.404822428185, 31.0895043996517, 400);
+                this.rD = new xt3d.AdvancedPlugin.RotatingDial(this.viewer, position, {
+                    radius: 40e4,
+                    textureUrl: "/static/images/kedu"
+                });
+            },
+
+            //获取坐标串
+            getDegreesArrayHeights(feature, height) {
+                let degreesArrayHeights = [];
+                let coordinates;
+                if (feature.geometry.type == "MultiPolygon") {
+                    coordinates = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type == "Polygon") {
+                    coordinates = feature.geometry.coordinates[0];
+                }
+                //坐标串转为需要的格式[x,y,z,x,y,z....]
+                for (let i = 0; i < coordinates.length; i++) {
+                    const element = coordinates[i];
+                    degreesArrayHeights.push(element[0]);
+                    degreesArrayHeights.push(element[1]);
+                    degreesArrayHeights.push(height || 0);
+                }
+
+                return degreesArrayHeights;
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2485908.8757991423,
+                        y: 5918142.269908528,
+                        z: 2995157.671278651
+                    },
+                    orientation: {
+                        heading: 6.2493612738484785,
+                        pitch: -0.9003312267207324,
+                        roll: 0.00003797085538082001
+                    },
+                    duration: 5
+                };
+
+                setTimeout(() => {
+                    this.viewer.scene.camera.flyTo(flyToOpts);
+                }, 2000);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

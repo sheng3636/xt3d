@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>点线面绘制扩展</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src="./libs/turf.min.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('marker')">点</button>
+        <button onclick="drawActivate('text')">文本</button>
+        <button onclick="drawActivate('polyline')">线</button>
+        <button onclick="drawActivate('polygon')">面</button>
+        <button onclick="drawActivate('circle')">圆</button>
+        <button onclick="drawActivate('rectangle')">矩形</button>
+        <button onclick="clearDraw">清空</button>
+        <button onclick="save()">保存</button>
+        <div class="tip-item">除了简单点线面外，新增文本、圆、矩形等对象，并能够保存为json文件，从json文件加载</div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initDraw();
+                this.loadDatas();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true; //默认为false 
+            },
+
+            //初始化绘制
+            initDraw() {
+                this.plotLayer = new xt3d.LabelPlotting.GeoPlot.PlotLayer(this.viewer);
+                this.plotDraw = new xt3d.LabelPlotting.GeoPlot.PlotDraw(this.viewer);
+
+                this.plotDraw.PlotDrawEndEvent.addEventListener((plot) => {
+                    this.plotLayer.addPlot(plot.toGeoJson());
+                    plot.remove();
+                })
+            },
+
+            //激活绘制工具
+            drawActivate(type) {
+                this.plotDraw.activate(type);
+            },
+
+            //清除绘制结果
+            clearDraw() {
+                this.plotLayer.clear();
+            },
+
+            //保存绘制内容
+            savePlots() {
+                const features = [];
+                this.plotLayer.plots.forEach(plot => {
+                    features.push(plot.toGeoJson());
+                })
+                let geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                let data = JSON.stringify(geojson);
+
+                var blob = new Blob([data], {
+                    type: 'text/json'
+                });
+                var e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = new Date().getTime() + ".json";
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+
+            //加载数据
+            loadDatas() {
+                fetch("/data/labelplotting/1603782504969.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach(feature => {
+                        this.plotLayer.addPlot(feature);
+                    });
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://localhost:9003/model/XUNICt4K/tileset.json",
+                    })
+                );
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        function clearDraw() {
+            xt3dInit.clearDraw();
+        }
+
+        function save() {
+            xt3dInit.savePlots();
+        }
+    </script>
+</body>
+
+</html>

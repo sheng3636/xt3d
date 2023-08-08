@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>书签管理</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        input {
+            height: 30px;
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+        }
+        
+        .bookmark-list {
+            max-height: 800px;
+            overflow: hidden;
+        }
+        
+        .bookmark-container {
+            position: relative;
+            border: 1px solid rgb(246, 246, 248);
+            border-radius: 5px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        
+        .bookmark-img {
+            height: 200px;
+            width: 300px;
+        }
+        
+        .bookmark-text {
+            position: absolute;
+            bottom: 0px;
+            background: #06081296;
+            color: white;
+            width: 100%;
+            text-align: left;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .bookmark-text:hover {
+            background: #51b4188a;
+        }
+        
+        .bookmark-delete {
+            position: absolute;
+            right: 10px;
+            bottom: 6px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .bookmark-delete:hover {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"> </div>
+    <div class="form-container">
+        <div style="display: flex;align-items: center">
+            <input type="text" id="inputBookmarkName"><button onclick="addBookmark()">添加</button>
+        </div>
+        <div class="bookmark-list" id="bookmarkList"></div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    }),
+                    contextOptions: {
+                        webgl: {
+                            alpha: true,
+                            depth: false,
+                            stencil: true,
+                            antialias: true,
+                            premultipliedAlpha: true,
+                            preserveDrawingBuffer: true,
+                            failIfMajorPerformanceCaveat: true
+                        },
+                        allowTextureFilterAnisotropic: true
+                    }
+                });
+
+            },
+
+            //设置视角
+            setView() {
+                this.defaultView = {
+                    destination: {
+                        x: -1786421.197370212,
+                        y: 5501661.313181829,
+                        z: 2680487.898044998
+                    },
+                    orientation: {
+                        heading: 2.374363218526797,
+                        pitch: -0.47583562533664026,
+                        roll: 0.0020031393509505335
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(this.defaultView);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        let bookmarkList = []; //如果已有书签列表
+        let bookmarkManager = new xt3d.CameraDominate.BookmarkManager(xt3dInit.viewer, bookmarkList);
+
+
+        function addBookmark() {
+            let bookmarkName = document.getElementById("inputBookmarkName").value;
+            if (bookmarkName == "") {
+                alert("请输入正确的书签名称！！！");
+                return;
+            }
+
+            //创建一个书签
+            bookmarkManager
+                .createBookmark(bookmarkName, 200, 200)
+                .then(res => {
+                    bookmarkList.push(res);
+                    createBookmarkDom(res);
+                });
+        }
+
+        //创建bookmark dom元素
+        function createBookmarkDom(bookmark) {
+            let container = document.createElement("div");
+            container.classList.add("bookmark-container");
+
+            let img = document.createElement("img");
+            img.classList.add("bookmark-img");
+            img.src = bookmark.img;
+            container.appendChild(img);
+
+            img.onclick = e => {
+                xt3dInit.viewer.scene.camera.flyTo(bookmark.cameraView);
+            };
+
+            let name = document.createElement("div");
+            name.classList.add("bookmark-text");
+            name.innerHTML = bookmark.name;
+            container.appendChild(name);
+
+            let btn = document.createElement("span");
+            btn.innerHTML = "删除";
+            btn.classList.add("bookmark-delete");
+            container.appendChild(btn);
+            btn.onclick = e => {
+                delBookmark(bookmark);
+                container.remove();
+            };
+
+            document.getElementById("bookmarkList").appendChild(container);
+        }
+
+        function delBookmark(bookmark) {
+            for (let i = 0; i < bookmarkList.length; i++) {
+                const item = bookmarkList[i];
+                if (item.id == bookmark.id) {
+                    bookmarkList.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

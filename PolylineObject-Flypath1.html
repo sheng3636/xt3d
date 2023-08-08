@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态轨迹线</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadPath();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //飞行线
+            loadPath() {
+                fetch("/static/data/flypath.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    this.initPath(res);
+                })
+            },
+
+            initPath(data) {
+                let property = new Cesium.SampledPositionProperty();
+
+                let start;
+                let stop;
+                for (let i = 0, len = data.length; i < len; i++) {
+                    let item = data[i];;
+                    let lng = Number(item.x.toFixed(6));
+                    let lat = Number(item.y.toFixed(6));
+                    let hei = item.z;
+                    let time = item.time;
+
+                    let position = null;
+                    if (lng && lat) {
+                        position = Cesium.Cartesian3.fromDegrees(lng, lat, hei);
+                    }
+                    let juliaDate = null
+                    if (time) {
+                        juliaDate = Cesium.JulianDate.fromIso8601(time);
+                    }
+                    if (position && juliaDate) {
+                        property.addSample(juliaDate, position);
+                    }
+
+                    if (i == 0) {
+                        start = juliaDate;
+                    } else if (i == len - 1) {
+                        stop = juliaDate;
+                    }
+
+                    this.viewer.entities.add({
+                        position: position,
+                        point: {
+                            pixelSize: 4,
+                            color: Cesium.Color.WHITE.withAlpha(0.8)
+                        }
+                    })
+                }
+
+                //设置时钟属性
+                this.viewer.clock.startTime = start.clone();
+                this.viewer.clock.stopTime = stop.clone();
+                this.viewer.clock.currentTime = start.clone();
+                this.viewer.clock.shouldAnimate = true;
+                this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+                this.viewer.clock.multiplier = 5;
+
+                if (this.viewer.timeline) {
+                    this.viewer.timeline.zoomTo(start, stop);
+                }
+
+                //创建path对象
+                let flyPath = new xt3d.PolylineObject.FlyPath(this.viewer, {
+                    position: property,
+                    orientation: new Cesium.VelocityOrientationProperty(property),
+                    model: {
+                        uri: "/static/glb/wrj.glb",
+                        colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+                        color: Cesium.Color.WHITE,
+                        scale: 0.1,
+                        minimumPixelSize: 50,
+                    },
+                    label: {
+                        text: '侦查无人机',
+                        color: Cesium.Color.AZURE,
+                        outline: true,
+                        outlineColor: Cesium.Color.BLACK,
+                        outlineWidth: 2,
+                        horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        pixelOffset: new Cesium.Cartesian2(10, -25),
+                        scaleByDistance: new Cesium.NearFarScalar(500, 1, 1500, 0.4),
+                    },
+                });
+
+                let flyCylinder = new xt3d.PolylineObject.FlyCylinder(this.viewer, property);
+                //flyPath.remove();
+                //flyCylinder.remove();
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2475375.9177402095,
+                        y: 4780087.592872154,
+                        z: 3412984.727142855
+                    },
+                    orientation: {
+                        heading: 4.660867971042048,
+                        pitch: -0.6998819723213083,
+                        roll: 6.279214287424039
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

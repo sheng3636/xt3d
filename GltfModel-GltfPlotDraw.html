@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>gltf标绘绘制</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('fireMan')">消防员</button>
+        <button onclick="drawActivate('fireCar')">消防车</button>
+        <button onclick="drawActivate('police')">警察</button>
+        <button onclick="drawActivate('policeCar')">警车</button>
+        <button onclick="clearDraw()">清空</button>
+        <button onclick="save()">保存</button>
+
+        <div class="tip-item">点击“消防员”按钮后根据提示在场景中绘制消防员</div>
+        <div class="tip-item">点击“消防车”按钮后根据提示在场景中绘制消防车</div>
+        <div class="tip-item">点击“警察”按钮后根据提示在场景中绘制警察</div>
+        <div class="tip-item">点击“消防车”按钮后根据提示在场景中绘制警车</div>
+        <div class="tip-item">如果绘制后模型没有显示，可能是模型加载有点慢，加载时间与模型大小有关。</div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                // this.load3dtiles();
+                this.setView();
+                this.initGltfDraw();
+                this.initDatas();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+                    })
+                });
+            },
+
+            //初始化数据
+            initDatas() {
+                fetch("/static/data/labelplotting/1602600681304.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach(feature => {
+                        this.gltfPlotLayer.addPlot(feature);
+                    })
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+            //初始化绘制
+            initGltfDraw() {
+                this.gltfPlotLayer = new xt3d.GltfModel.GltfPlot.PlotLayer(this.viewer);
+                this.gltfPlotLayer.setPlotSelectable(true);
+
+                this.gltfDraw = new xt3d.GltfModel.GltfPlot.PlotDraw(this.viewer);
+                this.gltfDraw.DrawEndEvent.addEventListener((position) => {
+                    this.handleDrawEnd(position);
+                })
+            },
+            //设置默认视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+
+                        x: -1573776.4611502131,
+                        y: 5328146.87088957,
+                        z: 3122651.280185215
+                    },
+                    orientation: {
+                        heading: 0.06944133440396705,
+                        pitch: -0.6148427743539875,
+                        roll: 6.2831846648617145
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            //绘制结束事件
+            handleDrawEnd(position) {
+                switch (this.drawPlotType) {
+                    case "police":
+                        this.addPolice(position);
+                        break;
+                    case "policeCar":
+                        this.addPoliceCar(position);
+                        break;
+                    case "fireMan":
+                        this.addFireMan(position);
+                        break;
+                    case "fireCar":
+                        this.addFireCar(position);
+                        break;
+                }
+            },
+
+            //添加警员
+            addPolice(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/police.gltf",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 2,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            //添加警车
+            addPoliceCar(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/police_car.gltf",
+                        style: {
+                            width: 1.4,
+                            height: 1.8,
+                            scale: 1.5,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            //添加消防员
+            addFireMan(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/glb/xiaofangyuan.glb",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 1,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            //添加消防车
+            addFireCar(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/xiaofangche.gltf",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 1,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            //激活绘制工具
+            drawActivate(type) {
+                this.drawPlotType = type;
+                this.gltfDraw.activate();
+            },
+
+            //保存到文件
+            savePlots() {
+                const features = [];
+                this.gltfPlotLayer.plots.forEach(plot => {
+                    features.push(plot.toGeoJson());
+                })
+                let geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                let data = JSON.stringify(geojson);
+
+                var blob = new Blob([data], {
+                    type: 'text/json'
+                });
+                var e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = new Date().getTime() + ".json";
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+
+            //清空
+            clear() {
+                this.gltfPlotLayer.clear();
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                if (this.Window1) {
+                    this.Window1.windowClose();
+                    this.Window1 = undefined;
+                }
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        function clearDraw() {
+            xt3dInit.clear();
+        }
+
+        function save() {
+            xt3dInit.savePlots();
+        }
+    </script>
+</body>
+
+</html>

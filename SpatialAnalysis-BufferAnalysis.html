@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>缓冲区分析</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initBuffers();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //初始化缓冲区
+            initBuffers() {
+                this.initPointBuffer();
+                this.initPolylineBuffer();
+                this.initPolygonBuffer();
+            },
+
+            //初始化点缓冲
+            initPointBuffer() {
+                let point = [106.422638966289, 29.5698367125623];
+                this.addPoint(point);
+                let positions = xt3d.SpatialAnalysis.Buffer.pointBuffer(point, 60, {
+                    units: 'meters',
+                    z: 0
+                });
+                this.addBufferPolyogn(positions);
+            },
+
+            //添加点
+            addPoint(point) {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(point[0], point[1], 0),
+                    point: {
+                        pixelSize: 10,
+                        color: Cesium.Color.YELLOW,
+                        outlineWidth: 3,
+                        outlineColor: Cesium.Color.YELLOW.withAlpha(0.4),
+                    }
+                });
+            },
+
+            //初始化线缓冲
+            initPolylineBuffer() {
+                let points = [
+                    [106.425203158107, 29.5694914480581],
+                    [106.428808047023, 29.569230166027],
+                    [106.431661917416, 29.5692674920729],
+                    [106.434708906857, 29.5693048181049]
+                ];
+                let degreesArray = [];
+                points.forEach(item => {
+                    degreesArray.push(item[0]);
+                    degreesArray.push(item[1]);
+                });
+                this.addPolyline(Cesium.Cartesian3.fromDegreesArray(degreesArray));
+
+                let positions = xt3d.SpatialAnalysis.Buffer.polylineBuffer(points, 30, {
+                    units: 'meters',
+                    z: 0
+                });
+                this.addBufferPolyogn(positions);
+            },
+
+            //添加线
+            addPolyline(positions) {
+                this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 2,
+                        material: Cesium.Color.YELLOW,
+                    }
+                })
+            },
+
+            //初始化面缓冲
+            initPolygonBuffer() {
+                let points = [
+                    [106.438549830166, 29.5701073244566],
+                    [106.440695597377, 29.5701073244566],
+                    [106.440738512722, 29.5688755679036],
+                    [106.438700033871, 29.5687262630581],
+                    [106.438034846035, 29.5690248725284],
+                    [106.438549830166, 29.5701073244566]
+                ];
+
+                let degreesArray = [];
+                points.forEach(item => {
+                    degreesArray.push(item[0]);
+                    degreesArray.push(item[1]);
+                });
+                this.addPolygon(Cesium.Cartesian3.fromDegreesArray(degreesArray));
+
+                let positions = xt3d.SpatialAnalysis.Buffer.polygonBuffer(points, 60, {
+                    units: 'meters',
+                    z: 0
+                });
+                this.addBufferPolyogn(positions);
+            },
+
+            //添加面
+            addPolygon(positions) {
+                this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(positions),
+                        material: Cesium.Color.YELLOW.withAlpha(0.6),
+                        classificationType: Cesium.ClassificationType.BOTH
+                    },
+                    polyline: {
+                        positions: positions,
+                        width: 2,
+                        material: Cesium.Color.YELLOW.withAlpha(0.4),
+                    }
+                });
+            },
+
+            //添加缓冲面
+            addBufferPolyogn(positions) {
+                this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: new Cesium.PolygonHierarchy(positions),
+                        material: Cesium.Color.RED.withAlpha(0.6),
+                        classificationType: Cesium.ClassificationType.BOTH
+                    },
+                });
+            },
+
+            //设置视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1571387.3809212528,
+                        y: 5327289.882969427,
+                        z: 3128663.905758795
+                    },
+                    orientation: {
+                        heading: 6.166690373674861,
+                        pitch: -0.8912442588528116,
+                        roll: 6.2826513409245255
+                    }
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

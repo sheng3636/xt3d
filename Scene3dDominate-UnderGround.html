@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>地表透明（地下模式）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        .el-form-item__label {
+            color: white;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="form-container" id="formContainer">
+        <el-form ref="form" :model="form" label-width="110px">
+            <el-form-item label="地下模式开关：">
+                <el-switch v-model="form.underGroundEnable" @change="chkUnderground"></el-switch>
+            </el-form-item>
+            <el-form-item label="地表透明度：">
+                <el-slider v-model="form.alpha" :disabled="!form.underGroundEnable" style="width:250px" :min="0" :max="1" :step="0.1" @input="changeAlpha"></el-slider>
+            </el-form-item>
+        </el-form>
+
+        <button @click="camera1">俯仰视角</button>
+        <button @click="camera2">地下视角1</button>
+        <button @click="camera3">地下视角2</button>
+    </div>
+
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addModel();
+                this.addBox();
+                this.addPolylineVolume();
+                this.setView();
+
+                this.underGround = new xt3d.SceneDominate.UnderGround(this.viewer);
+                this.underGround.activate();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //添加模型
+            addModel() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88433361209046, 27.645364988637994, 850),
+                    model: {
+                        uri: "/static/gltf/xiaofangche.gltf",
+                        colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+                        color: Cesium.Color.WHITE,
+                        scale: 2,
+                        maximumScale: 6,
+                    }
+                });
+
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.884684, 27.645236, 850),
+                    model: {
+                        uri: "/static/gltf/xiaofangche.gltf",
+                        colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+                        color: Cesium.Color.WHITE,
+                        scale: 2,
+                        maximumScale: 6,
+                    }
+                });
+            },
+
+            //添加柱体
+            addBox() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.884566, 27.6455, 850),
+                    box: {
+                        dimensions: new Cesium.Cartesian3(10, 10, 20),
+                        material: Cesium.Color.YELLOW
+                    }
+                });
+            },
+
+            //添加管线
+            addPolylineVolume() {
+                let lineString = [
+                    [106.88355376451588, 27.6463676411241, 840.0],
+                    [106.88522910724784, 27.645135003039023, 840.0],
+                    [106.88590845875306, 27.645923905844867, 840.0],
+                    [106.88413636965775, 27.646905649202246, 840.0],
+                    [106.88372029525429, 27.646473316273184, 840.0]
+                ];
+
+                let positions = [];
+                lineString.forEach(item => {
+                    positions.push(Cesium.Cartesian3.fromDegrees(item[0], item[1], item[2]))
+                })
+
+                this.viewer.entities.add({
+                    polylineVolume: {
+                        positions: positions,
+                        shape: this.computeCircle(0.5),
+                        material: Cesium.Color.RED,
+                    },
+                });
+            },
+
+            //管线形状
+            computeCircle(radius) {
+                var positions = [];
+                for (var i = 0; i < 360; i++) {
+                    var radians = Cesium.Math.toRadians(i);
+                    positions.push(
+                        new Cesium.Cartesian2(
+                            radius * Math.cos(radians),
+                            radius * Math.sin(radians)
+                        )
+                    );
+                }
+                return positions;
+            },
+
+            //设置初始视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1642571.109251998,
+                        y: 5411138.154654505,
+                        z: 2942098.167472331
+                    },
+                    orientation: {
+                        heading: 5.450601406118034,
+                        pitch: -0.5763782371499313,
+                        roll: 6.280751500849277
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    form: {
+                        underGroundEnable: true,
+                        alpha: 0.8
+                    }
+                }
+            },
+            methods: {
+                //改变地下模式可用
+                chkUnderground() {
+                    if (this.form.underGroundEnable) {
+                        xt3dInit.underGround.activate();
+                    } else {
+                        xt3dInit.underGround.deactivate();
+                    }
+                },
+
+                //改变透明值
+                changeAlpha() {
+                    xt3dInit.underGround.setAlpha(this.form.alpha);
+                },
+
+                //视角 1
+                camera1() {
+                    let flyToOpts = {
+                        destination: {
+                            x: -1642520.7062941045,
+                            y: 5411292.873460493,
+                            z: 2942295.0596271716
+                        },
+                        orientation: {
+                            heading: 5.926427854705866,
+                            pitch: -1.5119620008871242,
+                            roll: 6.266070447186079
+                        },
+                        duration: 1
+                    };
+                    xt3dInit.viewer.scene.camera.flyTo(flyToOpts);
+                },
+                //视角 2
+                camera2() {
+                    let flyToOpts = {
+                        destination: {
+                            x: -1642412.2831661056,
+                            y: 5411080.547864046,
+                            z: 2942010.9438542794
+                        },
+                        orientation: {
+                            heading: 0.13770007433951026,
+                            pitch: 0.06781475986517727,
+                            roll: 0.0003790297477417326
+                        },
+                        duration: 1
+                    };
+                    xt3dInit.viewer.scene.camera.flyTo(flyToOpts);
+                },
+                //视角 3
+                camera3() {
+                    let flyToOpts = {
+                        destination: {
+                            x: -1642557.3834583496,
+                            y: 5410928.808183915,
+                            z: 2942185.351353508
+                        },
+                        orientation: {
+                            heading: 4.451254950474495,
+                            pitch: 0.12194453156914276,
+                            roll: 6.280502978418216
+                        },
+                        duration: 1
+                    };
+                    xt3dInit.viewer.scene.camera.flyTo(flyToOpts);
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

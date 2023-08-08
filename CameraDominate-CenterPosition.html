@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>视角中心点</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+                this.sceneCenterPosition = new xt3d.CameraDominate.CenterPosition(this.viewer);
+                this.addWalkMan();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    }),
+                });
+
+            },
+
+            //添加模型
+            addWalkMan() {
+                this.viewer.entities.add({
+                    position: new Cesium.CallbackProperty(e => {
+                        return this.sceneCenterPosition.getValue();
+                    }, false),
+                    model: {
+                        uri: "/data.xt3d.cn/assets/gltf/man/walk.gltf",
+                        scale: 10
+                    },
+                    ellipse: {
+                        semiMajorAxis: 10,
+                        semiMinorAxis: 10,
+                        material: Cesium.Color.YELLOW.withAlpha(0.2)
+                    }
+                })
+            },
+
+            //设置初始视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1715605.0327672798,
+                        y: 4994004.816486211,
+                        z: 3566310.326093384
+                    },
+                    orientation: {
+                        heading: 0.03857198224516534,
+                        pitch: -0.6815549249886712,
+                        roll: 0.0001552838405389778
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

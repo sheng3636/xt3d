@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>场景出图（导出图片）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="btn-container">
+        <button onclick="downLoad1()">下载图片</button>
+        <button onclick="downLoad2()">下载缩略图</button>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initMonitors();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    contextOptions: {
+                        webgl: {
+                            alpha: true,
+                            depth: false,
+                            stencil: true,
+                            antialias: true,
+                            premultipliedAlpha: true,
+                            preserveDrawingBuffer: true,
+                            failIfMajorPerformanceCaveat: true
+                        },
+                        allowTextureFilterAnisotropic: true
+                    },
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+            },
+
+            //添加相机点位
+            initMonitors() {
+                let monitors = [{
+                    name: "北京西路与北京路交叉口",
+                    ip: "42.23.33.23",
+                    type: "固定枪机",
+                    state: "在线",
+                    position: {
+                        x: -1642312.5134694357,
+                        y: 5410103.431854676,
+                        z: 2942105.546479778
+                    }
+                }, {
+                    name: "阿化修理店门口",
+                    ip: "42.23.33.22",
+                    type: "固定枪机",
+                    state: "在线",
+                    position: {
+                        x: -1642335.9668148402,
+                        y: 5410073.68998821,
+                        z: 2942146.013788689
+                    }
+                }, {
+                    name: "瑞安市钢材市场(东新路店)",
+                    ip: "42.23.33.12",
+                    type: "固定枪机",
+                    state: "在线",
+                    position: {
+                        x: -1642349.165646185,
+                        y: 5410058.839841634,
+                        z: 2942167.85307159
+                    }
+                }, {
+                    name: "安心大药房(上旺西路店)",
+                    ip: "42.23.33.25",
+                    type: "固定枪机",
+                    state: "在线",
+                    position: {
+                        x: -1642234.6906042907,
+                        y: 5410203.789605635,
+                        z: 2941976.755600351
+                    }
+                }, ]
+
+                monitors.forEach(item => {
+                    this.viewer.entities.add({
+                        position: item.position,
+                        info: item,
+                        billboard: {
+                            image: '/static/images/marker/bluecamera.png',
+                            scaleByDistance: new Cesium.NearFarScalar(1500, 1, 12000, 0.8),
+                            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 10000),
+                            verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                        }
+                    })
+                })
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+
+        let exportFile = new xt3d.SceneDominate.ExportFile(xt3dInit.viewer);
+
+        //下载场景
+        function downLoad1() {
+            exportFile.exportImage();
+        }
+
+        //下载缩略图
+        function downLoad2() {
+            exportFile.exportSmallImage();
+        }
+    </script>
+</body>
+
+</html>

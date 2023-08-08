@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>超级线</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuilding();
+                this.addPolylines1();
+                this.addPolylines2();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                let imageryProvider =
+                    new Cesium.UrlTemplateImageryProvider({
+                        url: "https://api.mapbox.com/styles/v1/marsgis/cki0a0ire3jvh19r92vwfau1e/tiles/512/{z}/{x}/{y}@2x?access_token=sk.eyJ1IjoibWFyc2dpcyIsImEiOiJjbDFhYXQ3a2EwaHF6M2NvdnhmdjR6ajZ2In0.-sahm9R0QuPP3pAihJHC4A"
+                    })
+                imageryProvider.defaultBrightness = 0.1;
+
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: imageryProvider
+                });
+
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            addPolylines1() {
+                let startPoint = [108.06877586700776, 34.63957352424283];
+
+                let endPoint = [108.068740161456, 34.64252395548559];
+                let positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline1(positions, Cesium.Color.LIME);
+
+                endPoint = [108.0686131998362, 34.63436547491341];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline1(positions, Cesium.Color.AQUA);
+
+
+                endPoint = [108.07299898810169, 34.63427747409825];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline1(positions, Cesium.Color.RED);
+
+                endPoint = [108.07256688405496, 34.63994004791921];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline1(positions, Cesium.Color.YELLOW);
+
+
+                endPoint = [108.06316063226006, 34.6397806272969];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline1(positions, Cesium.Color.ORANGE);
+            },
+
+            addPolylines2() {
+                let startPoint = [108.07640114172817, 34.637714562818886];
+
+                let endPoint = [108.07665660400173, 34.635353250219396];
+                let positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline2(positions.reverse(), Cesium.Color.LIME);
+
+                endPoint = [108.07282363395764, 34.639089599989525];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline2(positions.reverse(), Cesium.Color.AQUA, 2);
+
+
+                endPoint = [108.07738166610908, 34.641128124337435];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline2(positions.reverse(), Cesium.Color.RED);
+
+                endPoint = [108.08145786642352, 34.63517759720681];
+                positions = xt3d.Utils.parabola(startPoint, endPoint, 268);
+                this.addPolyline2(positions.reverse(), Cesium.Color.YELLOW, 2);
+            },
+
+            addPolyline1(positions, color) {
+                this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 8,
+                        material: new xt3d.PolylineObject.PolylineSuperMaterial({
+                            color: color,
+                            duration: 2000,
+                            count: 1,
+                            url: "/static/images/polylinematerial/flyline_01.png"
+                        }),
+                    }
+                })
+            },
+
+            addPolyline2(positions, color, count) {
+                this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 15,
+                        material: new xt3d.PolylineObject.PolylineSuperMaterial({
+                            color: color,
+                            duration: 2000,
+                            count: count || 1,
+                            url: "/static/images/polylinematerial/arrow_01.png"
+                        }),
+                    }
+                })
+            },
+
+            loadBuilding() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(108.07312, 34.63856, 10),
+                    model: {
+                        uri: "http://www.xt3d.cn/data/gltf/building.gltf",
+                        colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+                        color: Cesium.Color.WHITE,
+                        scale: 1,
+                    }
+                })
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1630514.6433714125,
+                        y: 4994252.773347584,
+                        z: 3606980.767066906
+                    },
+                    orientation: {
+                        heading: 3.640949343622151,
+                        pitch: -0.7139431302484232,
+                        roll: 0.000011247440551365173
+                    },
+                    duration: 3
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

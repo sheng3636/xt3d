@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>简单渐变标注</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.addGradientLabels();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+            },
+
+
+            //添加GradientLabel
+            addGradientLabels() {
+                let position = Cesium.Cartesian3.fromDegrees(121.92424498806614, 40.89661528946011, 12);
+                let gradientLabel = new xt3d.PointObject.GradientLabel(this.viewer, position, "冷却装置");
+
+                position = Cesium.Cartesian3.fromDegrees(121.92435768210461, 40.89759625865303, 18);
+                gradientLabel = new xt3d.PointObject.GradientLabel(this.viewer, position, "发电机");
+
+                position = Cesium.Cartesian3.fromDegrees(121.92543397812894, 40.897983965047615, 19);
+                gradientLabel = new xt3d.PointObject.GradientLabel(this.viewer, position, "过滤室");
+
+                position = Cesium.Cartesian3.fromDegrees(121.92488000957968, 40.89778043856062, 19);
+                gradientLabel = new xt3d.PointObject.GradientLabel(this.viewer, position, "控制设备");
+
+                position = Cesium.Cartesian3.fromDegrees(121.92578073220974, 40.89745074489062, 8);
+                gradientLabel = new xt3d.PointObject.GradientLabel(this.viewer, position, "作业指挥");
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/3dtiles/gongchang/tileset.json"
+                    })
+                );
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2553374.172703172,
+                        y: 4097726.3906417913,
+                        z: 4153827.26639926
+                    },
+                    orientation: {
+                        heading: 4.992442359558382,
+                        pitch: -0.2934865299291718,
+                        roll: 6.279848754837252
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

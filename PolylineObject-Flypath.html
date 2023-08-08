@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>绕圈巡航</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addEllipsoid();
+                this.addFlyPolyline();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //半球体
+            addEllipsoid() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(108.914269, 34.324121, 0),
+                    ellipsoid: {
+                        radii: new Cesium.Cartesian3(200000.0, 200000.0, 200000.0),
+                        maximumCone: Cesium.Math.PI_OVER_TWO,
+                        material: new xt3d.EllipsoidObject.EllipsoidMaterial({
+                            color: Cesium.Color.fromCssColorString("#ff0000"),
+                            duration: 2000,
+                            count: 2
+                        })
+                    },
+                });
+            },
+
+            //飞机飞行线
+            addFlyPolyline() {
+                let start = Cesium.JulianDate.fromDate(new Date(2015, 2, 25, 16));
+                let stop = Cesium.JulianDate.addSeconds(
+                    start,
+                    360,
+                    new Cesium.JulianDate()
+                );
+                this.viewer.clock.startTime = start.clone();
+                this.viewer.clock.stopTime = stop.clone();
+                this.viewer.clock.currentTime = start.clone();
+                this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+                this.viewer.clock.multiplier = 10;
+
+                let position = this.computeCirclularFlight(108.914269, 34.324121, 3.5, start);
+                let entity = this.viewer.entities.add({
+                    availability: new Cesium.TimeIntervalCollection([
+                        new Cesium.TimeInterval({
+                            start: start,
+                            stop: stop,
+                        }),
+                    ]),
+                    position: position,
+                    orientation: new Cesium.VelocityOrientationProperty(position),
+                    model: {
+                        uri: "/static/glb/Cesium_Air.glb",
+                        minimumPixelSize: 48,
+                    },
+                    path: {
+                        resolution: 1,
+                        material: new xt3d.PolylineObject.PolylineLightingMaterialProperty(Cesium.Color.GREEN),
+                        width: 10,
+                    },
+                });
+            },
+
+            //飞行线
+            computeCirclularFlight(lon, lat, radius, start) {
+                let property = new Cesium.SampledPositionProperty();
+                for (let i = 0; i <= 360; i += 2) {
+                    let radians = Cesium.Math.toRadians(i);
+                    let time = Cesium.JulianDate.addSeconds(
+                        start,
+                        i,
+                        new Cesium.JulianDate()
+                    );
+                    let position = Cesium.Cartesian3.fromDegrees(
+                        lon + radius * 1.2 * Math.cos(radians),
+                        lat + radius * Math.sin(radians),
+                        100000
+                    );
+                    property.addSample(time, position);
+                }
+                return property;
+            },
+
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2224325.628950648,
+                        y: 6607102.85264413,
+                        z: 3073242.4068826777
+                    },
+                    orientation: {
+                        heading: 0.02107913234005121,
+                        pitch: -0.8968124890759657,
+                        roll: 6.283171613955314
+                    },
+                    duration: 2
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

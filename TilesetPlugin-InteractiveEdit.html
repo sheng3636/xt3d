@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>编辑（交互）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            max-width: 380px;
+            min-width: 300px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .el-slider__runway {
+            margin: 9px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="form-container" id="formContainer">
+        <p>比例：</p>
+        <input type="number" v-model.number="form.scale" @input="update3dtilesMaxtrix" :step="0.1" :max="100" :min="0.1" />
+        <p>经度：</p>
+        <input type="number" v-model.number="form.longitude" @input="update3dtilesMaxtrix" :step="0.001" />
+        <p>纬度：</p>
+        <input type="number" v-model.number="form.latitude" @input="update3dtilesMaxtrix" :step="0.001" />
+        <p>高度：</p>
+        <el-slider v-model="form.height" @input="update3dtilesMaxtrix" :min="-100" :max="1000"></el-slider>
+        <p>以x轴旋转</p>
+        <el-slider v-model="form.rx" @input="update3dtilesMaxtrix" :min="-100" :max="100"></el-slider>
+        <p>以y轴旋转</p>
+        <el-slider v-model="form.ry" @input="update3dtilesMaxtrix" :min="-100" :max="100"></el-slider>
+        <p>以z轴旋转</p>
+        <el-slider v-model="form.rz" @input="update3dtilesMaxtrix" :min="-100" :max="100"></el-slider>
+        <button @click="saveOpts">保存参数</button>
+    </div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.ModelLoadedEvent = new Cesium.Event();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        //url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                        //url: "http://data.xtgis.cn/3dtiles/max-fsdzm/tileset.json" 
+                        // url: "http://www.xt3d.cn/data/3dtiles/gongchang/tileset.json",
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(tileset);
+                        this.ModelLoadedEvent.raiseEvent(tileset); //模型加载完成
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    form: {
+                        scale: 1.0,
+                        longitude: 0,
+                        latitude: 0,
+                        height: 0, //修改高度
+                        rx: 0,
+                        ry: 0,
+                        rz: 0 //修改旋转
+                    }
+                }
+            },
+            methods: {
+                update3dtilesMaxtrix() {
+                    if (!tilesetEditor) return;
+                    tilesetEditor.updateModelMatrix(this.opts);
+                },
+
+                saveOpts() {
+                    console.log(tilesetEditor.getParams());
+                }
+            }
+        })
+
+
+        let tilesetEditor; //模型编辑器
+        xt3dInit.ModelLoadedEvent.addEventListener(tileset => {
+            tilesetEditor = new xt3d.TilesetPlugin.PositionEditor(xt3dInit.viewer, tileset);
+            vm.form = tilesetEditor.getParams(); //把已有参数设置到界面上 
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>立体墙呼吸灯</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuilData();
+                this.addWall1();
+                this.addWall2();
+                this.addWall3();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: true,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: "http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = false; //默认为false  
+                this.viewer.animation.container.style.visibility = 'hidden'; // 不显示动画控件  
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //添加墙体1
+            addWall1() {
+                var wallGeometry = new Cesium.WallGeometry({ 
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                        116.37929799114973, 39.89829307224057, 100,
+                        116.37951255218856, 39.89497548310295, 100,
+                        116.3978679817428, 39.89533386524037, 100,
+                        116.39752185488005, 39.898061816787596, 100
+                    ])
+                }); 
+                let wallPrimitive = new xt3d.AdvancedPlugin.BreathingWallPrimitive(wallGeometry, Cesium.Color.LIME);
+                this.viewer.scene.primitives.add(wallPrimitive);
+            },
+
+            //添加墙体2
+            addWall2() {
+                var wallGeometry = new Cesium.WallGeometry({ 
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                        116.39752185488005, 39.898061816787596, 100,
+                        116.39692006944435, 39.90439295276503, 100,
+                        116.39266270283463, 39.90424615368007, 100,
+                    ])
+                });
+                let wallPrimitive = new xt3d.AdvancedPlugin.BreathingWallPrimitive(wallGeometry, Cesium.Color.YELLOW);
+                this.viewer.scene.primitives.add(wallPrimitive);
+            },
+
+            //添加墙体3
+            addWall3() {
+                var wallGeometry = new Cesium.WallGeometry({ 
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                        116.39266270283463, 39.90424615368007, 100,
+                        116.39250588593495, 39.9050729049965, 100,
+                        116.39767752453106, 39.9052585221934, 100,
+                        116.39743670530584, 39.91188944544552, 100,
+                    ])
+                });
+                let wallPrimitive = new xt3d.AdvancedPlugin.BreathingWallPrimitive(wallGeometry, Cesium.Color.RED);
+                this.viewer.scene.primitives.add(wallPrimitive);
+            },
+
+            //添加建筑数据
+            loadBuilData() {
+                this.loadData1();
+                this.loadData2();
+                this.loadData3();
+            },
+
+            //建筑1
+            loadData1() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://lab.earthsdk.com/model/27af3f70003311eaae02359b3e5d0653/tileset.json"
+                    })
+                );
+                tileset.readyPromise
+                    .then(tileset => {
+                        let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                            shader: `varying vec3 v_positionEC;
+                                      void main(void){
+                                           vec4 position = czm_inverseModelView * vec4(v_positionEC,1);  
+                                           float glowRange = 50.0;  
+                                           gl_FragColor = vec4(0.2,  0.5, 1.0, 1.0); 
+                                           gl_FragColor *= vec4(vec3((position.z + 40.0) / 30.0), 0.2);  
+                                         
+                                           float time = fract(czm_frameNumber / 360.0);
+                                           time = abs(time - 0.5) * 2.0;
+                                           float diff = step(0.005, abs( clamp(position.z / glowRange, 0.0, 1.0) - time));
+                                           gl_FragColor.rgb += gl_FragColor.rgb * (1.0 - diff);
+                                    }`
+                        });
+                    })
+                    .otherwise(function(error) {
+                        console.error(error);
+                    });
+            },
+
+            //建筑2
+            loadData2() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://lab.earthsdk.com/model/212bc470003311eaae02359b3e5d0653/tileset.json"
+                    })
+                );
+                tileset.readyPromise
+                    .then(tileset => {
+                        let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                            shader: `varying vec3 v_positionEC;
+                                      void main(void){
+                                           vec4 position = czm_inverseModelView * vec4(v_positionEC,1);  
+                                           float glowRange = 50.0;  
+                                           gl_FragColor = vec4(0.2,  0.5, 1.0, 1.0);  
+                                           gl_FragColor *= vec4(vec3((position.z + 40.0) / 30.0), 0.2);  
+                                          
+                                           float time = fract(czm_frameNumber / 360.0);
+                                           time = abs(time - 0.5) * 2.0;
+                                           float diff = step(0.005, abs( clamp(position.z / glowRange, 0.0, 1.0) - time));
+                                           gl_FragColor.rgb += gl_FragColor.rgb * (1.0 - diff);
+                                    }`
+                        });
+                    })
+                    .otherwise(function(error) {
+                        console.error(error);
+                    });
+            },
+
+            //建筑3
+            loadData3() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://lab.earthsdk.com/model/1b91bf10003311eaae02359b3e5d0653/tileset.json"
+                    })
+                );
+                tileset.readyPromise
+                    .then(tileset => {
+                        let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                            shader: `varying vec3 v_positionEC;
+                                      void main(void){
+                                           vec4 position = czm_inverseModelView * vec4(v_positionEC,1);  
+                                           float glowRange = 50.0;  
+                                           gl_FragColor = vec4(0.2,  0.5, 1.0, 1.0);  
+                                           gl_FragColor *= vec4(vec3((position.z + 40.0) / 30.0), 0.2);  
+
+                                           float time = fract(czm_frameNumber / 360.0);
+                                           time = abs(time - 0.5) * 2.0;
+                                           float diff = step(0.005, abs( clamp(position.z / glowRange, 0.0, 1.0) - time));
+                                           gl_FragColor.rgb += gl_FragColor.rgb * (1.0 - diff);
+                                    }`
+                        });
+                    })
+                    .otherwise(function(error) {
+                        console.error(error);
+                    });
+            },
+
+            //设置默认视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2179256.649773337,
+                        y: 4389313.6458639335,
+                        z: 4069099.527877227
+                    },
+                    orientation: {
+                        heading: 5.29962774516043,
+                        pitch: -0.3104341444741181,
+                        roll: 6.280295711424159
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

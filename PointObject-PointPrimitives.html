@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Primitives加载大量图标点</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+    <script src='./libs/turf.min.js'></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initPrimitives();
+                this.addPrimitives();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: true,
+                    selectionIndicator: true,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+
+            },
+
+            //初始化BillboardCollection
+            initPrimitives() {
+                // Create a billboard collection  
+                this.billboards = this.viewer.scene.primitives.add(new Cesium.BillboardCollection());
+            },
+
+            //添加图标点
+            addPrimitives() {
+                let points = turf.randomPoint(20000, {
+                    bbox: [73, 20, 135, 40]
+                }); //使用turf生产20000个随机坐标点
+                let features = points.features;
+                let feature, geom, coordinates, position;
+
+                for (let i = 0; i < features.length; i++) {
+                    feature = features[i];
+                    geom = feature.geometry;
+                    coordinates = geom.coordinates;
+                    position = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1], 0);
+                    this.addPrimitive(position);
+                }
+            },
+
+            //添加单个图标点
+            addPrimitive(position) {
+                this.billboards.add({
+                    position: position,
+                    image: '/static/images/marker/monitor.png',
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                });
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2519873.872063144,
+                        y: 5980265.43512472,
+                        z: 2728481.985781643
+                    },
+                    orientation: {
+                        heading: 0.15184662496471635,
+                        pitch: -0.9371141121917788,
+                        roll: 6.282781043024009
+                    }
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

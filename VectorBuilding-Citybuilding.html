@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>城市建筑白模</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+
+        .b-item {
+            padding: 5px 10px;
+            background: rgba(0, 217, 255, 0.13);
+            border-radius: 5px;
+            margin: 3px 0px;
+        }
+
+        .b-name {
+            display: inline-block;
+            width: 130px;
+        }
+
+        .b-load-c {
+            margin-right: 10px;
+        }
+
+        .b-load-c,
+        .b-load-e {
+            background: rgba(13, 134, 214, 0.267);
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .b-load-c:hover {
+            background: rgba(177, 214, 13, 0.267);
+        }
+
+        .b-load-e:hover {
+            background: rgba(177, 214, 13, 0.267);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <div class="b-item">
+            <span class="b-name">成都市</span>
+            <span class="b-load-c"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/chengdu/tileset.json",0)'>普通加载</span>
+            <span class="b-load-e"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/chengdu/tileset.json",1)'>特效加载</span>
+        </div>
+        <div class="b-item">
+            <span class="b-name">上海核心地段</span>
+            <span class="b-load-c"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/shanghai/tileset.json",0)'>普通加载</span>
+            <span class="b-load-e"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/shanghai/tileset.json",1)'>特效加载</span>
+        </div>
+        <div class="b-item">
+            <span class="b-name">深圳南山区大街道</span>
+            <span class="b-load-c"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/sz_ns2/tileset.json",0)'>普通加载</span>
+            <span class="b-load-e"
+                onclick='loadBuild("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/sz_ns2/tileset.json",1)'>特效加载</span>
+        </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles("https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/sz_ns2/tileset.json", 0);
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                let imageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+                    url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                })
+
+                imageryProvider.defaultBrightness = 0.1;
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: imageryProvider
+                });
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            load3dtiles(url, styleType) {
+                this.viewer.scene.primitives.removeAll();
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: url
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        if (styleType == 0) {
+                            this.setTileStyle(tileset);
+                        } else {
+                            this.createCustomShaderEffect(tileset);
+                        };
+
+                        this.viewer.zoomTo(tileset);
+                    })
+                    .otherwise(function (error) {
+                        console.log(error);
+                    });
+            },
+
+            setTileStyle(tileset) {
+                tileset.style = new Cesium.Cesium3DTileStyle({
+                    color: {
+                        conditions: [
+                            ['${Floor} >= 16', 'rgb(59 178 208)'],
+                            ['${Floor} >= 13', 'rgb(21 209 242)'],
+                            ['${Floor} >= 8', 'rgb(21 209 242)'],
+                            ['${Floor} >= 3', 'rgb(34 59 83)'],
+                            ['true', 'rgb(251 176 59)']
+                        ]
+                    }
+                });
+            },
+
+            createCustomShaderEffect(tileset) {
+                let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                    color: '0.2, 0.5, 1.0, 1.0', //颜色 rgba 浮点型 
+                    glowRange: true, //是否显示光环
+                    glowRangeHeight: '100.0', //光环范围 浮点型
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function loadBuild(url, styleType) {
+            xt3dInit.load3dtiles(url, styleType);
+        }
+    </script>
+</body>
+
+</html>

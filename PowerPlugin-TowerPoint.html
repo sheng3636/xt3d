@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>电塔点</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .form-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="form-container" id="formContainer">
+        <label>方向：</label>
+        <el-slider v-model="angle" :show-tooltip="true" @input="inputChange" :min="0" :max="360"></el-slider>
+        <el-checkbox label="显示连接点" v-model="showLinkedPoint" @change="chkShowLinkedPoint"></el-checkbox>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addTower();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //电塔点
+            addTower() {
+                let position = Cesium.Cartesian3.fromDegrees(119.932965, 29.67896, 394.58);
+                this.tower = new xt3d.PowerPlugin.Tower(this.viewer, position, 105);
+                this.addLinkedPoints();
+            },
+
+            //添加连线点
+            addLinkedPoints() {
+                this.linkedPoints = [];
+                let positions = this.tower.getLinkedPositions();
+                positions.forEach(position => {
+                    let e = this.viewer.entities.add({
+                        position: position,
+                        point: {
+                            pixelSize: 10,
+                            color: Cesium.Color.fromRandom({
+                                alpha: 1
+                            })
+                        }
+                    });
+                    this.linkedPoints.push(e);
+                });
+            },
+
+            //删除连线点
+            removeLinkedPoints() {
+                this.linkedPoints.forEach(item => {
+                    this.viewer.entities.remove(item);
+                });
+                this.linkedPoints = [];
+            },
+
+            //设置视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2767600.1965010124,
+                        y: 4806466.218253136,
+                        z: 3139841.2724256646
+                    },
+                    orientation: {
+                        heading: 3.651393409704802,
+                        pitch: -0.42963490710782537,
+                        roll: 6.2816386384145755
+                    }
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            },
+        }
+
+        xt3dInit.init("map3d");
+
+        //界面控制
+        let vm = new Vue({
+            el: "#formContainer",
+            data() {
+                return {
+                    angle: 105,
+                    showLinkedPoint: true
+                };
+            },
+
+            methods: {
+                chkShowLinkedPoint() {
+                    xt3dInit.removeLinkedPoints();
+                    if (this.showLinkedPoint) {
+                        xt3dInit.addLinkedPoints();
+                    }
+                },
+
+                inputChange() {
+                    xt3dInit.tower.updateAngle(this.angle);
+
+                    xt3dInit.removeLinkedPoints();
+                    if (this.showLinkedPoint) {
+                        xt3dInit.addLinkedPoints();
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

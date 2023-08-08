@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>热点面板文本</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addHotSpotBoards();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    skyAtmosphere: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+            },
+
+            //添加HotSpotBoard
+            addHotSpotBoards() {
+                let position = Cesium.Cartesian3.fromDegrees(116.274028, 30.978035, 944.63);
+                let hotSpotBoard = new xt3d.PointObject.HotSpotBoard(this.viewer, position, {
+                    chineseTitle: "攀登点1",
+                    englishTitle: "Climbing point 1",
+                    bgImageUrl: "/static/images/hotspotboard"
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(116.272111, 30.98754, 938.13);
+                hotSpotBoard = new xt3d.PointObject.HotSpotBoard(this.viewer, position, {
+                    chineseTitle: "攀登点2",
+                    englishTitle: "Climbing point 2",
+                    bgImageUrl: "/static/images/hotspotboard"
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(116.261625, 30.985559, 1172.21);
+                hotSpotBoard = new xt3d.PointObject.HotSpotBoard(this.viewer, position, {
+                    chineseTitle: "攀登点3",
+                    englishTitle: "Climbing point 3",
+                    bgImageUrl: "/static/images/hotspotboard"
+                });
+            },
+
+            //设置默认视角
+            setView() {
+                this.viewer.scene.camera.flyTo({
+                    destination: {
+                        x: -2424215.2692117495,
+                        y: 4908219.815464572,
+                        z: 3265881.2209251253
+                    },
+                    orientation: {
+                        heading: 4.27152875954761,
+                        pitch: -0.45854016371454875,
+                        roll: 6.280201738866047
+                    },
+                    duration: 1
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

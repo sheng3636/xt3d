@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图片 canvas画图billboard文字动画</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.addBillboardPlanes();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/3dtiles/gongchang/tileset.json",
+                    })
+                );
+            },
+
+            // 添加BillboardPlane
+            addBillboardPlanes() {
+                let position = Cesium.Cartesian3.fromDegrees(121.92424498806614, 40.89661528946011, 12);
+                let p1 = new xt3d.PointObject.BillboardPlane(this.viewer, position);
+
+                position = Cesium.Cartesian3.fromDegrees(121.92435768210461, 40.89759625865303, 18);
+                let p2 = new xt3d.PointObject.BillboardPlane(this.viewer, position);
+
+                position = Cesium.Cartesian3.fromDegrees(121.92543397812894, 40.897983965047615, 19);
+                let p3 = new xt3d.PointObject.BillboardPlane(this.viewer, position);
+
+                let max = 100;
+                let min = 1;
+                //定时更新数据
+                setInterval(() => {
+                    p1.updateText(Math.floor(Math.random() * (max - min)) + min);
+                    p2.updateText(Math.floor(Math.random() * (max - min)) + min);
+                    p3.updateText(Math.floor(Math.random() * (max - min)) + min);
+                }, 1000);
+            },
+
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2553393.6419166615,
+                        y: 4097867.5398520203,
+                        z: 4153816.106705832
+                    },
+                    orientation: {
+                        heading: 5.402228688436439,
+                        pitch: -0.5918797601825894,
+                        roll: 6.280092867887838
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

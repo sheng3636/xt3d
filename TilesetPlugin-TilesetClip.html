@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>裁剪</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+    <script src="./libs/turf.min.js"></script>
+
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="btn-container">
+        <button onclick="drawActivate('Polygon')">绘制多边形</button>
+        <button onclick="clearClip()">清除</button>
+        <div class="tip-item">目前仅支持凸多边形，如果绘制的是凹多边形，可能裁剪结果不正确</div>
+    </div>
+
+    </div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.ModelLoadedEvent = new Cesium.Event();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.ModelLoadedEvent.raiseEvent(tileset);
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        let tileset;
+        //模型加载完成后设为全局对象
+        xt3dInit.ModelLoadedEvent.addEventListener(t => {
+            tileset = t;
+
+            //默认裁剪
+            initClip();
+        });
+
+        //模型裁剪类
+        let tilesetClip = new xt3d.TilesetPlugin.TilesetClip(xt3dInit.viewer);
+
+        //绘制类
+        let entityDraw = new xt3d.Map3dTools.EntityDraw(xt3dInit.viewer);
+        entityDraw.DrawEndEvent.addEventListener((result, positions) => {
+            result.remove();
+            console.log(positions);
+            //绘制完成后进行裁剪
+            tilesetClip.add(positions, tileset);
+        });
+
+        function initClip() {
+            let positions = [{
+                x: -1715372.1104364456,
+                y: 4993210.382459393,
+                z: 3566564.5427094135
+            }, {
+                x: -1715365.4040908897,
+                y: 4993183.085313424,
+                z: 3566613.924048169
+            }, {
+                x: -1715311.96887019,
+                y: 4993199.615407809,
+                z: 3566615.753193611
+            }, {
+                x: -1715319.2569736778,
+                y: 4993227.467114703,
+                z: 3566565.2857384873
+            }]
+            tilesetClip.add(positions, tileset);
+        }
+
+
+        //界面按钮事件
+        function drawActivate(type) {
+            entityDraw.activate(type);
+            tilesetClip.clear();
+        }
+
+        function clearClip() {
+            tilesetClip.clear();
+        }
+    </script>
+</body>
+
+</html>

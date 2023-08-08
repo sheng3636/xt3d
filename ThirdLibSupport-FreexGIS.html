@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>恒歌科技</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #editEarthContainer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editEarthContainer"></div>
+
+    <script src="http://www.freexgis.com/online/femap/FreeXOnline.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <script>
+        /*测试恒歌科技目标瞄准功能 其他功能可自行测试*/
+
+        var FreeEarth = new FreeXEarth.FeMap(document.getElementById("editEarthContainer"));
+        var options = {
+            IP_ADDRESS: "http://www.freexgis.com/",
+            layerManagerConfig: {
+                baseLayers: [{
+                    "url": "freexserver/htc/service/wmts",
+                    "name": "World_30m_Local_6dm",
+                    "title": "HGT",
+                    "format": "image/jpeg",
+                    "visible": true,
+                    "maxVisibleLevel": 21,
+                    "iconUrl": "/data.xt3d.cn/assets/img/geolayer/hgt.png",
+                    "mobileIconUrl": "static/img/geolayer/mobile_hgt.png",
+                    "type": "WMTS"
+                }],
+                "terrains": [{
+                    "url": "web-data/terrain",
+                    "type": "terrain",
+                    "name": "terrain",
+                    "level": 8,
+                    "show": true,
+                    "iconUrl": "static/img/geolayer/hgt_wmts.png",
+                    "mobileIconUrl": "static/img/geolayer/mobile_hgt_wmts.png",
+                    "title": "高程数据"
+                }],
+            },
+            dataSources: []
+        };
+
+        var opt = {
+            url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
+            name: "GAO_DE",
+            projection: "EPSG:3857",
+            title: "高德影像",
+            visible: true
+        };
+        xyzLayer = new FreeXEarth.FeUrlTemplateLayer(opt);
+        FreeEarth.layerManager.addLayer(xyzLayer); //FreeEarth  FeMap对象
+
+        FreeEarth.loadConfig(options);
+        //添加瞄准特效
+        var opt = {
+            srcPosition: [108.94815, 24.26121, 1000],
+            destPosition: [108.94815, 20.26121, 1000],
+            partition: 120,
+            outsideRadius: 20000
+        };
+        var aim = new FreeXEarth.FeAimEffect(opt);
+        FreeEarth.addEffect(aim);
+        //动态旋转瞄准特效
+        var i = 0;
+        var allTime = 0;
+        setInterval(function() {
+            if (allTime > 10000) {
+                return;
+            }
+            allTime += 50;
+            aim.setDestPosition([108, 25 + i * 0.01, 2000]); //设置目标位置位置
+            i++;
+        }, 50)
+        var options = {
+            destination: [100.0, 27.0, 400000.0],
+            rotation: [110.0, -30.0, 0.0],
+            duration: 3.0
+        };
+        FreeEarth.flyTo(options);
+
+
+        function initXT3dObject(viewer) {
+            let position = Cesium.Cartesian3.fromDegrees(108.94815, 24.26121, 1000);
+            let wall = new xt3d.WallObject.CircleWall(viewer, position, {
+                radius: 400000,
+                wallHeight: 50000,
+                materialType: xt3d.WallObject.MaterialTypes.LINEFLOW,
+                wallColor: Cesium.Color.GREEN
+            });
+        }
+
+        //创建xt3d对象 只需拿到viewer对象即可 FreeXEarth中 feMap即为Cesium Viewer对象
+        initXT3dObject(FreeEarth);
+    </script>
+</body>
+
+</html>

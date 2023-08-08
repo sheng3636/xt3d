@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>锯齿围栏</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addWall();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: true,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    // terrainProvider: new Cesium.CesiumTerrainProvider({
+                    //     url: "http://data.xtgis.cn/terrain",
+                    //     requestWaterMask: true,
+                    //     requestVertexNormals: true
+                    // }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true
+
+            },
+
+            addWall() {
+                let ps = [];
+                let lls = [
+                    [117.319966, 31.842082, 12.29],
+                    [117.330034, 31.835286, 11.07],
+                    [117.330576, 31.823452, 11.01],
+                    [117.311457, 31.821023, 17.11],
+                    [117.308954, 31.828975, 16.29]
+                ];
+                lls.forEach(item => {
+                    ps.push(Cesium.Cartesian3.fromDegrees(item[0], item[1], item[2]))
+                })
+                let serratedWall = new xt3d.WallObject.SerratedWall(this.viewer, ps, {
+                    wallHeight: 500,
+                    direction: -1,
+                    speed: 10,
+                    color: Cesium.Color.fromCssColorString("#f33349")
+                });
+
+                //serratedWall.remove();
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2487153.036992519,
+                        y: 4823017.00791476,
+                        z: 3346002.0156240542
+                    },
+                    orientation: {
+                        heading: 1.558143791589158,
+                        pitch: -0.6614460944136646,
+                        roll: 0.0038082524218099323
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

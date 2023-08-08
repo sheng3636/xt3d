@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>点线面绘制</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!-- <script src='http://www.xt3d.cn/libs/turf.min.js'></script> -->
+    <script src="./libs/turf.min.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <!-- <script src="./xt3d/xt3d.js"></script> -->
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('Point')">绘制点</button>
+        <button onclick="drawActivate('Polyline')">绘制线</button>
+        <button onclick="drawActivate('Polygon')">绘制面</button>
+        <button onclick="clearDraw()">清空绘制</button>
+
+        <div class="tip-item">点击“绘制点”按钮后在场景中点击鼠标左键绘制点</div>
+        <div class="tip-item">点击“绘制线”按钮后在场景中点击鼠标左键绘制线,点击鼠标右键结束绘制。</div>
+        <div class="tip-item">点击“绘制面”按钮后在场景中点击鼠标左键绘制面,点击鼠标右键结束绘制。</div>
+        <div class="tip-item">点击“清空绘制”按钮后删除所有绘制对象</div>
+        <div class="tip-item">第一次绘制点后可能图标加载较慢，属正常情况，绘制结束会有回调事件，在回调事件中获取绘制结果</div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.initDrawTool();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true; //默认为false
+            },
+
+            //初始化绘制工具
+            initDrawTool() {
+                this.drawTool = new xt3d.LabelPlotting.EntityDraw(this.viewer);
+                this.drawTool.DrawEndEvent.addEventListener((result, positions, drawType) => {
+                    result.remove();
+                    this.addDrawResult(positions, drawType);
+                    console.log("绘制类型：" + drawType + "结果如下");
+                    console.log(positions)
+                })
+            },
+
+            //添加绘制结果
+            addDrawResult(positions, drawType) {
+                switch (drawType) {
+                    case "Point":
+                        this.generatePoint(positions);
+                        break;
+                    case "Polyline":
+                        this.generatePolyline(positions);
+                        break;
+                    case "Polygon":
+                        this.generatePolygon(positions);
+                        break;
+                }
+            },
+
+            //构造点
+            generatePoint(positions) {
+                let entity = this.viewer.entities.add({
+                    position: positions[0],
+                    billboard: {
+                        image: "/static/images/poi/sp.png",
+                        scaleByDistance: new Cesium.NearFarScalar(300, 1, 1200, 0.4), //设置随图缩放距离和比例
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 10000), //设置可见距离 10000米可见
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    }
+                })
+            },
+
+            //构造线
+            generatePolyline(positions) {
+                let entity = this.viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 2,
+                        material: new Cesium.PolylineDashMaterialProperty({
+                            color: Cesium.Color.YELLOW,
+                        }),
+                        depthFailMaterial: new Cesium.PolylineDashMaterialProperty({
+                            color: Cesium.Color.YELLOW,
+                        }),
+                    }
+                })
+            },
+
+            //构造面
+            generatePolygon(positions) {
+                let entity = this.viewer.entities.add({
+                    polygon: {
+                        hierarchy: positions,
+                        material: Cesium.Color.RED.withAlpha(0.4),
+                        perPositionHeight: true
+                    },
+                    polyline: {
+                        positions: positions.concat(positions[0]),
+                        width: 1,
+                        material: new Cesium.PolylineDashMaterialProperty({
+                            color: Cesium.Color.YELLOW,
+                        })
+                    }
+                })
+            },
+
+            //激活绘制工具
+            drawActivate(type) { //type in Point Polyline Polygon
+                this.drawTool.activate(type);
+            },
+
+            //清除所有绘制
+            clearDraw() {
+                this.viewer.entities.removeAll();
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://localhost:9003/model/XUNICt4K/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        function clearDraw() {
+            xt3dInit.clearDraw();
+        }
+    </script>
+</body>
+
+</html>

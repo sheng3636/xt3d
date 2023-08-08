@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>扩散墙</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuildData();
+                this.addWalls();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            addWalls() {
+                let p1 = {
+                    x: -1336621.3161093448,
+                    y: 5326891.653918462,
+                    z: 3232313.9045081865
+                };
+                let p2 = {
+                    x: -1336371.254927663,
+                    y: 5325664.063701625,
+                    z: 3234436.839795243
+                };
+                let p3 = {
+                    x: -1334301.2104443484,
+                    y: 5327066.724091915,
+                    z: 3233010.7269238452
+                };
+                let c1 = new xt3d.WallObject.CircleDiffWall(this.viewer, p1, {
+                    radius: 500,
+                    wallHeight: 300,
+                    wallColor: Cesium.Color.RED
+                });
+                let c2 = new xt3d.WallObject.JustDiffWall(this.viewer, p2, {
+                    radius: 500,
+                    wallHeight: 300,
+                    edgeCount: 8,
+                    wallColor: Cesium.Color.AQUA
+                });
+                let c3 = new xt3d.WallObject.CircleDiffWall(this.viewer, p3, {
+                    radius: 500,
+                    wallHeight: 300,
+                    wallColor: Cesium.Color.YELLOW
+                });
+            },
+
+            //加载建筑物数据
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+                    url: "http://www.xt3d.cn/data/country_build/chengdu_ajust_clip/tileset.json"
+                }));
+
+                tileset.readyPromise.then((tileset) => {
+                    let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                        color: '0.2, 0.8, 1.0, 1.0', //颜色 rgba 浮点型 
+                        glowRange: true, //是否显示光环
+                        glowRangeHeight: '100.0', //光环范围 浮点型
+                    });
+                }).otherwise(function(error) {
+                    console.error(error);
+                });
+            },
+
+
+            //设置视角
+            setView() {
+                this.viewer.scene.camera.setView({
+                    duration: 1,
+                    destination: {
+                        x: -1337790.7881094853,
+                        y: 5330396.094162445,
+                        z: 3231621.5380446212
+                    },
+                    orientation: {
+                        heading: 6.010538181825211,
+                        pitch: -0.6819480997380261,
+                        roll: 6.282163306739159,
+                    }
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

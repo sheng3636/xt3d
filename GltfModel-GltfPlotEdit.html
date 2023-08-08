@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>gltf标绘编辑</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='http://www.xt3d.cn/libs/turf.min.js'></script>
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+        /* 属性编辑框样式 */
+        
+        .attr-panel {
+            position: absolute;
+            right: 25px;
+            top: 90px;
+            pointer-events: auto;
+            border-radius: 3px;
+        }
+        
+        .attr-panel-header {
+            height: 36px;
+            background: rgb(26 32 48 / 88%);
+            display: flex;
+            align-items: center;
+            color: white;
+            justify-content: space-between;
+            border-bottom: 1px solid rgb(57 150 150);
+        }
+        
+        .attr-panel-header-title {
+            padding: 0px 10px;
+            cursor: default;
+            font-size: 16px;
+        }
+        
+        .attr-panel-body {
+            text-align: left;
+            overflow: auto;
+            box-sizing: border-box;
+            padding: 8px;
+            font-size: 16px;
+            background: #2e323e99;
+            overflow: hidden;
+        }
+        
+        .attr-panel-body .el-form-item__label {
+            color: #fbfbfb;
+        }
+        
+        .attr-panel-body .el-input__inner {
+            background-color: #0d1f3e5e;
+            border: 1px solid #157affb6;
+            color: white;
+        }
+        
+        .attr-panel-body .el-textarea__inner {
+            background-color: #0d1f3e5e;
+            border: 1px solid #157affb6;
+            color: white;
+        }
+        
+        .attr-panel-body .el-color-picker__trigger {
+            border: 1px solid #a8141400;
+        }
+        
+        .attr-panel-body .el-input-number__decrease,
+        .attr-panel-body .el-input-number__increase {
+            background: #1f4071;
+            color: #eef0f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="drawActivate('fireMan')">消防员</button>
+        <button onclick="drawActivate('fireCar')">消防车</button>
+        <button onclick="drawActivate('police')">警察</button>
+        <button onclick="drawActivate('policeCar')">警车</button>
+        <button onclick="clearDraw()">清空</button>
+        <button onclick="save()">保存</button>
+
+        <div class="tip-item">点击“消防员”按钮后根据提示在场景中绘制消防员</div>
+        <div class="tip-item">点击“消防车”按钮后根据提示在场景中绘制消防车</div>
+        <div class="tip-item">点击“警察”按钮后根据提示在场景中绘制警察</div>
+        <div class="tip-item">点击“消防车”按钮后根据提示在场景中绘制警车</div>
+        <div class="tip-item">如果绘制后模型没有显示，可能是模型加载有点慢，加载时间与模型大小有关。</div>
+        <div class="tip-item">点击选中模型，选中后鼠标按住移动。</div>
+    </div>
+
+    <div class="attr-panel" id="infoPanel" v-if="plot!=undefined">
+        <div class="attr-panel-header">
+            <span class="attr-panel-header-title">属性编辑</span>
+        </div>
+        <div class="attr-panel-body">
+            <el-form ref="form" :model="plot" label-width="80px" size="mini">
+                <el-form-item label="模型名称">
+                    <el-input v-model="plot.properties.attr.name" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="模型角度">
+                    <el-slider @input="updateHeading" :min="0" :max="360" v-model="plot.properties.style.heading"></el-slider>
+                </el-form-item>
+                <el-form-item label="模型比例">
+                    <el-slider @input="updateScale" :step="0.2" :min="0.5" :max="10" v-model="plot.properties.style.scale"></el-slider>
+                </el-form-item>
+            </el-form>
+        </div>
+    </div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.initGltfDraw();
+                this.initGltfEdit();
+                this.load3dtiles();
+                this.initDatas();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+                    })
+                });
+            },
+
+            //加载数据
+            initDatas() {
+                fetch("/static/data/labelplotting/1602600681304.json").then(res => {
+                    return res.json();
+                }).then(res => {
+                    let features = res.features;
+                    features.forEach(feature => {
+                        this.gltfPlotLayer.addPlot(feature);
+                    })
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+
+            //初始化绘制
+            initGltfDraw() {
+                this.gltfPlotLayer = new xt3d.GltfModel.GltfPlot.PlotLayer(this.viewer);
+                this.gltfPlotLayer.setPlotSelectable(true);
+
+                this.gltfDraw = new xt3d.GltfModel.GltfPlot.PlotDraw(this.viewer);
+                this.gltfDraw.DrawEndEvent.addEventListener((position) => {
+                    this.handleDrawEnd(position);
+                })
+            },
+
+            //初始化编辑
+            initGltfEdit() {
+                this.gltfPlotEdit = new xt3d.GltfModel.GltfPlot.PlotEdit(
+                    this.viewer,
+                    this.gltfPlotLayer
+                );
+            },
+
+            //绘制结束事件
+            handleDrawEnd(position) {
+                switch (this.drawPlotType) {
+                    case "police":
+                        this.addPolice(position);
+                        break;
+                    case "policeCar":
+                        this.addPoliceCar(position);
+                        break;
+                    case "fireMan":
+                        this.addFireMan(position);
+                        break;
+                    case "fireCar":
+                        this.addFireCar(position);
+                        break;
+                }
+            },
+
+            addPolice(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/police.gltf",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 2,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            addPoliceCar(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/police_car.gltf",
+                        style: {
+                            width: 1.4,
+                            height: 1.8,
+                            scale: 1.5,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            addFireMan(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/glb/xiaofangyuan.glb",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 1,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            addFireCar(position) {
+                var geoFeature = {
+                    type: "Feature",
+                    properties: {
+                        plotCode: xt3d.GltfModel.getPlotCode(),
+                        modelUrl: "/static/gltf/xiaofangche.gltf",
+                        style: {
+                            width: 1,
+                            height: 1.6,
+                            scale: 1,
+                            heading: 0
+                        },
+                        attr: {}
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: xt3d.GltfModel.cartesian3ToCoordinates(position)
+                    }
+                };
+                this.gltfPlotLayer.addPlot(geoFeature);
+            },
+
+            //激活绘制工具
+            drawActivate(type) {
+                this.drawPlotType = type;
+                this.gltfDraw.activate();
+            },
+
+            //保存文件
+            savePlots() {
+                const features = [];
+                this.gltfPlotLayer.plots.forEach(plot => {
+                    features.push(plot.toGeoJson());
+                })
+                let geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                let data = JSON.stringify(geojson);
+
+                var blob = new Blob([data], {
+                    type: 'text/json'
+                });
+                var e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = new Date().getTime() + ".json";
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+
+            //清空
+            clear() {
+                this.gltfPlotLayer.clear();
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置默认视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+
+                        x: -1573776.4611502131,
+                        y: 5328146.87088957,
+                        z: 3122651.280185215
+                    },
+                    orientation: {
+                        heading: 0.06944133440396705,
+                        pitch: -0.6148427743539875,
+                        roll: 6.2831846648617145
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function drawActivate(type) {
+            xt3dInit.drawActivate(type);
+        }
+
+        function clearDraw() {
+            xt3dInit.clear();
+        }
+
+        function save() {
+            xt3dInit.savePlots();
+        }
+
+
+        //界面控制
+        let vm = new Vue({
+            el: "#infoPanel",
+            data() {
+                return {
+                    plot: undefined //当前选中的编辑对象
+                }
+            },
+
+            methods: {
+                updateHeading(value) {
+                    this.plot.updateHeading(value);
+                },
+
+                updateScale(value) {
+                    this.plot.setScale(value);
+                }
+            }
+        })
+
+        xt3dInit.gltfPlotLayer.selectedPlotChanged.addEventListener(e => {
+            vm.plot = e;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>轨迹回放</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 380px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <div class="btn-container">
+        <button onclick="start()">开始</button>
+        <div class="tip-item">可以自由设置轨迹播放速度，监听站点达到事件，展示站点相关信息</div>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t7.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            //初始化轨迹线
+            initTrackLine() {
+                let stops = [{
+                    time: "2020-10-10 20:40:44",
+                    position: {
+                        x: -1573617.4792363436,
+                        y: 5327874.154272335,
+                        z: 3122892.2787437937
+                    },
+                }, {
+                    time: "2020-10-10 20:50:34",
+                    position: {
+                        x: -1573731.9941211839,
+                        y: 5327897.036182902,
+                        z: 3122799.912331608
+                    },
+                }, {
+                    time: "2020-10-10 21:10:43",
+                    position: {
+                        x: -1573827.099578625,
+                        y: 5327918.677117841,
+                        z: 3122722.2807716513
+                    },
+                }, {
+                    time: "2020-10-10 21:40:33",
+                    position: {
+                        x: -1573884.5479743225,
+                        y: 5327843.811385092,
+                        z: 3122812.1113319555
+                    },
+                }, {
+                    time: "2020-10-10 21:55:22",
+                    position: {
+                        x: -1573936.4138518127,
+                        y: 5327774.013957246,
+                        z: 3122901.092331419
+                    },
+                }]
+
+                if (this.trackLine) {
+                    this.trackLine.stop();
+                    this.clearStops();
+                }
+                this.trackLine = new xt3d.TrackRoam.TrackLine(this.viewer, {
+                    modelUrl: "/static/gltf/redCar.glb",
+                    scale: 0.1
+                });
+                this.stopEntities = [];
+                this.trackLine.StopsArrivedEvent.addEventListener(this.stopsArrivedEventHandler, this);
+                this.trackLine.play(stops, 50); //站点和速度
+            },
+
+            //站点到达事件
+            stopsArrivedEventHandler(stop, index) {
+                const stopEntity = this.viewer.entities.add({
+                    position: stop.position,
+                    label: {
+                        text: stop.time,
+                        scale: 0.5,
+                        font: 'normal 24px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000),
+                        scaleByDistance: new Cesium.NearFarScalar(1000, 1, 3000, 0.4),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -50),
+                        outlineWidth: 9,
+                        outlineColor: Cesium.Color.WHITE
+                    },
+                    billboard: {
+                        image: "static/images/marker/marker.png",
+                        scaleByDistance: new Cesium.NearFarScalar(300, 1, 1200, 0.4), //设置随图缩放距离和比例
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 10000), //设置可见距离 10000米可见
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    },
+                });
+                this.stopEntities.push(stopEntity);
+            },
+
+            //清除站点
+            clearStops() {
+                if (!this.stopEntities) return;
+                this.stopEntities.forEach(item => {
+                    this.viewer.entities.remove(item);
+                });
+                this.stopEntities = [];
+            },
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2553179.736293043,
+                        y: 4097996.669789019,
+                        z: 4153757.005193304
+                    },
+                    orientation: {
+                        heading: 5.837346505274043,
+                        pitch: -0.7927209256695096,
+                        roll: 6.281137980253018
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            //加载3dtiles数据
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        this.viewer.zoomTo(
+                            tileset,
+                        );
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        function start() {
+            xt3dInit.initTrackLine();
+        }
+    </script>
+</body>
+
+</html>

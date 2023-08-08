@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tooltip鼠标移入信息</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addMonitor();
+                this.addFireCar();
+                this.addText();
+                this.addLabel();
+                this.addCylinder();
+                this.viewer.flyTo(this.viewer.entities);
+                this.sceneTooltip = new xt3d.SceneControl.SceneTooltip(this.viewer);
+                // this.sceneTooltip.remove();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    })
+                });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+            },
+
+            addMonitor() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88494472424244, 27.651695813697945, 0),
+                    tooltip: "永辉超市门口监控2",
+                    billboard: {
+                        image: '/static/images/marker/bluecamera.png',
+                        scaleByDistance: new Cesium.NearFarScalar(500, 1, 1200, 0.8),
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 10000),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    }
+                })
+            },
+
+            addFireCar() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88550634358194, 27.65144046270557, 0),
+                    tooltip: "消防车模型",
+                    model: {
+                        uri: "/static/gltf/xiaofangche.gltf",
+                        colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+                        color: Cesium.Color.WHITE,
+                        scale: 2,
+                        maximumScale: 6,
+                    }
+                });
+            },
+
+            addText() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88508052553753, 27.651412543526178, 0),
+                    tooltip: "文本信息 Cesium实战",
+                    label: {
+                        text: "Cesium实战",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 40px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 500000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.4),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -10),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    }
+                })
+            },
+
+            addLabel() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88524719514241, 27.651278344527853, 0),
+                    tooltip: "文本信息 + 图标",
+                    label: {
+                        text: "文本信息 + 图标",
+                        fillColor: Cesium.Color.WHITE,
+                        scale: 0.5,
+                        font: 'normal 40px MicroSoft YaHei',
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 500000),
+                        scaleByDistance: new Cesium.NearFarScalar(50000, 1, 500000, 0.4),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        pixelOffset: new Cesium.Cartesian2(0, -50),
+                        outlineWidth: 20,
+                        outlineColor: Cesium.Color.BLACK
+                    },
+                    billboard: {
+                        image: '/static/images/marker/mark3.png',
+                        scaleByDistance: new Cesium.NearFarScalar(500, 1, 1200, 0.8),
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 10000),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    }
+                })
+            },
+
+            addCylinder() {
+                this.viewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(106.88524924333072, 27.651659443920074, 0),
+                    tooltip: "体对象-圆锥体",
+                    cylinder: {
+                        length: 20,
+                        topRadius: 0, //根据需要设置
+                        bottomRadius: 5.0,
+                        material: Cesium.Color.RED.withAlpha(0.5),
+                    },
+                });
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

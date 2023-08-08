@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>旋转椎体</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.loadBuildData();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+
+
+            loadBuildData() {
+                let tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "https://jdvop.oss-cn-qingdao.aliyuncs.com/mapv-data/titleset/shanghai/tileset.json"
+                    })
+                );
+                tileset.readyPromise
+                    .then(tileset => {
+                        let cs = new xt3d.BuildingEffects.CustomShaderEffect(this.viewer, tileset, {
+                            color: '0.2, 0.5, 1.0, 1.0', //颜色 rgba 浮点型 
+                            glowRange: true, //是否显示光环
+                            glowRangeHeight: '100.0', //光环范围 浮点型
+                            clickHighlight: true
+                        });
+                    })
+                    .otherwise(function(error) {
+                        console.error(error);
+                    });
+                this.viewer.flyTo(tileset);
+            },
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+        //椎体 
+        let position = Cesium.Cartesian3.fromDegrees(121.50320483066757, 31.23641093043576, 382.83983348350085);
+        let rp = new xt3d.BuildingEffects.RotatingPyramid(xt3dInit.viewer, position, {
+            circleHeight: 20,
+            circleImage: "/data.xt3d.cn/assets/images/circle/circular_03.png",
+            modelUrl: "/data.xt3d.cn/assets/glb/pyramid.glb"
+        });
+    </script>
+</body>
+
+</html>

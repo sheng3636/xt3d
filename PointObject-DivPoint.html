@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>div文本点</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addDivPoints();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: true,
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+                this.viewer.scene.globe.depthTestAgainstTerrain = true;
+
+            },
+
+            //添加divpoint
+            addDivPoints() {
+                let position = Cesium.Cartesian3.fromDegrees(116.274028, 30.978035, 944.63);
+                let divPoint = new xt3d.PointObject.DivPoint(this.viewer, position, {
+                    name: "明山泉水",
+                    flow: 88.3,
+                    stage: 20.02,
+                    status: [{
+                        num: 1,
+                        state: 0,
+                        stateName: "关闭状态"
+                    }, {
+                        num: 2,
+                        state: 1,
+                        stateName: "正常状态"
+                    }]
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(116.261625, 30.985559, 1172.21);
+                divPoint = new xt3d.PointObject.DivPoint(this.viewer, position, {
+                    name: "南岭水厂",
+                    flow: 98.3,
+                    stage: 30.04,
+                    status: [{
+                        num: 1,
+                        state: 0,
+                        stateName: "关闭状态"
+                    }, {
+                        num: 2,
+                        state: 1,
+                        stateName: "正常状态"
+                    }, {
+                        num: 3,
+                        state: 2,
+                        stateName: "中间状态"
+                    }]
+                });
+
+                position = Cesium.Cartesian3.fromDegrees(116.272111, 30.98754, 938.13);
+                divPoint = new xt3d.PointObject.DivPoint(this.viewer, position, {
+                    name: "三桥水厂",
+                    flow: 95.3,
+                    stage: 32.04,
+                    status: [{
+                        num: 1,
+                        state: 0,
+                        stateName: "关闭状态"
+                    }, {
+                        num: 2,
+                        state: 1,
+                        stateName: "正常状态"
+                    }]
+                });
+            },
+
+            //设置默认视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2423889.8749900186,
+                        y: 4909558.020418335,
+                        z: 3267657.2345441836
+                    },
+                    orientation: {
+                        heading: 3.7426609979356034,
+                        pitch: -0.9521550075200276,
+                        roll: 6.2803081630469535
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

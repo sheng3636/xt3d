@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>光柱椎体（粒子效果）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addConeGlows();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+                    })
+                });
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //添加光柱椎体
+            addConeGlows() {
+                let pointObjs = [{
+                    position: Cesium.Cartesian3.fromDegrees(116.3123, 31.8329, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(116.7517, 30.5255, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(118.1909, 32.536, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(115.8062, 30.6244, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(115.7629, 32.9919, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.5208, 33.6841, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(118.0481, 29.9542, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.7734, 31.4978, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(116.1914, 33.4698, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.3889, 30.2014, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.4109, 33.1073, 0),
+                    color: Cesium.Color.RED
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(118.3557, 31.0858, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(116.7847, 33.7722, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(118.6304, 32.5363, 0),
+                    color: Cesium.Color.RED
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.9382, 30.9375, 0),
+                    color: Cesium.Color.CYAN
+                }, {
+                    position: Cesium.Cartesian3.fromDegrees(117.29, 32.0581, 117.8),
+                    color: Cesium.Color.RED
+                }];
+
+                for (let i = 0; i < pointObjs.length; i++) {
+                    let pointObj = pointObjs[i];
+                    let coneGlow = new xt3d.AdvancedPlugin.ConeGlowExt(this.viewer, pointObj.position, {
+                        radius: 5000,
+                        height: 80000,
+                        color: pointObj.color,
+                        distanceDisplayCondition: new Cesium.DistanceDisplayConditionGeometryInstanceAttribute(8000, 3010000),
+                    })
+                }
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2366923.5614564246,
+                        y: 5402886.312927618,
+                        z: 3409769.6741513386
+                    },
+                    orientation: {
+                        heading: 1.0541649212467705,
+                        pitch: -0.8913923169706712,
+                        roll: 0.000370180589240654
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>管道流动</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.addPolyline();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    shouldAnimate: false,
+                    // imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                    //     url: "https://t7.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=tdtTk"
+                    // })
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                    }),
+                    terrainProvider: new Cesium.ArcGISTiledElevationTerrainProvider({
+                        url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+                    }),
+                });
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
+
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+            },
+
+            //加载线数据
+            addPolyline() {
+                let positions = [
+                    113.37726820378649, 31.784832764537008, 0,
+                    113.37699665851758, 31.787016905850045, 0,
+                    113.37382687609674, 31.787312939996426, 0,
+                ];
+
+                let polylineVolume = this.viewer.entities.add({
+                    polylineVolume: {
+                        positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                        shape: this.computeCircle(3.0),
+                        cornerType: Cesium.CornerType.MITERED,
+                        material: new xt3d.PolylineObject.PolylineVolumeTrialMaterialProperty({
+                            color: Cesium.Color.RED,
+                            duration: 5000,
+                            count: 15,
+                            url: "/static/images/polylinematerial/spriteline2.png"
+                        }),
+                    }
+                });
+
+                positions = [
+                    113.37700385185695, 31.78711866542147, 0,
+                    113.3767356269648, 31.78873073137868, 0,
+                    113.37451032167836, 31.78854279724877, 0
+                ];
+
+                polylineVolume = this.viewer.entities.add({
+                    polylineVolume: {
+                        positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                        shape: this.computeCircle(3.0),
+                        cornerType: Cesium.CornerType.MITERED,
+                        material: new xt3d.PolylineObject.PolylineVolumeTrialMaterialProperty({
+                            color: Cesium.Color.BLUE,
+                            duration: 5000,
+                            count: 15,
+                            url: "/static/images/polylinematerial/spriteline2.png"
+                        }),
+                    }
+                });
+            },
+
+
+            computeCircle(radius) {
+                const positions = [];
+                for (let i = 0; i < 360; i += 1) {
+                    const radians = Cesium.Math.toRadians(i);
+                    positions.push(
+                        new Cesium.Cartesian2(radius * Math.cos(radians), radius * Math.sin(radians))
+                    );
+                }
+                return positions;
+            },
+
+            //设置默认视图
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -2153461.5443479796,
+                        y: 4981094.430482705,
+                        z: 3340935.64029291
+                    },
+                    orientation: {
+                        heading: 3.9369377319352745,
+                        pitch: -0.6821874753976127,
+                        roll: 6.28042695653107
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.flyTo(flyToOpts);
+            },
+
+            destroy() {
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+    </script>
+</body>
+
+</html>

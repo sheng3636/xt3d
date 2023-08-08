@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>视频墙（含编辑）</title>
+    <!-- 引入Cesium -->
+    <script src="https://unpkg.com/cesium@1.84.0/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
+
+    <script src='./libs/turf.min.js'></script>
+
+    <!-- 使用vue绑定控件 -->
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.5/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui@2.15.5/lib/index.js"></script>
+
+    <!--  引入xt3d -->
+    <script src="./bbb1.js"></script>
+    <style>
+        html,
+        body,
+        #map3d {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        .btn-container {
+            position: absolute;
+            left: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00d0ffb8;
+            color: white;
+            padding: 7px 9px;
+            border-radius: 2px;
+            margin: 3px;
+            cursor: pointer
+        }
+        
+        .tip-item {
+            margin: 2px 0px;
+            padding: 5px 1px;
+        }
+        
+        .edit-container {
+            position: absolute;
+            right: 10px;
+            top: 90px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
+            max-width: 300px;
+        }
+        
+        .el-form-item__label {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map3d"></div>
+
+    <div class="btn-container">
+        <button onclick="drawActivate('wall')">绘制视频墙</button>
+        <button onclick="savePlots()">保存</button>
+        <button onclick="clearWall()">清空</button>
+        <div class="tip-item">
+            点击“绘制视频墙”按钮，根据提示在场景中绘制视频墙
+        </div>
+        <div class="tip-item">
+            选中墙体，显示属性面板，调整视频墙的属性，拖动相关节点进行位置节点移动
+        </div>
+    </div>
+
+    <div class="edit-container" id="editContainer" v-if="plot">
+        <el-form ref="form" :model="plot" label-width="80px" size="mini">
+            <el-form-item label="视频地址">
+                <el-input v-model="plot.properties.style.url" @input="updateStyle"></el-input>
+            </el-form-item>
+            <el-form-item v-if="plot.properties.plotType=='wall'" label="墙体高度">
+                <el-slider @input="updateStyle" :step="0.5" :min="0" :max="plot.properties.style.wallHeight+50" v-model="plot.properties.style.wallHeight"></el-slider>
+            </el-form-item>
+            <el-form-item v-if="plot.properties.plotType=='wall'" label="底部高度">
+                <el-slider @input="updateStyle" :step="0.5" :min="0" :max="plot.properties.style.baseHeight+20" v-model="plot.properties.style.baseHeight"></el-slider>
+            </el-form-item>
+            <el-form-item label="视频操作">
+                <el-button type="primary" @click="playClick">播放</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+    <script>
+        let xt3dInit = {
+            init(el) {
+                this.initViewer(el);
+                this.load3dtiles();
+                this.setView();
+            },
+
+            //初始化viewer
+            initViewer(el) {
+                this.viewer = new Cesium.Viewer(el, {
+                    infoBox: false,
+                    selectionIndicator: false,
+                    navigation: false,
+                    animation: false,
+                    shouldAnimate: false,
+                    timeline: false,
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+                    })
+                });
+                this.viewer.scene.globe.depthTestAgainstTerrain = true; //默认为false 
+                //是否开启抗锯齿
+                this.viewer.scene.fxaa = true;
+                this.viewer.scene.postProcessStages.fxaa.enabled = true;
+            },
+
+            //加载三维模型
+            load3dtiles() {
+                var tileset = this.viewer.scene.primitives.add(
+                    new Cesium.Cesium3DTileset({
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
+                    })
+                );
+
+                tileset.readyPromise
+                    .then(tileset => {
+                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
+                    })
+                    .otherwise(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1573592.989980596,
+                        y: 5328123.997766691,
+                        z: 3122848.7140220148
+                    },
+                    orientation: {
+                        heading: 2.838961283815536,
+                        pitch: -0.4645048819486619,
+                        roll: 0.0009567719750185333
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
+            },
+
+            destroy() {
+                this.clear();
+                this.viewer.entities.removeAll();
+                this.viewer.imageryLayers.removeAll(true);
+                this.viewer.destroy();
+            }
+        }
+
+        xt3dInit.init("map3d");
+
+
+        //图层对象
+        let plotLayer = new xt3d.VideoPlugin.VideoWallPlotLayer(xt3dInit.viewer);
+        plotLayer.setPlotSelectable(true);
+
+        //加载已有数据
+        fetch("/static/data/labelplotting/1608470854280.json").then(res => {
+            return res.json();
+        }).then(res => {
+            let features = res.features;
+            features.forEach(feature => {
+                plotLayer.addPlot(feature);
+            })
+        }).catch(err => {
+            console.log(err)
+        })
+
+        //绘制对象
+        let plotDraw = new xt3d.VideoPlugin.VideoWallPlotDraw(xt3dInit.viewer);
+        plotDraw.PlotDrawEndEvent.addEventListener((plot) => {
+            plotLayer.addPlot(plot.toGeoJson());
+            plot.remove();
+        });
+
+        //编辑对象
+        let plotEdit = new xt3d.VideoPlugin.VideoWallPlotEdit(xt3dInit.viewer, plotLayer);
+        plotEdit.activate();
+
+
+        function drawActivate(type) {
+            plotDraw.activate(type);
+        }
+
+        function clearWall() {
+            plotEdit.clear();
+            plotLayer.clear();
+        }
+
+
+
+        //属性编辑
+        let vm = new Vue({
+            el: "#editContainer",
+            data() {
+                return {
+                    plot: undefined
+                }
+            },
+            methods: {
+                updateStyle() {
+                    this.plot.updateStyle();
+                },
+                playClick() {
+                    this.plot.playVideo();
+                }
+            }
+        })
+
+        //对象被选中事件
+        plotLayer.selectedPlotChanged.addEventListener(e => {
+            vm.plot = e;
+        });
+
+        //保存数据
+        function savePlots() {
+            const features = [];
+            plotLayer.plots.forEach(plot => {
+                features.push(plot.toGeoJson());
+            })
+            let geojson = {
+                "type": "FeatureCollection",
+                "features": features
+            }
+            let data = JSON.stringify(geojson);
+
+            var blob = new Blob([data], {
+                type: 'text/json'
+            });
+            var e = document.createEvent('MouseEvents');
+            var a = document.createElement('a');
+            a.download = new Date().getTime() + ".json";
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+            e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+    </script>
+</body>
+
+</html>
