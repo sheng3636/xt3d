@@ -31,51 +31,33 @@
             },
                 _0x5b780a = document.title,
                 _0x257695 = window.location),
-            // xt3d.xt3dInfo = function(_0x5dea36) {
-            //     _0x5dea36.clear(),
-            //     _0x5dea36.log(`%c xt3d-sdk`, `color:red;font-size:20px`),
-            //     _0x5dea36.log('uuid：' + xt3d['uuid']),
-            //     _0x5dea36.log('v：' + xt3d['v']),
-            //     _0x5dea36.log('说明：' + xt3d['r']),
-            //     _0x5dea36.log(`CESIUM版本：` + Cesium['VERSION']),
-            //     _0x5dea36.log(`编译时间：2022-02-18 11:15`),
-            //     _0x5dea36.log('作者：谢 涛'),
-            //     _0x5dea36.log(`QQ ：1911074953`),
-            //     _0x5dea36.log(`微信：xt3d2021`),
-            //     _0x5dea36.log(`博客：https://blog.csdn.net/xietao20/`),
-            //     _0x5dea36.log('在线地址：http://211.149.185.229:8080/');
-            // }
-            // ,
-            // xt3d.xt3dInfo(window.console),
             xt3d.xt3dLogo = function () {
-                for (var _0x56cf69 = document.getElementsByClassName('xt3d-logo-container'), _0x4dfb13 = 0; _0x4dfb13 < _0x56cf69.length; _0x4dfb13++)
-                    _0x56cf69[_0x4dfb13].remove();
-                for (var _0x13cd3b = document.getElementsByClassName('cesium-widget'), _0x3e7a48 = 0; _0x3e7a48 < _0x13cd3b.length; _0x3e7a48++) {
-                    var _0x518e64 = _0x13cd3b[_0x3e7a48],
-                        _0x4062fd = document.createElement('div');
+                let elements = document.getElementsByClassName('xt3d-logo-container')
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].remove();
+                }
+                let elementWidget = document.getElementsByClassName('cesium-widget')
+                for (let i = 0; i < elementWidget.length; i++) {
+                    var ele = elementWidget[i];
+                    var _0x4062fd = document.createElement('div');
                     _0x4062fd.classList.add('xt3d-logo-container');
                     var _0x5033be = document.createElement('img');
-                    _0x5033be.classList.add('xt3d-logo-img'),
-                        _0x5033be.src = 'data:image/png;base64,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',
-                        _0x518e64.appendChild(_0x4062fd),
-                        _0x4062fd.appendChild(_0x5033be),
-                        _0x4062fd.onclick = function (_0x1c4548) {
-                            window.open('http://211.149.185.229:8080/');
-                        },
-                        _0x5033be = document.createElement('span'),
-                        (_0x5033be.classList.add('xt3d-logo-text'),
-                            _0x5033be.innerHTML = 'xt3d',
-                            _0x4062fd.appendChild(_0x5033be));
+                    _0x5033be.classList.add('xt3d-logo-img');
+                    _0x5033be.src = '/static/images/logo.png';
+                    ele.appendChild(_0x4062fd);
+                    _0x4062fd.appendChild(_0x5033be);
+                    _0x4062fd.onclick = function (_0x1c4548) {
+                        window.open('http://211.149.185.229:8080/');
+                    };
+                    _0x5033be = document.createElement('span');
+                    _0x5033be.classList.add('xt3d-logo-text');
+                    _0x5033be.innerHTML = 'xt3d';
+                    _0x4062fd.appendChild(_0x5033be);
                 }
             },
             setTimeout(function () {
-                // xt3d.xt3dInfo(window['console']),
                 xt3d.xt3dLogo();
             }, 1000)
-        // setInterval(function () {
-        //     xt3d.xt3dInfo(window.console),
-        //         xt3d.xt3dLogo();
-        // }, 10000);
         function _0x32c18b(_0x45d9c6, _0x5e1a99, _0x2ca564) {
             if (!function (_0x2c5ec3) {
                 if (`function` != typeof _0x2c5ec3) {
@@ -102,14 +84,15 @@
                 return _0x45d9c6.apply(_0x5e1a99, arguments);
             };
         }
-        function _0x402d97(_0x1b90a9) {
+        // 判断数据是 是不是 object类型
+        function isObject(_0x1b90a9) {
             return `object` == typeof _0x1b90a9 ? null !== _0x1b90a9 : 'function' == typeof _0x1b90a9;
         }
-        function _0xb58d14(_0x126a3f) {
-            if (!_0x402d97(_0x126a3f)) {
-                throw TypeError(_0x126a3f + ' is not an object!');
+        function _0xb58d14(val) {
+            if (!isObject(val)) {
+                throw TypeError(val + ' is not an object!');
             }
-            return _0x126a3f;
+            return val;
         }
         function _0x241534(_0x59a4a1) {
             try {
@@ -122,17 +105,17 @@
             return _0x35c9f2 ? _0xa2bdc6.createElement(_0x1fd068) : {};
         }
         function _0x4dc03d(_0x16ed27, _0x1a41a6) {
-            if (!_0x402d97(_0x16ed27)) {
+            if (!isObject(_0x16ed27)) {
                 return _0x16ed27;
             }
             var _0x54e324, _0x343791;
-            if (_0x1a41a6 && `function` == typeof (_0x54e324 = _0x16ed27.toString) && !_0x402d97(_0x343791 = _0x54e324.call(_0x16ed27))) {
+            if (_0x1a41a6 && `function` == typeof (_0x54e324 = _0x16ed27.toString) && !isObject(_0x343791 = _0x54e324.call(_0x16ed27))) {
                 return _0x343791;
             }
-            if (`function` == typeof (_0x54e324 = _0x16ed27.valueOf) && !_0x402d97(_0x343791 = _0x54e324.call(_0x16ed27))) {
+            if (`function` == typeof (_0x54e324 = _0x16ed27.valueOf) && !isObject(_0x343791 = _0x54e324.call(_0x16ed27))) {
                 return _0x343791;
             }
-            if (!_0x1a41a6 && `function` == typeof (_0x54e324 = _0x16ed27.toString) && !_0x402d97(_0x343791 = _0x54e324.call(_0x16ed27))) {
+            if (!_0x1a41a6 && `function` == typeof (_0x54e324 = _0x16ed27.toString) && !isObject(_0x343791 = _0x54e324.call(_0x16ed27))) {
                 return _0x343791;
             }
             throw TypeError(`Can't convert object to primitive value`);
@@ -174,7 +157,7 @@
                         }
                     })['a'];
                 })), _0xa2bdc6 = _0x1e1264.document,
-            _0x35c9f2 = _0x402d97(_0xa2bdc6) && _0x402d97(_0xa2bdc6.createElement),
+            _0x35c9f2 = isObject(_0xa2bdc6) && isObject(_0xa2bdc6.createElement),
             _0x5c8815 = !_0x5994a4 && !_0x241534(function () {
                 return 7 != Object.defineProperty(_0x387024('div'), 'a', {
                     'get': function () {
@@ -343,7 +326,14 @@
                     _0x383adf.restore(),
                     _0x4fb4ee.toDataURL(`image/png`).replace(`image/png`, 'image/octet-stream');
             }(),
-            Cesium.Material.ConeGlowBottomCircleSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image,  vec2(st )); material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb  ; return material; }`,
+            Cesium.Material.ConeGlowBottomCircleSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image,  vec2(st ));
+                    material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb;
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.ConeGlowBottomCircleType, {
                 'fabric': {
                     'type': Cesium.Material.ConeGlowBottomCircleType,
@@ -398,7 +388,15 @@
                     _0x4e8ebf.stroke(),
                     _0x2bb840.toDataURL(`image/png`).replace(`image/png`, 'image/octet-stream');
             }(),
-            Cesium.Material['ConeGlowBottomRotateCircleSource'] = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(st )); material.diffuse = 2.5 * color.rgb  ; material.alpha = colorImage.a ; return material; }`,
+            Cesium.Material['ConeGlowBottomRotateCircleSource'] = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(st ));
+                    material.diffuse = 2.5 * color.rgb;
+                    material.alpha = colorImage.a;
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.ConeGlowBottomRotateCircleType, {
                 'fabric': {
                     'type': Cesium.Material.ConeGlowBottomRotateCircleType,
@@ -437,7 +435,16 @@
                                     'color': this.color,
                                     'alpha': 2
                                 },
-                                'source': 'uniform vec4 color; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); material.diffuse =2.9 * color.rgb; material.alpha = color.a * dis * alpha ; return material; }'
+                                'source': 
+                                    `uniform vec4 color;
+                                    czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        vec2 st = materialInput.st;
+                                        float dis = distance(st, vec2(0.5));
+                                        material.diffuse =2.9 * color.rgb;
+                                        material.alpha = color.a * dis * alpha;
+                                        return material;
+                                    }`
                             },
                             'translucent': !1
                         }),
@@ -539,7 +546,27 @@
             },
             Cesium.ScanlineMaterialProperty = _0x22dd81,
             Cesium.Material.ScanlineType = `Scanline`,
-            Cesium.Material.ScanlineSource = 'uniform vec4 color; uniform float speed; float circle(vec2 uv, float r, float blur) { float d = length(uv) * 2.0; float c = smoothstep(r+blur, r, d); return c; } czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st - 0.5; material.diffuse =2.8 * color.rgb; material.emission = vec3(0); float t =fract(czm_frameNumber * speed / 1000.0); float s = 0.3; float radius1 = smoothstep(.0, s, t) * 0.5; float alpha1 = circle(st, radius1, 0.01) * circle(st, radius1, -0.01); float alpha2 = circle(st, radius1, 0.01 - radius1) * circle(st, radius1, 0.01); float radius2 = 0.5 + smoothstep(s, 1.0, t) * 0.5; float alpha3 = circle(st, radius1, radius2 + 0.01 - radius1) * circle(st, radius1, -0.01); material.alpha = smoothstep(1.0, s, t) * (alpha1 + alpha2*0.1 + alpha3*0.1); material.alpha *=color.a ; return material; }',
+            Cesium.Material.ScanlineSource = 
+                `uniform vec4 color; uniform float speed;
+                float circle(vec2 uv, float r, float blur) {
+                    float d = length(uv) * 2.0;
+                    float c = smoothstep(r+blur, r, d);
+                    return c;
+                }
+                czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st - 0.5;
+                    material.diffuse =2.8 * color.rgb;
+                    material.emission = vec3(0); 
+                    t =fract(czm_frameNumber * speed / 1000.0);
+                    float s = 0.3; float radius1 = smoothstep(.0, s, t) * 0.5;
+                    float alpha1 = circle(st, radius1, 0.01) * circle(st, radius1, -0.01);
+                    float alpha2 = circle(st, radius1, 0.01 - radius1) * circle(st, radius1, 0.01);
+                    float radius2 = 0.5 + smoothstep(s, 1.0, t) * 0.5;
+                    float alpha3 = circle(st, radius1, radius2 + 0.01 - radius1) * circle(st, radius1, -0.01);
+                    material.alpha = smoothstep(1.0, s, t) * (alpha1 + alpha2*0.1 + alpha3*0.1);
+                    material.alpha *=color.a ; return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.ScanlineType, {
                 'fabric': {
                     'type': Cesium.Material.ScanlineType,
@@ -1071,7 +1098,17 @@
                                 'image': 'data:image/png;base64,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',
                                 'time': 0
                             },
-                            'source': `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t)); float powerRatio = fract(czm_frameNumber / 30.0) + 1.0; float alpha = pow(1.0 -  st.t, powerRatio); material.alpha = colorImage.a * color.a *alpha; material.diffuse =  1.5 * color.rgb  ; return material; }`
+                            'source': 
+                                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    vec2 st = materialInput.st;
+                                    vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t));
+                                    float powerRatio = fract(czm_frameNumber / 30.0) + 1.0;
+                                    float alpha = pow(1.0 -  st.t, powerRatio);
+                                    material.alpha = colorImage.a * color.a *alpha;
+                                    material.diffuse =  1.5 * color.rgb;
+                                    return material;
+                                }`
                         },
                         'translucent': !0
                     }),
@@ -1267,7 +1304,15 @@
                 return this === _0x3d550b || _0x3d550b instanceof _0x2b37e7 && Cesium.Property.equals(this['_color'], _0x3d550b[`_color`]);
             },
             Cesium.Material.CylinderGlowGradientWallType = 'CylinderGlowGradientWall',
-            Cesium.Material.CylinderGlowGradientWallSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t)); material.alpha = colorImage.a * color.a; material.diffuse =  1.9 * color.rgb  ; return material; }`,
+            Cesium.Material.CylinderGlowGradientWallSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse =  1.9 * color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.CylinderGlowGradientWallType, {
                 'fabric': {
                     'type': Cesium.Material.CylinderGlowGradientWallType,
@@ -1319,7 +1364,15 @@
                 return this === _0x369623 || _0x369623 instanceof _0x45fd85 && Cesium.Property.equals(this[`_color`], _0x369623[`_color`]) && this.duration == _0x369623.duration;
             },
             Cesium.Material.CylinderGlowFlowWallType = `CylinderGlowFlowWall`,
-            Cesium.Material.CylinderGlowFlowWallSource = 'czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t)); material.alpha = colorImage.a * color.a; material.diffuse =  1.9 * color.rgb  ; return material; }',
+            Cesium.Material.CylinderGlowFlowWallSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse =  1.9 * color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.CylinderGlowFlowWallType, {
                 'fabric': {
                     'type': Cesium.Material.CylinderGlowFlowWallType,
@@ -1369,7 +1422,14 @@
                 return this === _0x488825 || _0x488825 instanceof _0x2f027a && Cesium.Property.equals(this[`_color`], _0x488825[`_color`]);
             },
             Cesium.Material.CylinderGlowCircleType = `CylinderGlowCircle`,
-            Cesium.Material.CylinderGlowCircleSource = 'czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image,  vec2(st )); material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb  ; return material; }',
+            Cesium.Material.CylinderGlowCircleSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image,  vec2(st ));
+                    material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.CylinderGlowCircleType, {
                 'fabric': {
                     'type': Cesium.Material.CylinderGlowCircleType,
@@ -1594,7 +1654,23 @@
                                     'u_color': this['u_color'],
                                     'image': this.image
                                 },
-                                'source': `uniform vec4 u_color; czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float time = fract(czm_frameNumber / 90.) ; vec2 new_st = fract(st-vec2(time,time)); vec4 color = texture2D(image,new_st); vec3 diffuse = color.rgb; float alpha = color.a; diffuse *= u_color.rgb; alpha *= u_color.a; alpha *= u_color.a; material.diffuse = diffuse; material.alpha = alpha * pow(1. - st.t,u_color.a); return material; }`
+                                'source': 
+                                    `uniform vec4 u_color;
+                                    czm_material czm_getMaterial(czm_materialInput materialInput){
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        vec2 st = materialInput.st;
+                                        float time = fract(czm_frameNumber / 90.);
+                                        vec2 new_st = fract(st-vec2(time,time));
+                                        vec4 color = texture2D(image,new_st);
+                                        vec3 diffuse = color.rgb;
+                                        float alpha = color.a;
+                                        diffuse *= u_color.rgb;
+                                        alpha *= u_color.a;
+                                        alpha *= u_color.a;
+                                        material.diffuse = diffuse;
+                                        material.alpha = alpha * pow(1. - st.t,u_color.a);
+                                        return material;
+                                    }`
                             }
                         })
                     }),
@@ -1616,7 +1692,18 @@
                             'uniforms': {
                                 'u_color': this['u_color']
                             },
-                            'source': 'uniform vec4 u_color; czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float powerRatio = 1./(fract(czm_frameNumber / 30.0) +  1.) ; float alpha = pow(1. - st.t,powerRatio); vec4 color = vec4(u_color.rgb, alpha*u_color.a); material.diffuse = color.rgb; material.alpha = color.a; return material; }'
+                            'source': 
+                                `uniform vec4 u_color;
+                                czm_material czm_getMaterial(czm_materialInput materialInput){
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    vec2 st = materialInput.st;
+                                    float powerRatio = 1./(fract(czm_frameNumber / 30.0) +  1.);
+                                    float alpha = pow(1. - st.t,powerRatio);
+                                    vec4 color = vec4(u_color.rgb, alpha*u_color.a);
+                                    material.diffuse = color.rgb;
+                                    material.alpha = color.a;
+                                    return material;
+                                }`
                         }
                     })
                 });
@@ -1644,7 +1731,30 @@
                                     'u_color': this['u_color'],
                                     'image': this.gradientCircleCanvas
                                 },
-                                'source': 'czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec4 tColor = u_color; vec2 st = materialInput.st; vec2 center = st - vec2(0.5,0.5); float length = length(center)/0.5; float time = 1. - abs(czm_frameNumber / 360. - 0.5); float param = 1. - step(length, 0.6);//大于0.6模糊，rate = 0.6 float scale = param * length;// 0.6< length 返回0，反之返回1. float alpha = param * (1.0 - abs(scale - 0.8) / 0.2);// 0.8 < length 返回0，反之返回1. float param1 = step(length, 0.7);//小于0.5模糊 float scale1 = param1 * length;// 0.6< length 返回0，反之返回1. alpha += param1 * (1.0 - abs(scale1 - 0.35) / 0.35);// 0.8 < length 返回0，反之返回1. material.diffuse = u_color.rgb * vec3(u_color.a); material.alpha = pow(alpha, 4.0); return material; }'
+                                'source': 
+                                    `czm_material czm_getMaterial(czm_materialInput materialInput){
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        vec4 tColor = u_color;
+                                        vec2 st = materialInput.st;
+                                        vec2 center = st - vec2(0.5,0.5);
+                                        float length = length(center)/0.5;
+                                        float time = 1. - abs(czm_frameNumber / 360. - 0.5);
+                                        float param = 1. - step(length, 0.6);
+                                        //大于0.6模糊，rate = 0.6
+                                        float scale = param * length;
+                                        // 0.6< length 返回0，反之返回1.
+                                        float alpha = param * (1.0 - abs(scale - 0.8) / 0.2);
+                                        // 0.8 < length 返回0，反之返回1.
+                                        float param1 = step(length, 0.7);
+                                        //小于0.5模糊
+                                        float scale1 = param1 * length;
+                                        // 0.6< length 返回0，反之返回1.
+                                        alpha += param1 * (1.0 - abs(scale1 - 0.35) / 0.35);
+                                        // 0.8 < length 返回0，反之返回1.
+                                        material.diffuse = u_color.rgb * vec3(u_color.a);
+                                        material.alpha = pow(alpha, 4.0);
+                                        return material;
+                                    }`
                             }
                         })
                     }),
@@ -1669,7 +1779,24 @@
                                     'u_color': this['u_color'],
                                     'image': this.ringCanvas
                                 },
-                                'source': `czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec2 center = st - vec2(0.5,0.5); float time = -czm_frameNumber * 3.1415926 / 180.;//扫描速度1度 float sin_t = sin(time); float cos_t = cos(time); vec2 center_rotate = vec2(center.s*cos_t-center.t*sin_t+0.5,center.s*sin_t+center.t*cos_t+0.5); vec4 color = texture2D(image,center_rotate); vec3 tColor = color.rgb * u_color.rgb; tColor *= u_color.a; material.diffuse = tColor; float length = 2. - length(center)/0.5; material.alpha = color.a * pow(length, 0.5);//color.r = 0 或1 return material; }`
+                                'source': 
+                                    `czm_material czm_getMaterial(czm_materialInput materialInput){
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        vec2 st = materialInput.st;
+                                        vec2 center = st - vec2(0.5,0.5);
+                                        float time = -czm_frameNumber * 3.1415926 / 180.;
+                                        //扫描速度1度
+                                        float sin_t = sin(time);
+                                        float cos_t = cos(time);
+                                        vec2 center_rotate = vec2(center.s*cos_t-center.t*sin_t+0.5,center.s*sin_t+center.t*cos_t+0.5);
+                                        vec4 color = texture2D(image,center_rotate);
+                                        vec3 tColor = color.rgb * u_color.rgb;
+                                        tColor *= u_color.a;
+                                        material.diffuse = tColor;
+                                        float length = 2. - length(center)/0.5;
+                                        material.alpha = color.a * pow(length, 0.5);
+                                        //color.r = 0 或1 return material;
+                                    }`
                             }
                         })
                     }),
@@ -1958,7 +2085,16 @@
                             'uniforms': {
                                 'color': this.style.color || new Cesium.Color(0.2, 1, 0, 0.6)
                             },
-                            'source': `uniform vec4 color; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; material.diffuse = color.rgb; float alpha = pow(st.t,1.0); material.alpha = color.a  * alpha; return material; }`
+                            'source': 
+                                `uniform vec4 color;
+                                czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    vec2 st = materialInput.st;
+                                    material.diffuse = color.rgb;
+                                    float alpha = pow(st.t,1.0);
+                                    material.alpha = color.a  * alpha;
+                                    return material;
+                                }`
                         },
                         'translucent': !0
                     }),
@@ -2076,7 +2212,20 @@
                 return this === _0x2db1d3 || _0x2db1d3 instanceof _0x5e9d13 && Cesium.Property.equals(this['_color'], _0x2db1d3[`_color`]);
             },
             Cesium.Material.DiffCircleMaterial1Type = `DiffCircleMaterial1`,
-            Cesium.Material.DiffCircleMaterial1Source = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); material.diffuse = 1.8 * color.rgb; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5, 0.5)); float per = fract(time); if(dis > per * 0.5){ material.alpha = 0.0; discard; }else { material.alpha = color.a  * dis / per / 1.0; } return material; }`,
+            Cesium.Material.DiffCircleMaterial1Source = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    material.diffuse = 1.8 * color.rgb;
+                    vec2 st = materialInput.st;
+                    float dis = distance(st, vec2(0.5, 0.5));
+                    float per = fract(time);
+                    if(dis > per * 0.5){
+                        material.alpha = 0.0; discard;
+                    }else {
+                        material.alpha = color.a  * dis / per / 1.0;
+                    }
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.DiffCircleMaterial1Type, {
                 'fabric': {
                     'type': Cesium.Material.DiffCircleMaterial1Type,
@@ -2149,7 +2298,14 @@
                 return this === _0x34df19 || _0x34df19 instanceof _0x2168a3 && Cesium.Property.equals(this[`_color`], _0x34df19[`_color`]);
             },
             Cesium.Material.DiffCircle2MaterialType = 'DiffCircle2Material',
-            Cesium.Material.DiffCircle2MaterialSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image,  vec2(st )); material.alpha = colorImage.a * color.a*0.6; material.diffuse =  2.2* color.rgb  ; return material; }`,
+            Cesium.Material.DiffCircle2MaterialSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st; vec4 colorImage = texture2D(image,  vec2(st ));
+                    material.alpha = colorImage.a * color.a*0.6;
+                    material.diffuse =  2.2* color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.DiffCircle2MaterialType, {
                 'fabric': {
                     'type': Cesium.Material.DiffCircle2MaterialType,
@@ -2231,7 +2387,15 @@
                 return this === _0x3e2eac || _0x3e2eac instanceof _0x400577 && Cesium.Property.equals(this['_color'], _0x3e2eac['_color']);
             },
             Cesium.Material.ScanCircleType = 'ScanCircle',
-            Cesium.Material.ScanCircleSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image,  vec2(st )); material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb  ; return material; }`,
+            Cesium.Material.ScanCircleSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image,  vec2(st ));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse =  1.5* color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.ScanCircleType, {
                 'fabric': {
                     'type': Cesium.Material.ScanCircleType,
@@ -2348,7 +2512,62 @@
         }, {
             'key': 'getScanSegmentShader',
             'value': function () {
-                return `uniform sampler2D colorTexture;uniform sampler2D depthTexture;varying vec2 v_textureCoordinates;uniform vec4 u_scanCenterEC;uniform vec3 u_scanPlaneNormalEC;uniform vec3 u_scanLineNormalEC;uniform float u_radius;uniform vec4 u_scanColor;vec4 toEye(in vec2 uv, in float depth) { vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0)); vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0); posInCamera =posInCamera / posInCamera.w; return posInCamera; }bool isPointOnLineRight(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt){vec3 v01 = testPt - ptOnLine;normalize(v01);vec3 temp = cross(v01, lineNormal);float d = dot(temp, u_scanPlaneNormalEC);return d > 0.5;}vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){vec3 v01 = point -planeOrigin;float d = dot(planeNormal, v01) ;return (point - planeNormal * d);}float distancePointToLine(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt){vec3 tempPt = pointProjectOnPlane(lineNormal, ptOnLine, testPt);return length(tempPt - ptOnLine);}float getDepth(in vec4 depth){float z_window = czm_unpackDepth(depth);z_window = czm_reverseLogDepth(z_window);float n_range = czm_depthRange.near;float f_range = czm_depthRange.far;return (2.0 * z_window - n_range - f_range) / (f_range - n_range);}void main(){gl_FragColor = texture2D(colorTexture, v_textureCoordinates);float depth = getDepth( texture2D(depthTexture, v_textureCoordinates));vec4 viewPos = toEye(v_textureCoordinates, depth);vec3 prjOnPlane = pointProjectOnPlane(u_scanPlaneNormalEC.xyz, u_scanCenterEC.xyz, viewPos.xyz);float dis = length(prjOnPlane.xyz - u_scanCenterEC.xyz);float twou_radius = u_radius * 2.0;if(dis < u_radius){float f0 = 1.0 -abs(u_radius - dis) / u_radius;f0 = pow(f0, 64.0);vec3 lineEndPt = vec3(u_scanCenterEC.xyz) + u_scanLineNormalEC * u_radius;float f = 0.0;if(isPointOnLineRight(u_scanCenterEC.xyz, u_scanLineNormalEC.xyz, prjOnPlane.xyz)){float dis1= length(prjOnPlane.xyz - lineEndPt);f = abs(twou_radius -dis1) / twou_radius;f = pow(f, 3.0);}gl_FragColor = mix(gl_FragColor, u_scanColor, f + f0);}}`;
+                let shader = 
+                `uniform sampler2D colorTexture;
+                uniform sampler2D depthTexture;
+                varying vec2 v_textureCoordinates;
+                uniform vec4 u_scanCenterEC;
+                uniform vec3 u_scanPlaneNormalEC;
+                uniform vec3 u_scanLineNormalEC;
+                uniform float u_radius;
+                uniform vec4 u_scanColor;
+                vec4 toEye(in vec2 uv, in float depth) {
+                    vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));
+                    vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);
+                    posInCamera =posInCamera / posInCamera.w;
+                    return posInCamera;
+                }
+                bool isPointOnLineRight(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt){
+                    vec3 v01 = testPt - ptOnLine;
+                    normalize(v01);
+                    vec3 temp = cross(v01, lineNormal);
+                    float d = dot(temp, u_scanPlaneNormalEC);
+                    return d > 0.5;
+                }
+                vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){
+                    vec3 v01 = point -planeOrigin;float d = dot(planeNormal, v01);
+                    return (point - planeNormal * d);
+                }
+                float distancePointToLine(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt){
+                    vec3 tempPt = pointProjectOnPlane(lineNormal, ptOnLine, testPt);
+                    return length(tempPt - ptOnLine);
+                }
+                float getDepth(in vec4 depth){
+                    float z_window = czm_unpackDepth(depth);
+                    z_window = czm_reverseLogDepth(z_window);
+                    float n_range = czm_depthRange.near;
+                    float f_range = czm_depthRange.far;
+                    return (2.0 * z_window - n_range - f_range) / (f_range - n_range);
+                }
+                void main(){
+                    gl_FragColor = texture2D(colorTexture, v_textureCoordinates);
+                    float depth = getDepth( texture2D(depthTexture, v_textureCoordinates));
+                    vec4 viewPos = toEye(v_textureCoordinates, depth);
+                    vec3 prjOnPlane = pointProjectOnPlane(u_scanPlaneNormalEC.xyz, u_scanCenterEC.xyz, viewPos.xyz);
+                    float dis = length(prjOnPlane.xyz - u_scanCenterEC.xyz);float twou_radius = u_radius * 2.0;
+                    if(dis < u_radius){
+                        float f0 = 1.0 -abs(u_radius - dis) / u_radius;
+                        f0 = pow(f0, 64.0);
+                        vec3 lineEndPt = vec3(u_scanCenterEC.xyz) + u_scanLineNormalEC * u_radius;float f = 0.0;
+                        if(isPointOnLineRight(u_scanCenterEC.xyz, u_scanLineNormalEC.xyz, prjOnPlane.xyz)){
+                            float dis1= length(prjOnPlane.xyz - lineEndPt);
+                            f = abs(twou_radius -dis1) / twou_radius;
+                            f = pow(f, 3.0);
+                        }
+                        gl_FragColor = mix(gl_FragColor, u_scanColor, f + f0);
+                    }
+                }`
+                return  shader;
             }
         }, {
             'key': `remove`,
@@ -2407,7 +2626,39 @@
                 return this === _0x1847e9 || _0x1847e9 instanceof _0x39b095 && Cesium.Property.equals(this[`_color`], _0x1847e9[`_color`]);
             },
             Cesium.Material.WaveCircleMaterialType = `CircleWaveMaterial`,
-            Cesium.Material.CircleWaveSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); material.diffuse = 1.5 * color.rgb; vec2 st = materialInput.st; vec3 str = materialInput.str; float dis = distance(st, vec2(0.5, 0.5)); float per = fract(time); if (abs(str.z) > 0.001) { discard; } if (dis > 0.5) { discard; } else { float perDis = 0.5 / count; float disNum; float bl = .0; for (int i = 0; i <= 999; i++) { if (float(i) <= count) { disNum = perDis *float(i) - dis + per / count; if (disNum > 0.0) { if (disNum < perDis) { bl = 1.0 - disNum / perDis; } else if(disNum - perDis < perDis) { bl = 1.0 - abs(1.0 - disNum / perDis); } material.alpha = pow(bl, gradient); } } } } return material; }`,
+            Cesium.Material.CircleWaveSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    material.diffuse = 1.5 * color.rgb;
+                    vec2 st = materialInput.st;
+                    vec3 str = materialInput.str;
+                    float dis = distance(st, vec2(0.5, 0.5));
+                    float per = fract(time);
+                    if (abs(str.z) > 0.001) {
+                        discard;
+                    }
+                    if (dis > 0.5) {
+                        discard;
+                    } else {
+                        float perDis = 0.5 / count;
+                        float disNum;
+                        float bl = .0;
+                        for (int i = 0; i <= 999; i++) {
+                            if (float(i) <= count) {
+                                disNum = perDis *float(i) - dis + per / count;
+                                if (disNum > 0.0) {
+                                    if (disNum < perDis) {
+                                        bl = 1.0 - disNum / perDis;
+                                    } else if(disNum - perDis < perDis) {
+                                        bl = 1.0 - abs(1.0 - disNum / perDis);
+                                    }
+                                    material.alpha = pow(bl, gradient);
+                                }
+                            }
+                        } 
+                    }
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.WaveCircleMaterialType, {
                 'fabric': {
                     'type': Cesium.Material.WaveCircleMaterialType,
@@ -3928,7 +4179,14 @@
             },
             Cesium.Material.EllipsoidStripeVerticalType = 'EllipsoidStripeVertical',
             Cesium.Material.EllipsoidStripeVerticalImage = `data:image/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAUCAYAAAB7wJiVAAACgklEQVRoQ9WZi27DIAxFIeGX9n53//9FBTy5rSNESDC2U2mVqkQRgc7X1wczDwC/zrmQUgrzPM+3a3DOzeVzvL99L89zzmGapss953k5pnG/rAcAwXuP83rH+AAAeO+Tc27km3POaZqmRNfB9/G9rHmf1osx5hDC8ts9AJzqoHKD1xm3Eos7/iYKSxDnHBTBzKOBbYxXz5FSypjbkt/iz+fzKYSwCh45pifWqFO2xhfOIMdNDIPQkO4fDwAZnaR0htpZJFaMMZXOIPHQIT/czKUyxnXQVvCZ62GScD+arNa8WyaCyTwoyDcGKMYYNE4hsbgiNBxxcWn1XCwIOQIAkoAxS6BrVgiZk1NK6Yro63WrnKEgX0VZWuBaZjG3fDEdtMUWMdgrjnTL1y0YFhltMUcqwU6CjAJ4CZ4VQ+oyJgW7kTPMWMF1RsmQT2ZNb7qnB32la0zB7pyzyOhD50CHfBzAkK6DmAxhg13pDLUjqAzWjOkxo2YJCTJasqzG77mO1hCD3cgRSxMo6StGeyQU5L0sK1sA33o+yhDulnm0Y5eCXdmXmHfsKMibkCGc7FaNkYLdyBmHsmJv2/tqwRArp9yrY6eASPsKrbO2OnZ0CApixYRyni7Ymc5kg13pDAtHYA+0bBAkzEFBXsrAjHbsWmcwd1tisNe7L2nnfq+OHQV53jsOZ2axihWVQ1tzSU5+/13Hju5CQZ72mrvOsUm3LHHPtkiU2jFSsCv7EhJzVX5GmUOs4HbsJIgVQ5pOGRWl4UrTjp3EktT40b6is8aKWyjIo4Yh3L5i4P8grVNfNtiVzjisY+eKj4I8HHwexXEfh0FisCt3X6ujeG5wN8bt7ub+ANZIqbIlvAh5AAAAAElFTkSuQmCC`,
-            Cesium.Material.EllipsoidStripeVerticalSource = 'czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(count*st.t + time), fract(st.s))); material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb  ; return material; }',
+            Cesium.Material.EllipsoidStripeVerticalSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(count*st.t + time), fract(st.s)));
+                    material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb;
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.EllipsoidStripeVerticalType, {
                 'fabric': {
                     'type': Cesium.Material.EllipsoidStripeVerticalType,
@@ -3960,7 +4218,36 @@
                         'geometryInstances': _0x475b28,
                         'asynchronous': !1,
                         'appearance': new Cesium.MaterialAppearance({
-                            'fragmentShaderSource': 'varying vec3 v_positionEC; varying vec3 v_normalEC; varying vec2 v_st; void main() { vec3 positionToEyeEC = -v_positionEC; vec3 normalEC = normalize(v_normalEC); #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC); #endif czm_materialInput materialInput; materialInput.normalEC = normalEC; materialInput.positionToEyeEC = positionToEyeEC; materialInput.st = v_st; czm_material material = czm_getMaterial(materialInput); #ifdef FLAT gl_FragColor = vec4(material.diffuse + material.emission, material.alpha); #else gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC); #endif } ', 'vertexShaderSource': 'attribute vec3 position3DHigh; attribute vec3 position3DLow; attribute vec3 normal; attribute vec2 st; attribute float batchId; varying vec3 v_positionEC; varying vec3 v_normalEC; varying vec2 v_st; void main() { vec4 p = czm_computePosition(); v_positionEC = (czm_modelViewRelativeToEye * p).xyz; v_normalEC = czm_normal * normal; v_st = st; gl_Position = czm_modelViewProjectionRelativeToEye * p; } ',
+                            'fragmentShaderSource': 
+                                `varying vec3 v_positionEC;
+                                varying vec3 v_normalEC;
+                                varying vec2 v_st; void main() {
+                                    vec3 positionToEyeEC = -v_positionEC;
+                                    vec3 normalEC = normalize(v_normalEC);
+                                    #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC);
+                                    #endif czm_materialInput materialInput;
+                                    materialInput.normalEC = normalEC;
+                                    materialInput.positionToEyeEC = positionToEyeEC;
+                                    materialInput.st = v_st;
+                                    czm_material material = czm_getMaterial(materialInput);
+                                    #ifdef FLAT gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);
+                                    #else gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC); #endif
+                                }`,
+                            'vertexShaderSource':
+                                `attribute vec3 position3DHigh;
+                                attribute vec3 position3DLow;
+                                attribute vec3 normal;
+                                attribute vec2 st;
+                                attribute float batchId;
+                                varying vec3 v_positionEC;
+                                varying vec3 v_normalEC;
+                                varying vec2 v_st; void main() {
+                                    vec4 p = czm_computePosition();
+                                    v_positionEC = (czm_modelViewRelativeToEye * p).xyz;
+                                    v_normalEC = czm_normal * normal;
+                                    v_st = st;
+                                    gl_Position = czm_modelViewProjectionRelativeToEye * p;
+                                }`,
                             'material': new Cesium.Material({
                                 'fabric': {
                                     'type': 'VtxfShader1',
@@ -3968,7 +4255,67 @@
                                         'color': this.style.color || new Cesium.Color(0.2, 1, 0, 1),
                                         'speed_1': 5
                                     },
-                                    'source': 'uniform vec4 color; uniform float speed_1; #define pi 3.1415926535 #define PI2RAD 0.01745329252 #define TWO_PI (2. * PI) float rands(float p){ return fract(sin(p) * 10000.0); } float noise(vec2 p){ float time = fract( czm_frameNumber * speed_1 / 1000.0); float t = time / 20000.0; if(t > 1.0) t -= floor(t); return rands(p.x * 14. + p.y * sin(t) * 0.5); } vec2 sw(vec2 p){ return vec2(floor(p.x), floor(p.y)); } vec2 se(vec2 p){ return vec2(ceil(p.x), floor(p.y)); } vec2 nw(vec2 p){ return vec2(floor(p.x), ceil(p.y)); } vec2 ne(vec2 p){ return vec2(ceil(p.x), ceil(p.y)); } float smoothNoise(vec2 p){ vec2 inter = smoothstep(0.0, 1.0, fract(p)); float s = mix(noise(sw(p)), noise(se(p)), inter.x); float n = mix(noise(nw(p)), noise(ne(p)), inter.x); return mix(s, n, inter.y); } float fbm(vec2 p){ float z = 2.0; float rz = 0.0; vec2 bp = p; for(float i = 1.0; i < 6.0; i++){ rz += abs((smoothNoise(p) - 0.5)* 2.0) / z; z *= 2.0; p *= 2.0; } return rz; } czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec2 st2 = materialInput.st; float time = fract( czm_frameNumber * speed_1 / 1000.0); if (st.t < 0.5) { discard; } st *= 4.; float rz = fbm(st); st /= exp(mod( time * 2.0, pi)); rz *= pow(15., 0.9); vec4 temp = vec4(0); temp = mix( color  / rz, vec4(color.rgb, 0.1), 0.2); if (st2.s < 0.05) { temp = mix(vec4(color.rgb, 0.1), temp, st2.s / 0.05); } if (st2.s > 0.95){ temp = mix(temp, vec4(color.rgb, 0.1), (st2.s - 0.95) / 0.05); } material.diffuse = temp.rgb; material.alpha = temp.a * 2.0; return material; }'
+                                    'source': 
+                                        `uniform vec4 color;
+                                        uniform float speed_1;
+                                        #define pi 3.1415926535
+                                        #define PI2RAD 0.01745329252
+                                        #define TWO_PI (2. * PI)
+                                        float rands(float p){
+                                            return fract(sin(p) * 10000.0);
+                                        }
+                                        float noise(vec2 p){
+                                            float time = fract( czm_frameNumber * speed_1 / 1000.0);
+                                            float t = time / 20000.0;
+                                            if(t > 1.0) t -= floor(t);
+                                            return rands(p.x * 14. + p.y * sin(t) * 0.5);
+                                        }
+                                        vec2 sw(vec2 p){
+                                            return vec2(floor(p.x), floor(p.y));
+                                        }
+                                        vec2 se(vec2 p){
+                                            return vec2(ceil(p.x), floor(p.y));
+                                        }
+                                        vec2 nw(vec2 p){
+                                            return vec2(floor(p.x), ceil(p.y));
+                                        }
+                                        vec2 ne(vec2 p){
+                                            return vec2(ceil(p.x), ceil(p.y));
+                                        }
+                                        float smoothNoise(vec2 p){
+                                            vec2 inter = smoothstep(0.0, 1.0, fract(p));
+                                            float s = mix(noise(sw(p)), noise(se(p)), inter.x);
+                                            float n = mix(noise(nw(p)), noise(ne(p)), inter.x);
+                                            return mix(s, n, inter.y);
+                                        }
+                                        float fbm(vec2 p){
+                                            float z = 2.0;
+                                            float rz = 0.0;
+                                            vec2 bp = p;
+                                            for(float i = 1.0; i < 6.0; i++){
+                                                rz += abs((smoothNoise(p) - 0.5)* 2.0) / z; z *= 2.0; p *= 2.0;
+                                            } return rz;
+                                        }
+                                        czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                            czm_material material = czm_getDefaultMaterial(materialInput);
+                                            vec2 st = materialInput.st;
+                                            vec2 st2 = materialInput.st;
+                                            float time = fract( czm_frameNumber * speed_1 / 1000.0);
+                                            if (st.t < 0.5) { discard; } st *= 4.;
+                                            float rz = fbm(st);
+                                            st /= exp(mod( time * 2.0, pi));
+                                            rz *= pow(15., 0.9);
+                                            vec4 temp = vec4(0);
+                                            temp = mix( color  / rz, vec4(color.rgb, 0.1), 0.2);
+                                            if (st2.s < 0.05) { temp = mix(vec4(color.rgb, 0.1), temp, st2.s / 0.05);
+                                        }
+                                        if (st2.s > 0.95){
+                                            temp = mix(temp, vec4(color.rgb, 0.1), (st2.s - 0.95) / 0.05);
+                                        }
+                                        material.diffuse = temp.rgb;
+                                        material.alpha = temp.a * 2.0;
+                                        return material;
+                                    }`
                                 },
                                 'translucent': !1
                             }),
@@ -4015,7 +4362,17 @@
                                     'color_0': this.style.color || new Cesium.Color(0.2, 1, 0, 1),
                                     'totoalFrameCount_1': 500
                                 },
-                                'source': 'uniform float totoalFrameCount_1; uniform vec4 color_0; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float t = mod(czm_frameNumber, totoalFrameCount_1) / totoalFrameCount_1; t *= 1.03; float alpha = smoothstep(t- 0.03, t, st.s) * step(-t, -st.s); alpha += 0.1; alpha *= step(-0.5, -abs(0.5-st.t)); material.diffuse = color_0.rgb; material.alpha = alpha; return material; }  '
+                                'source': 
+                                    `uniform float totoalFrameCount_1;
+                                    uniform vec4 color_0; czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        vec2 st = materialInput.st;
+                                        float t = mod(czm_frameNumber, totoalFrameCount_1) / totoalFrameCount_1;
+                                        t *= 1.03; float alpha = smoothstep(t- 0.03, t, st.s) * step(-t, -st.s);
+                                        alpha += 0.1; alpha *= step(-0.5, -abs(0.5-st.t));
+                                        material.diffuse = color_0.rgb;
+                                        material.alpha = alpha; return material;
+                                    }`
                             },
                             'translucent': !1
                         }),
@@ -5500,7 +5857,7 @@
                     'KEY': _0x3be277,
                     'NEED': !1,
                     'fastKey': function (_0x2fa6e0, _0xebf55d) {
-                        if (!_0x402d97(_0x2fa6e0))
+                        if (!isObject(_0x2fa6e0))
                             return `symbol` == typeof _0x2fa6e0 ? _0x2fa6e0 : (`string` == typeof _0x2fa6e0 ? 'S' : 'P') + _0x2fa6e0;
                         if (!_0x5228dc(_0x2fa6e0, _0x3be277)) {
                             if (!_0x4acede(_0x2fa6e0))
@@ -5731,7 +6088,7 @@
                         for (var _0xdcf03e, _0x4c5da4, _0x16ad2b = [_0x400922], _0x67509 = 1; _0x67509 < arguments.length;)
                             _0x16ad2b.push(arguments[_0x67509++]);
                         if (_0x4c5da4 = _0xdcf03e = _0x16ad2b[1],
-                            (_0x402d97(_0xdcf03e) || void 0 !== _0x400922) && !_0x467c0d(_0x400922))
+                            (isObject(_0xdcf03e) || void 0 !== _0x400922) && !_0x467c0d(_0x400922))
                             return _0x35aec2(_0xdcf03e) || (_0xdcf03e = function (_0x452550, _0x589ade) {
                                 if (`function` == typeof _0x4c5da4 && (_0x589ade = _0x4c5da4.call(this, _0x452550, _0x589ade)),
                                     !_0x467c0d(_0x589ade)) {
@@ -5759,7 +6116,7 @@
         _0x242ce7(_0x316cc6);
         function _0x5d04cb(_0x4a7fed, _0x4a5e23) {
             if (_0xb58d14(_0x4a7fed),
-                !_0x402d97(_0x4a5e23) && null !== _0x4a5e23)
+                !isObject(_0x4a5e23) && null !== _0x4a5e23)
                 throw TypeError(_0x4a5e23 + `: can't set as prototype!`);
         }
         var _0x42376b = _0x2433b0(function (_0x24ff30, _0x1eddbe) {
@@ -13844,8 +14201,7 @@
                         `overrideMimeType` in _0x1c7616 ? _0x1c7616.overrideMimeType(`text/plain; charset=x-user-defined`) : `responseType` in _0x1c7616 ? _0x1c7616.responseType = `arraybuffer` : _0x1c7616.setRequestHeader(`Accept-Charset`, `x-user-defined`),
                         _0x1c7616.onloadstart = function () {
                             _0x353ca2 || _0x1b343c();
-                        }
-                        ,
+                        },
                         _0x1c7616.onload = function (_0x1ce1a4) {
                             200 != this.status && _0x412b3d(`xhr - response`),
                                 `response` in this || (this.response = new VBArray(this.responseText).toArray().map(String.fromCharCode).join(''));
@@ -13909,11 +14265,10 @@
                 this.viewer = _0x192b6c,
                 this.position = _0x470101;
             var _0x3b4110 = document.createElement('img');
-            _0x3b4110 = _0x475dbd,
+            _0x3b4110.src = _0x475dbd,
                 _0x3b4110.onload = function () {
                     _0x1f95f7.loadGif(_0x3b4110);
-                }
-                ;
+                };
         }
         _0x5f4426(`.is-shulie { width: 15px; text-align: center; background: transparent; font-size: 9px; font-weight: 600; color: white; font-family: "Microsoft YaHei", "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans GB", "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif !important; position: absolute; display: block; box-sizing: border-box; pointer-events: none; } .is-shulie-item { writing-mode: vertical-lr; font-size: 16px; letter-spacing: 4px; } .pre-topCard-list-item-line { display: block; height: 100px; width: 1px; margin-left: calc(50% + 2px); margin-top: 3px; background-color: #fff; } .pre-topCard-list-item-circle { width: 10px; height: 10px; background-color: #fff; border-radius: 50%; margin-left: 5px; margin-top: -10px; }`, {}),
             (_0x4ec804(_0x2b72ed, [{
@@ -15002,7 +15357,16 @@
                             'uniforms': {
                                 'color': _0x16ab13
                             },
-                            'source': `uniform vec4 color; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float alpha = distance(st,vec2(0.5, 0.5)); material.alpha = color.a  * alpha  * 1.5; material.diffuse = color.rgb * 1.3; return material; }`
+                            'source': 
+                                `uniform vec4 color;
+                                czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    vec2 st = materialInput.st;
+                                    float alpha = distance(st,vec2(0.5, 0.5));
+                                    material.alpha = color.a  * alpha  * 1.5;
+                                    material.diffuse = color.rgb * 1.3;
+                                    return material;
+                                }`
                         },
                         'translucent': !0
                     }),
@@ -15397,7 +15761,19 @@
                                 'color_0': _0x444226,
                                 'totoalFrameCount_1': 1000
                             },
-                            'source': 'uniform float totoalFrameCount_1; uniform vec4 color_0; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float t = mod(czm_frameNumber, totoalFrameCount_1) / totoalFrameCount_1; t *= 1.03; float alpha = smoothstep(t- 0.03, t, st.s) * step(-t, -st.s); alpha += 0.1; alpha *= step(-0.4, -abs(0.5-st.t)); material.diffuse = color_0.rgb; material.alpha = alpha; return material; }'
+                            'source': 
+                                `uniform float totoalFrameCount_1;
+                                uniform vec4 color_0; czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    vec2 st = materialInput.st;
+                                    float t = mod(czm_frameNumber, totoalFrameCount_1) / totoalFrameCount_1;
+                                    t *= 1.03; float alpha = smoothstep(t- 0.03, t, st.s) * step(-t, -st.s);
+                                    alpha += 0.1;
+                                    alpha *= step(-0.4, -abs(0.5-st.t));
+                                    material.diffuse = color_0.rgb;
+                                    material.alpha = alpha;
+                                    return material;
+                                }`
                         },
                         'translucent': !0
                     }),
@@ -15434,7 +15810,14 @@
                     return this === _0x16963c || _0x16963c instanceof _0x588709 && Cesium.Property.equals(this[`_color`], _0x16963c[`_color`]) && this.duration == _0x16963c.duration && this.count == _0x16963c.count;
                 },
                 Cesium.Material.PolylineArrowOpacityType = `PolylineArrowOpacity`,
-                Cesium.Material.PolylineArrowOpacitySource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t))); material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb * 3.0 ; return material;}`,
+                Cesium.Material.PolylineArrowOpacitySource = 
+                    `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                        czm_material material = czm_getDefaultMaterial(materialInput);
+                        vec2 st = materialInput.st;
+                        vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t)));
+                        material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb * 3.0;
+                        return material;
+                    }`,
                 Cesium.Material['_materialCache'].addMaterial(Cesium.Material.PolylineArrowOpacityType, {
                     'fabric': {
                         'type': Cesium.Material.PolylineArrowOpacityType,
@@ -15492,7 +15875,15 @@
             }
             ,
             Cesium.Material.PolylineEnergyTransType = 'PolylineEnergyTrans',
-            Cesium.Material.PolylineEnergyTransSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t))); material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb *3.0 ; return material;}`,
+            Cesium.Material.PolylineEnergyTransSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t)));
+                    material.alpha =  colorImage.a * color.a;
+                    material.diffuse =  color.rgb *3.0;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineEnergyTransType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineEnergyTransType,
@@ -15544,7 +15935,15 @@
             },
             Cesium.Material.PolylineLightingType = 'PolylineLighting',
             Cesium.Material.PolylineLightingImage = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAACYCAYAAACS0lH9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAJ0GlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgMTE2LjE2NDY1NSwgMjAyMS8wMS8yNi0xNTo0MToyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iIHhtbG5zOmV4aWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vZXhpZi8xLjAvIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDplODY0YmNmNy1lZGIyLWIyNDQtYWI0NC04OWZkNmMwOTQ4MDYiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjIyOGMxMDUtODFmZS00MjAxLWIwOTEtZDkwMGI0NTI0NWMwIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9IjcxNzA5OEJGODAwODNEREJGRDQyQzAzMzQ5NDlDRDFDIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9IiIgdGlmZjpJbWFnZVdpZHRoPSI1MTIiIHRpZmY6SW1hZ2VMZW5ndGg9IjE1MiIgdGlmZjpQaG90b21ldHJpY0ludGVycHJldGF0aW9uPSIyIiB0aWZmOlNhbXBsZXNQZXJQaXhlbD0iMyIgdGlmZjpYUmVzb2x1dGlvbj0iMS8xIiB0aWZmOllSZXNvbHV0aW9uPSIxLzEiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjEiIGV4aWY6RXhpZlZlcnNpb249IjAyMzEiIGV4aWY6Q29sb3JTcGFjZT0iNjU1MzUiIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSI1MTIiIGV4aWY6UGl4ZWxZRGltZW5zaW9uPSIxNTIiIHhtcDpDcmVhdGVEYXRlPSIyMDIxLTAyLTIzVDEwOjAyOjQxKzA4OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMS0wMi0yM1QxMDowODo0NCswODowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMS0wMi0yM1QxMDowODo0NCswODowMCI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmZmYTk5ZjhhLTdiZmQtNDcxNi04MTgwLWJmZTUyMmFmNGUzNSIgc3RFdnQ6d2hlbj0iMjAyMS0wMi0yM1QxMDowODo0NCswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBpbWFnZS9qcGVnIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iZGVyaXZlZCIgc3RFdnQ6cGFyYW1ldGVycz0iY29udmVydGVkIGZyb20gaW1hZ2UvanBlZyB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjYyMjhjMTA1LTgxZmUtNDIwMS1iMDkxLWQ5MDBiNDUyNDVjMCIgc3RFdnQ6d2hlbj0iMjAyMS0wMi0yM1QxMDowODo0NCswODowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOmZmYTk5ZjhhLTdiZmQtNDcxNi04MTgwLWJmZTUyMmFmNGUzNSIgc3RSZWY6ZG9jdW1lbnRJRD0iNzE3MDk4QkY4MDA4M0REQkZENDJDMDMzNDk0OUNEMUMiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0iNzE3MDk4QkY4MDA4M0REQkZENDJDMDMzNDk0OUNEMUMiLz4gPHBob3Rvc2hvcDpEb2N1bWVudEFuY2VzdG9ycz4gPHJkZjpCYWc+IDxyZGY6bGk+NzE3MDk4QkY4MDA4M0REQkZENDJDMDMzNDk0OUNEMUM8L3JkZjpsaT4gPC9yZGY6QmFnPiA8L3Bob3Rvc2hvcDpEb2N1bWVudEFuY2VzdG9ycz4gPHRpZmY6Qml0c1BlclNhbXBsZT4gPHJkZjpTZXE+IDxyZGY6bGk+ODwvcmRmOmxpPiA8cmRmOmxpPjg8L3JkZjpsaT4gPHJkZjpsaT44PC9yZGY6bGk+IDwvcmRmOlNlcT4gPC90aWZmOkJpdHNQZXJTYW1wbGU+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+h9EbuwAAA01JREFUeJzt3TuOFVkQBNDoJhmEkDBgZv8L5GMgIcRvHg5ryDTiHKn98Co67q16T4/HYwIAVHm+DgAA7FMAAKCQAgAAhSbJ03UIAGCXBQAACikAAFDIEQAAFLIAAEAhBQAACikAAFBoogQAQB0PfwAopAAAQCGvAQJAIQsAABSyAABAIQsAABSyAABAIQUAAAo5AgCAQr4ECACFPPwBoJACAACFHAEAQCEPfwAoZAEAgEIe/gBQyAIAAIU8/AGgkAUAAAr5LQAAKOS/fwAoZAEAgELuAABAIQsAABRSAACgkAIAAIXcAQCAQhYAAChkAQCAQgoAABRSAACgkIc/ABSaJC+uQwAAu7wFAACFFAAAKDR//wCAIhYAACjkEiAAFLIAAEChSfLyOgQAsMuXAAGgkLcAAKCQAgAAhbwFAACFFAAAKOQIAAAKTZJ/rkMAALsUAAAo5AgAAAr5EiAAFFIAAKCQOwAAUEgBAIBCk+TVdQgAYNckeXMdAgDYNUneXocAAHZNkvfXIQCAXZPkv+sQAMCuSfLvdQgAYNckeXcdAgDY5RIgABSaJK+vQwAAu/wWAAAUmiRP1yEAgF2T5HEdAgDYNUl+XocAAHZNkm/XIQCAXZPky3UIAGDXJPl8HQIA2DVJPl6HAAB2TZIP1yEAgF2T5NN1CABgl0uAAFBokny9DgEA7Jok369DAAC7JsmP6xAAwC4FAAAK+S0AACikAABAoUny6zoEALDLHQAAKKQAAEAhRwAAUGiS/L4OAQDsUgAAoJAjAAAopAAAQKFJ8v91CABgly8BAkChSfK4DgEA7PIWAAAUsgAAQCFvAQBAIQsAABRSAACgkEuAAFDo+ToAALDPlwABoJACAACFFAAAKOQtAAAoZAEAgEIWAAAopAAAQCEFAAAKuQMAAIUsAABQyKeAAaCQBQAACrkDAACFHAEAQCELAAAUsgAAQCELAAAUsgAAQCELAAAUsgAAQCEFAAAKOQIAgEIWAAAo5LcAAKCQAgAAhRwBAEAhCwAAFLIAAEAhCwAAFLIAAEAhBQAACvkSIAAUsgAAQCEFAAAKKQAAUMhrgABQyAIAAIUUAAAo5AgAAApZAACgkAIAAIUUAAAo5A4AABT6A6gaPQ6/wRIfAAAAAElFTkSuQmCC`,
-            Cesium.Material.PolylineLightingSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.s), st.t)); material.alpha = colorImage.a * color.a; material.diffuse = (colorImage.rgb + color.rgb)* 1.3 ; return material;}`,
+            Cesium.Material.PolylineLightingSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.s), st.t));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse = (colorImage.rgb + color.rgb)* 1.3;
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.PolylineLightingType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineLightingType,
@@ -15597,7 +15996,15 @@
                 return this === _0x4d626c || _0x4d626c instanceof _0x38110f && Cesium.Property.equals(this[`_color`], _0x4d626c[`_color`]);
             },
             Cesium.Material.PolylineLinkPulseType = `PolylineLinkPulse`,
-            Cesium.Material.PolylineLinkPulseSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t)); material.alpha = colorImage.a * color.a; material.diffuse = (colorImage.rgb + color.rgb)* 2.5 ; return material;}`,
+            Cesium.Material.PolylineLinkPulseSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse = (colorImage.rgb + color.rgb)* 2.5;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineLinkPulseType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineLinkPulseType,
@@ -15653,7 +16060,14 @@
             }
             ,
             Cesium.Material.PolylineMigrateType = `PolylineMigrate`,
-            Cesium.Material.PolylineMigrateSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t)); material.alpha = colorImage.a * color.a; material.diffuse = color.rgb*1.5; return material; }`,
+            Cesium.Material.PolylineMigrateSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t));
+                    material.alpha = colorImage.a * color.a; material.diffuse = color.rgb*1.5;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineMigrateType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineMigrateType,
@@ -15704,7 +16118,15 @@
                 return this === _0x44c562 || _0x44c562 instanceof _0x396091 && this.duration == _0x44c562.duration;
             },
             Cesium.Material.PolylineSpriteType = `PolylineSprite`,
-            Cesium.Material.PolylineSpriteSource = 'czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t)); material.alpha = colorImage.a; material.diffuse = colorImage.rgb * 1.5 ; return material; }',
+            Cesium.Material.PolylineSpriteSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t));
+                    material.alpha = colorImage.a;
+                    material.diffuse = colorImage.rgb * 1.5;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineSpriteType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineSpriteType,
@@ -15758,7 +16180,18 @@
                 return this === _0x4c9a64 || _0x4c9a64 instanceof _0x56beae && this.speed == _0x4c9a64.speed && Cesium.Property.equals(this.color, _0x4c9a64.color);
             },
             Cesium.Material.PolylineTrailType = 'PolylineTrail',
-            Cesium.Material.PolylineTrailSource = `uniform vec4 color; uniform float speed; uniform float percent; uniform float gradient; czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float t =fract(czm_frameNumber * speed / 1000.0); t *= (1.0 + percent); float alpha = smoothstep(t- percent, t, st.s) * step(-t, -st.s); alpha += gradient; material.diffuse = color.rgb; material.alpha = alpha; return material; }`,
+            Cesium.Material.PolylineTrailSource =
+                `uniform vec4 color;
+                uniform float speed; uniform float percent;
+                uniform float gradient;
+                czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st; float t =fract(czm_frameNumber * speed / 1000.0);
+                    t *= (1.0 + percent);
+                    float alpha = smoothstep(t- percent, t, st.s) * step(-t, -st.s);
+                    alpha += gradient; material.diffuse = color.rgb;
+                    material.alpha = alpha;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineTrailType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineTrailType,
@@ -15811,7 +16244,17 @@
                 return this === _0x214e56 || _0x214e56 instanceof _0x3b41fc && this.duration == _0x214e56.duration && Cesium.Property.equals(this['_color'], _0x214e56[`_color`]);
             },
             Cesium.Material.PolylineTrialFlowType = `PolylineTrialFlow`,
-            Cesium.Material.PolylineTrialFlowSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; float t = time; t *= 1.03; float alpha = smoothstep(t- 0.1, t, st.s) * step(-t, -st.s); alpha += 0.1; material.diffuse= color.rgb; material.alpha = alpha; return material; } `,
+            Cesium.Material.PolylineTrialFlowSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    float t = time; t *= 1.03;
+                    float alpha = smoothstep(t- 0.1, t, st.s) * step(-t, -st.s);
+                    alpha += 0.1;
+                    material.diffuse= color.rgb;
+                    material.alpha = alpha;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineTrialFlowType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineTrialFlowType,
@@ -15868,7 +16311,14 @@
             }
             ,
             Cesium.Material.PolylineVolumeTrialType = `PolylineVolumeTrial`,
-            Cesium.Material.PolylineVolumeTrialSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t))); material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb *1.5 ; return material;}`,
+            Cesium.Material.PolylineVolumeTrialSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t)));
+                    material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb *1.5;
+                    return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.PolylineVolumeTrialType, {
                 'fabric': {
                     'type': Cesium.Material.PolylineVolumeTrialType,
@@ -15931,7 +16381,14 @@
                     return this === _0x69bdf3 || _0x69bdf3 instanceof _0x26898e && Cesium.Property.equals(this[`_color`], _0x69bdf3['_color']) && this.duration == _0x69bdf3.duration && this.count == _0x69bdf3.count && this.url == _0x69bdf3.url;
                 },
                 Cesium.Material.PolylineSuperType = `PolylineSuper`,
-                Cesium.Material.PolylineSuperSource = 'czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t))); material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb * 1.5 ; return material;}',
+                Cesium.Material.PolylineSuperSource = 
+                    `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                        czm_material material = czm_getDefaultMaterial(materialInput);
+                        vec2 st = materialInput.st;
+                        vec4 colorImage = texture2D(image, vec2(fract( count * st.s - time),fract(st.t)));
+                        material.alpha =  colorImage.a * color.a; material.diffuse =  color.rgb * 1.5 ;
+                        return material;
+                    }`,
                 Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.PolylineSuperType, {
                     'fabric': {
                         'type': Cesium.Material.PolylineSuperType,
@@ -17279,16 +17736,78 @@
         }, {
             'key': `getSnow_fs`,
             'value': function () {
-                return `uniform sampler2D colorTexture; varying vec2 v_textureCoordinates; float snow(vec2 uv,float scale) { float time = czm_frameNumber / 60.0; float w=smoothstep(1.,0.,-uv.y*(scale/10.));if(w<.1)return 0.; uv+=time/scale;uv.y+=time*2./scale;uv.x+=sin(uv.y+time*.5)/scale; uv*=scale;vec2 s=floor(uv),f=fract(uv),p;float k=3.,d; p=.5+.35*sin(11.*fract(sin((s+p+scale)*mat2(7,3,6,5))*5.))-f;d=length(p);k=min(d,k); k=smoothstep(0.,k,sin(f.x+f.y)*0.01); return k*w; } void main(void){ vec2 resolution = czm_viewport.zw; vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y); vec3 finalColor=vec3(0); float c = 0.0; c+=snow(uv,30.)*.0; c+=snow(uv,20.)*.0; c+=snow(uv,15.)*.0; c+=snow(uv,10.); c+=snow(uv,8.); c+=snow(uv,6.); c+=snow(uv,5.); finalColor=(vec3(c)); gl_FragColor = mix(texture2D(colorTexture, v_textureCoordinates), vec4(finalColor,1), 0.5); }`;
+                let shader = `uniform sampler2D colorTexture;
+                varying vec2 v_textureCoordinates;
+                float snow(vec2 uv,float scale) {
+                    float time = czm_frameNumber / 60.0;
+                    float w=smoothstep(1.,0.,-uv.y*(scale/10.));
+                    if(w<.1)return 0.;
+                    uv+=time/scale;
+                    uv.y+=time*2./scale;
+                    uv.x+=sin(uv.y+time*.5)/scale;
+                    uv*=scale;
+                    vec2 s=floor(uv),f=fract(uv),p;
+                    float k=3.,d;
+                    p=.5+.35*sin(11.*fract(sin((s+p+scale)*mat2(7,3,6,5))*5.))-f;
+                    d=length(p);
+                    k=min(d,k);
+                    k=smoothstep(0.,k,sin(f.x+f.y)*0.01);
+                    return k*w;
+                }
+                void main(void){
+                    vec2 resolution = czm_viewport.zw;
+                    vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y);
+                    vec3 finalColor=vec3(0);
+                    float c = 0.0; c+=snow(uv,30.)*.0; c+=snow(uv,20.)*.0; c+=snow(uv,15.)*.0; c+=snow(uv,10.);
+                    c+=snow(uv,8.);
+                    c+=snow(uv,6.);
+                    c+=snow(uv,5.);
+                    finalColor=(vec3(c));
+                    gl_FragColor = mix(texture2D(colorTexture, v_textureCoordinates), vec4(finalColor,1), 0.5);
+                }`
+                return shader;
             }
         }, {
             'key': `getRain_fs`,
             'value': function () {
-                return `uniform sampler2D colorTexture; varying vec2 v_textureCoordinates; float hash(float x){ return fract(sin(x*133.3)*13.13); } void main(void){ float time = czm_frameNumber / 600.0; vec2 resolution = czm_viewport.zw; vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y); vec3 c=vec3(.6,.7,.8); float a=-.4; float si=sin(a),co=cos(a); uv*=mat2(co,-si,si,co); uv*=length(uv+vec2(0,4.9))*.3+1.; float v=1.-sin(hash(floor(uv.x*100.))*2.); float b=clamp(abs(sin(20.*time*v+uv.y*(5./(2.+v))))-.95,0.,1.)*20.; c*=v*b; gl_FragColor = mix(texture2D(colorTexture, v_textureCoordinates), vec4(c,1), 0.5); }`;
+                let shader = `uniform sampler2D colorTexture;
+                varying vec2 v_textureCoordinates;
+                float hash(float x){
+                    return fract(sin(x*133.3)*13.13);
+                }
+                void main(void){
+                    float time = czm_frameNumber / 600.0;
+                    vec2 resolution = czm_viewport.zw;
+                    vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y);
+                    vec3 c=vec3(.6,.7,.8);
+                    float a=-.4;
+                    float si=sin(a),co=cos(a);
+                    uv*=mat2(co,-si,si,co);
+                    uv*=length(uv+vec2(0,4.9))*.3+1.;
+                    float v=1.-sin(hash(floor(uv.x*100.))*2.);
+                    float b=clamp(abs(sin(20.*time*v+uv.y*(5./(2.+v))))-.95,0.,1.)*20.;
+                    c*=v*b;
+                    gl_FragColor = mix(texture2D(colorTexture, v_textureCoordinates), vec4(c,1), 0.5);
+                }`
+                return shader;
             }
         }, {
-            'key': `getFog_fs`, 'value': function () {
-                return `uniform sampler2D colorTexture; uniform sampler2D depthTexture; varying vec2 v_textureCoordinates; void main(void) { vec4 origcolor=texture2D(colorTexture, v_textureCoordinates); vec4 fogcolor=vec4(0.8,0.8,0.8,0.5); float depth = czm_readDepth(depthTexture, v_textureCoordinates); vec4 depthcolor=texture2D(depthTexture, v_textureCoordinates); float f=(depthcolor.r-0.7)/0.2; if(f<0.0) f=0.0; else if(f>1.0) f=1.0; gl_FragColor = mix(origcolor,fogcolor,f); }`;
+            'key': `getFog_fs`,
+            'value': function () {
+                let shader = `uniform sampler2D colorTexture;
+                uniform sampler2D depthTexture;
+                varying vec2 v_textureCoordinates;
+                void main(void) {
+                    vec4 origcolor=texture2D(colorTexture, v_textureCoordinates);
+                    vec4 fogcolor=vec4(0.8,0.8,0.8,0.5);
+                    float depth = czm_readDepth(depthTexture, v_textureCoordinates);
+                    vec4 depthcolor=texture2D(depthTexture, v_textureCoordinates);
+                    float f=(depthcolor.r-0.7)/0.2;
+                    if(f<0.0) f=0.0;
+                    else if(f>1.0) f=1.0;
+                    gl_FragColor = mix(origcolor,fogcolor,f);
+                }`
+                return shader;
             }
         }]),
             _0x2229a6 = _0xf01636;
@@ -17441,7 +17960,15 @@
             },
             Cesium.CloudMaterialProperty = _0x4b98a2,
             Cesium.Material.CloudType = 'Cloud',
-            Cesium.Material.CloudSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image,   vec2(fract(st.s + time),fract(st.t))); material.alpha = colorImage.a * color.a  ; material.diffuse =  1.3 * color.rgb  ; return material; }`,
+            Cesium.Material.CloudSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image,vec2(fract(st.s + time),fract(st.t)));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse =  1.3 * color.rgb;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.CloudType, {
                 'fabric': {
                     'type': Cesium.Material.CloudType,
@@ -18316,7 +18843,22 @@
             _0x36d1b1(this, _0x5ba569),
                 this.viewer = _0x4cbe3c,
                 this.stage = new Cesium.PostProcessStage({
-                    'fragmentShader': `uniform sampler2D colorTexture; varying vec2 v_textureCoordinates; const int KERNEL_WIDTH=16; void main(void) { vec2 step = 1.0 / czm_viewport.zw; vec2 integralPos = v_textureCoordinates - mod(v_textureCoordinates, 8.0 * step); vec3 averageValue = vec3(0.0); for (int i = 0; i < KERNEL_WIDTH; i++) { for (int j = 0; j < KERNEL_WIDTH; j++) { averageValue += texture2D(colorTexture, integralPos + step * vec2(i, j)).rgb; } } averageValue /= float(KERNEL_WIDTH * KERNEL_WIDTH); gl_FragColor = vec4(averageValue, 1.0); } `
+                    'fragmentShader': `
+                    uniform sampler2D colorTexture;
+                    varying vec2 v_textureCoordinates;
+                    const int KERNEL_WIDTH=16;
+                    void main(void) { 
+                        vec2 step = 1.0 / czm_viewport.zw;
+                        vec2 integralPos = v_textureCoordinates - mod(v_textureCoordinates, 8.0 * step);
+                        vec3 averageValue = vec3(0.0);
+                        for (int i = 0; i < KERNEL_WIDTH; i++) { 
+                            for (int j = 0; j < KERNEL_WIDTH; j++) { 
+                                averageValue += texture2D(colorTexture, integralPos + step * vec2(i, j)).rgb;
+                            }
+                        }
+                        averageValue /= float(KERNEL_WIDTH * KERNEL_WIDTH);
+                        gl_FragColor = vec4(averageValue, 1.0);
+                    } `
                 }),
                 this.viewer.scene.postProcessStages.add(this.stage),
                 this.stage.enabled = !0;
@@ -18413,7 +18955,22 @@
                                         'offset': 0,
                                         'thickness': 0.3
                                     },
-                                    'source': ' uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a; return material; } '
+                                    'source':
+                                        `uniform vec4 color;
+                                        uniform float repeat;
+                                        uniform float offset;
+                                        uniform float thickness;
+                                        czm_material czm_getMaterial(czm_materialInput materialInput) { 
+                                            czm_material material = czm_getDefaultMaterial(materialInput);
+                                            float sp = 1.0/repeat;
+                                            vec2 st = materialInput.st;
+                                            float dis = distance(st, vec2(0.5));
+                                            float m = mod(dis + offset, sp);
+                                            float a = step(sp*(1.0-thickness), m);
+                                            material.diffuse = color.rgb;
+                                            material.alpha = a * color.a;
+                                            return material;
+                                        }`
                                 },
                                 'translucent': !1
                             }),
@@ -18433,7 +18990,21 @@
                                             'offset': 0,
                                             'thickness': 0.8
                                         },
-                                        'source': ' uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a * dis * 1.2; return material; } '
+                                        'source':
+                                            `uniform vec4 color;
+                                            uniform float repeat;
+                                            uniform float offset;
+                                            uniform float thickness;
+                                            czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                                czm_material material = czm_getDefaultMaterial(materialInput);
+                                                float sp = 1.0/repeat; vec2 st = materialInput.st;
+                                                float dis = distance(st, vec2(0.5));
+                                                float m = mod(dis + offset, sp);
+                                                float a = step(sp*(1.0-thickness), m);
+                                                material.diffuse = color.rgb;
+                                                material.alpha = a * color.a * dis * 1.2;
+                                                return material;
+                                            }`
                                     },
                                     'translucent': !1
                                 }),
@@ -19411,7 +19982,21 @@
                                 'offset': 0,
                                 'thickness': 0.3
                             },
-                            'source': ` uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a; return material; } `
+                            'source': 
+                                `uniform vec4 color;
+                                uniform float repeat;
+                                uniform float offset;
+                                uniform float thickness;
+                                czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                    czm_material material = czm_getDefaultMaterial(materialInput);
+                                    float sp = 1.0/repeat;
+                                    vec2 st = materialInput.st;
+                                    float dis = distance(st, vec2(0.5));
+                                    float m = mod(dis + offset, sp);
+                                    float a = step(sp*(1.0-thickness), m);
+                                    material.diffuse = color.rgb;
+                                    material.alpha = a * color.a; return material;
+                                } `
                         },
                         'translucent': !1
                     }),
@@ -19427,7 +20012,22 @@
                                     'offset': 0,
                                     'thickness': 0.3
                                 },
-                                'source': `uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a; return material; } `
+                                'source': 
+                                    `uniform vec4 color;
+                                    uniform float repeat;
+                                    uniform float offset;
+                                    uniform float thickness;
+                                    czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        float sp = 1.0/repeat;
+                                        vec2 st = materialInput.st;
+                                        float dis = distance(st, vec2(0.5));
+                                        float m = mod(dis + offset, sp);
+                                        float a = step(sp*(1.0-thickness), m);
+                                        material.diffuse = color.rgb;
+                                        material.alpha = a * color.a;
+                                        return material;
+                                    } `
                             },
                             'translucent': !1
                         }),
@@ -19451,7 +20051,21 @@
                                     'offset': 0,
                                     'thickness': 0.8
                                 },
-                                'source': `uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a * dis * 1.2; return material; } `
+                                'source': 
+                                    `uniform vec4 color;
+                                    uniform float repeat;
+                                    uniform float offset;
+                                    uniform float thickness;
+                                    czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                        czm_material material = czm_getDefaultMaterial(materialInput);
+                                        float sp = 1.0/repeat;
+                                        vec2 st = materialInput.st;
+                                        float dis = distance(st, vec2(0.5));
+                                        float m = mod(dis + offset, sp);
+                                        float a = step(sp*(1.0-thickness), m);
+                                        material.diffuse = color.rgb;
+                                        material.alpha = a * color.a * dis * 1.2; return material;
+                                    } `
                             },
                             'translucent': !1
                         }),
@@ -19467,7 +20081,22 @@
                                         'offset': 0,
                                         'thickness': 0.8
                                     },
-                                    'source': `uniform vec4 color; uniform float repeat; uniform float offset; uniform float thickness; czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); float sp = 1.0/repeat; vec2 st = materialInput.st; float dis = distance(st, vec2(0.5)); float m = mod(dis + offset, sp); float a = step(sp*(1.0-thickness), m); material.diffuse = color.rgb; material.alpha = a * color.a * dis * 1.2; return material; } `
+                                    'source': 
+                                        `uniform vec4 color;
+                                        uniform float repeat;
+                                        uniform float offset;
+                                        uniform float thickness;
+                                        czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                            czm_material material = czm_getDefaultMaterial(materialInput);
+                                            float sp = 1.0/repeat;
+                                            vec2 st = materialInput.st;
+                                            float dis = distance(st, vec2(0.5));
+                                            float m = mod(dis + offset, sp);
+                                            float a = step(sp*(1.0-thickness), m);
+                                            material.diffuse = color.rgb;
+                                            material.alpha = a * color.a * dis * 1.2;
+                                            return material;
+                                        }`
                                 },
                                 'translucent': !1
                             }),
@@ -21350,7 +21979,114 @@
             'value': function () {
                 var _0x1f4cb4 = this,
                     _0x11f1de = new Cesium.PostProcessStage({
-                        'fragmentShader': ` #define USE_CUBE_MAP_SHADOW true uniform sampler2D colorTexture; uniform sampler2D depthTexture; varying vec2 v_textureCoordinates; uniform mat4 camera_projection_matrix; uniform mat4 camera_view_matrix; uniform samplerCube shadowMap_textureCube; uniform mat4 shadowMap_matrix; uniform vec4 shadowMap_lightPositionEC; uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness; uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth; uniform float x_viewDistance; uniform vec4 x_visibleAreaColor; uniform vec4 x_invisibleAreaColor; struct zx_shadowParameters { vec3 texCoords; float depthBias; float depth; float nDotL; vec2 texelStepSize; float normalShadingSmooth; float darkness; }; float czm_shadowVisibility(samplerCube shadowMap, zx_shadowParameters shadowParameters) { float depthBias = shadowParameters.depthBias; float depth = shadowParameters.depth; float nDotL = shadowParameters.nDotL; float normalShadingSmooth = shadowParameters.normalShadingSmooth; float darkness = shadowParameters.darkness; vec3 uvw = shadowParameters.texCoords; depth -= depthBias; float visibility = czm_shadowDepthCompare(shadowMap, uvw, depth); return czm_private_shadowVisibility(visibility, nDotL, normalShadingSmooth, darkness); } vec4 getPositionEC(){ return czm_windowToEyeCoordinates(gl_FragCoord); } vec3 getNormalEC(){ return vec3(1.); } vec4 toEye(in vec2 uv,in float depth){ vec2 xy=vec2((uv.x*2.-1.),(uv.y*2.-1.)); vec4 posInCamera=czm_inverseProjection*vec4(xy,depth,1.); posInCamera=posInCamera/posInCamera.w; return posInCamera; } vec3 pointProjectOnPlane(in vec3 planeNormal,in vec3 planeOrigin,in vec3 point){ vec3 v01=point-planeOrigin; float d=dot(planeNormal,v01); return(point-planeNormal*d); } float getDepth(in vec4 depth){ float z_window=czm_unpackDepth(depth); z_window=czm_reverseLogDepth(z_window); float n_range=czm_depthRange.near; float f_range=czm_depthRange.far; return(2.*z_window-n_range-f_range)/(f_range-n_range); } float shadow(in vec4 positionEC){ vec3 normalEC=getNormalEC(); zx_shadowParameters shadowParameters; shadowParameters.texelStepSize=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy; shadowParameters.depthBias=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z; shadowParameters.normalShadingSmooth=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; shadowParameters.darkness=shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; vec3 directionEC=positionEC.xyz-shadowMap_lightPositionEC.xyz; float distance=length(directionEC); directionEC=normalize(directionEC); float radius=shadowMap_lightPositionEC.w; if(distance>radius) { return 2.0; } vec3 directionWC=czm_inverseViewRotation*directionEC; shadowParameters.depth=distance/radius-0.0003; shadowParameters.nDotL=clamp(dot(normalEC,-directionEC),0.,1.); shadowParameters.texCoords=directionWC; float visibility=czm_shadowVisibility(shadowMap_textureCube,shadowParameters); return visibility; } bool visible(in vec4 result) { result.x/=result.w; result.y/=result.w; result.z/=result.w; return result.x>=-1.&&result.x<=1. &&result.y>=-1.&&result.y<=1. &&result.z>=-1.&&result.z<=1.; } void main(){ // 釉色 = 结构二维(颜色纹理, 纹理坐标) gl_FragColor = texture2D(colorTexture, v_textureCoordinates); // 深度 = 获取深度(结构二维(深度纹理, 纹理坐标)) float depth = getDepth(texture2D(depthTexture, v_textureCoordinates)); // 视角 = (纹理坐标, 深度) vec4 viewPos = toEye(v_textureCoordinates, depth); // 世界坐标 vec4 wordPos = czm_inverseView * viewPos; // 虚拟相机中坐标 vec4 vcPos = camera_view_matrix * wordPos; float near = .001 * x_viewDistance; float dis = length(vcPos.xyz); if(dis > near && dis < x_viewDistance){ // 透视投影 vec4 posInEye = camera_projection_matrix * vcPos; // 可视区颜色 //  vec4 x_visibleAreaColor=vec4(0.,1.,0.,1.0); //  vec4 x_invisibleAreaColor=vec4(1.,0.,0.,1.0); if(visible(posInEye)){ float vis = shadow(viewPos); if(vis > 0.3){ gl_FragColor = mix(gl_FragColor,x_visibleAreaColor,.7); } else{ gl_FragColor = mix(gl_FragColor,x_invisibleAreaColor,.7); } } } }`,
+                        'fragmentShader': 
+                        `#define USE_CUBE_MAP_SHADOW true uniform sampler2D colorTexture;
+                        uniform sampler2D depthTexture;
+                        varying vec2 v_textureCoordinates;
+                        uniform mat4 camera_projection_matrix;
+                        uniform mat4 camera_view_matrix;
+                        uniform samplerCube shadowMap_textureCube;
+                        uniform mat4 shadowMap_matrix;
+                        uniform vec4 shadowMap_lightPositionEC;
+                        uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness;
+                        uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth;
+                        uniform float x_viewDistance;
+                        uniform vec4 x_visibleAreaColor;
+                        uniform vec4 x_invisibleAreaColor; struct zx_shadowParameters {
+                            vec3 texCoords;
+                            float depthBias;
+                            float depth;
+                            float nDotL;
+                            vec2 texelStepSize;
+                            float normalShadingSmooth;
+                            float darkness;
+                        };
+                        float czm_shadowVisibility(samplerCube shadowMap, zx_shadowParameters shadowParameters) {
+                            float depthBias = shadowParameters.depthBias;
+                            float depth = shadowParameters.depth;
+                            float nDotL = shadowParameters.nDotL;
+                            float normalShadingSmooth = shadowParameters.normalShadingSmooth;
+                            float darkness = shadowParameters.darkness;
+                            vec3 uvw = shadowParameters.texCoords;
+                            depth -= depthBias;
+                            float visibility = czm_shadowDepthCompare(shadowMap, uvw, depth);
+                            return czm_private_shadowVisibility(visibility, nDotL, normalShadingSmooth, darkness);
+                        }
+                        vec4 getPositionEC(){
+                            return czm_windowToEyeCoordinates(gl_FragCoord);
+                        }
+                        vec3 getNormalEC(){
+                            return vec3(1.);
+                        }
+                        vec4 toEye(in vec2 uv,in float depth){
+                            vec2 xy=vec2((uv.x*2.-1.),(uv.y*2.-1.));
+                            vec4 posInCamera=czm_inverseProjection*vec4(xy,depth,1.);
+                            posInCamera=posInCamera/posInCamera.w; return posInCamera;
+                        }
+                        vec3 pointProjectOnPlane(in vec3 planeNormal,in vec3 planeOrigin,in vec3 point){
+                            vec3 v01=point-planeOrigin;
+                            float d=dot(planeNormal,v01);
+                            return(point-planeNormal*d);
+                        }
+                        float getDepth(in vec4 depth){
+                            float z_window=czm_unpackDepth(depth);
+                            z_window=czm_reverseLogDepth(z_window);
+                            float n_range=czm_depthRange.near;
+                            float f_range=czm_depthRange.far;
+                            return(2.*z_window-n_range-f_range)/(f_range-n_range);
+                        }
+                        float shadow(in vec4 positionEC){
+                            vec3 normalEC=getNormalEC();
+                            zx_shadowParameters shadowParameters;
+                            shadowParameters.texelStepSize=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;
+                            shadowParameters.depthBias=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;
+                            shadowParameters.normalShadingSmooth=shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;
+                            shadowParameters.darkness=shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w;
+                            vec3 directionEC=positionEC.xyz-shadowMap_lightPositionEC.xyz;
+                            float distance=length(directionEC);
+                            directionEC=normalize(directionEC);
+                            float radius=shadowMap_lightPositionEC.w;
+                            if(distance>radius) {
+                                return 2.0;
+                            }
+                            vec3 directionWC=czm_inverseViewRotation*directionEC;
+                            shadowParameters.depth=distance/radius-0.0003;
+                            shadowParameters.nDotL=clamp(dot(normalEC,-directionEC),0.,1.);
+                            shadowParameters.texCoords=directionWC;
+                            float visibility=czm_shadowVisibility(shadowMap_textureCube,shadowParameters); return visibility;
+                        }
+                        bool visible(in vec4 result) {
+                            result.x/=result.w;
+                            result.y/=result.w;
+                            result.z/=result.w;
+                            return result.x>=-1.&&result.x<=1. &&result.y>=-1.&&result.y<=1. &&result.z>=-1.&&result.z<=1.;
+                        }
+                        void main(){
+                            // 釉色 = 结构二维(颜色纹理, 纹理坐标)
+                            gl_FragColor = texture2D(colorTexture, v_textureCoordinates);
+                            // 深度 = 获取深度(结构二维(深度纹理, 纹理坐标))
+                            float depth = getDepth(texture2D(depthTexture, v_textureCoordinates));
+                            // 视角 = (纹理坐标, 深度)
+                            vec4 viewPos = toEye(v_textureCoordinates, depth);
+                            // 世界坐标 vec4 wordPos = czm_inverseView * viewPos;
+                            // 虚拟相机中坐标 vec4 vcPos = camera_view_matrix * wordPos;
+                            float near = .001 * x_viewDistance;
+                            float dis = length(vcPos.xyz);
+                            if(dis > near && dis < x_viewDistance){
+                                // 透视投影 
+                                vec4 posInEye = camera_projection_matrix * vcPos;
+                                // 可视区颜色
+                                //  vec4 x_visibleAreaColor=vec4(0.,1.,0.,1.0);
+                                //  vec4 x_invisibleAreaColor=vec4(1.,0.,0.,1.0); 
+                                (visible(posInEye)){ float vis = shadow(viewPos);
+                                    if(vis > 0.3){
+                                        gl_FragColor = mix(gl_FragColor,x_visibleAreaColor,.7);
+                                    } else{
+                                        gl_FragColor = mix(gl_FragColor,x_invisibleAreaColor,.7);
+                                    }
+                                }
+                            }
+                        }`,
                         'uniforms': {
                             'shadowMap_textureCube': function () {
                                 return _0x1f4cb4.shadowMap.update(Reflect.get(_0x1f4cb4.viewer.scene, '_frameState')),
@@ -21745,7 +22481,132 @@
                     var _0x57bdd8 = this,
                         _0x5847f9 = _0x57bdd8.viewShadowMap._isPointLight ? _0x57bdd8.viewShadowMap._pointBias : _0x57bdd8.viewShadowMap['_primitiveBias'];
                     this.postProcess = new Cesium.PostProcessStage({
-                        'fragmentShader': 'uniform float czzj; uniform float dis; uniform float spzj; uniform vec3 visibleColor; uniform vec3 disVisibleColor; uniform float mixNum; uniform sampler2D colorTexture; uniform sampler2D marsShadow; uniform sampler2D depthTexture; uniform mat4 _shadowMap_matrix; uniform vec4 shadowMap_lightPositionEC; uniform vec3 shadowMap_lightPositionWC; uniform vec4 shadowMap_lightDirectionEC; uniform vec3 shadowMap_lightUp; uniform vec3 shadowMap_lightDir; uniform vec3 shadowMap_lightRight; uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness; uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth; varying vec2 v_textureCoordinates; vec4 toEye(in vec2 uv, in float depth){ vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0)); vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0); posInCamera =posInCamera / posInCamera.w; return posInCamera; } float getDepth(in vec4 depth){ float z_window = czm_unpackDepth(depth); z_window = czm_reverseLogDepth(z_window); float n_range = czm_depthRange.near; float f_range = czm_depthRange.far; return (2.0 * z_window - n_range - f_range) / (f_range - n_range); } float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){ return texture2D(shadowMap, uv).r; } float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){ return step(depth, _czm_sampleShadowMap(shadowMap, uv)); } float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){ float depthBias = shadowParameters.depthBias; float depth = shadowParameters.depth; float nDotL = shadowParameters.nDotL; float normalShadingSmooth = shadowParameters.normalShadingSmooth; float darkness = shadowParameters.darkness; vec2 uv = shadowParameters.texCoords; depth -= depthBias; vec2 texelStepSize = shadowParameters.texelStepSize; float radius = 1.0; float dx0 = -texelStepSize.x * radius; float dy0 = -texelStepSize.y * radius; float dx1 = texelStepSize.x * radius; float dy1 = texelStepSize.y * radius; float visibility = ( _czm_shadowDepthCompare(shadowMap, uv, depth) +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth) ) * (1.0 / 9.0) ; return visibility; } vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){ vec3 v01 = point -planeOrigin; float d = dot(planeNormal, v01) ; return (point - planeNormal * d); } float ptm(vec3 pt){ return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z); } void main() { const float PI = 3.141592653589793; vec4 color = texture2D(colorTexture, v_textureCoordinates); vec4 currD = texture2D(depthTexture, v_textureCoordinates); // vec4 stcc = texture2D(marsShadow, v_textureCoordinates); // gl_FragColor = currD; // return; if(currD.r>=1.0){ gl_FragColor = color; return; } float depth = getDepth(currD); // gl_FragColor = vec4(depth,0.0,0.0,1.0); // return; // float depth = czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates)); vec4 positionEC = toEye(v_textureCoordinates, depth); vec3 normalEC = vec3(1.0); czm_shadowParameters shadowParameters; shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy; shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z; shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; shadowParameters.depthBias *= max(depth * 0.01, 1.0); vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz); float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0); vec4 shadowPosition = _shadowMap_matrix * positionEC; shadowPosition /= shadowPosition.w; if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))) { gl_FragColor = color; return; } //坐标与视点位置距离，大于最大距离则舍弃阴影效果 vec4 lw = vec4(shadowMap_lightPositionWC,1.0); vec4 vw = czm_inverseView* vec4(positionEC.xyz, 1.0); if(distance(lw.xyz,vw.xyz)>dis){ gl_FragColor = color; return; } //水平夹角限制 vec3 ptOnSP = pointProjectOnPlane(shadowMap_lightUp,lw.xyz,vw.xyz); directionEC = ptOnSP - lw.xyz; float directionECMO = ptm(directionEC.xyz); float shadowMap_lightDirMO = ptm(shadowMap_lightDir.xyz); float cosJJ = dot(directionEC,shadowMap_lightDir)/(directionECMO*shadowMap_lightDirMO); float degJJ = acos(cosJJ)*(180.0 / PI); degJJ = abs(degJJ); if(degJJ>spzj/2.0){ gl_FragColor = color; return; } //垂直夹角限制 vec3 ptOnCZ = pointProjectOnPlane(shadowMap_lightRight,lw.xyz,vw.xyz); vec3 dirOnCZ = ptOnCZ - lw.xyz; float dirOnCZMO = ptm(dirOnCZ); float cosJJCZ = dot(dirOnCZ,shadowMap_lightDir)/(dirOnCZMO*shadowMap_lightDirMO); float degJJCZ = acos(cosJJCZ)*(180.0 / PI); degJJCZ = abs(degJJCZ); if(degJJCZ>czzj/2.0){ gl_FragColor = color; return; } shadowParameters.texCoords = shadowPosition.xy; shadowParameters.depth = shadowPosition.z; shadowParameters.nDotL = nDotL; float visibility = _czm_shadowVisibility(marsShadow, shadowParameters); if(visibility==1.0){ gl_FragColor = mix(color,vec4(visibleColor,1.0),mixNum); }else{ // if(abs(shadowPosition.z-0.0)<0.01){ //     return; // } gl_FragColor = mix(color,vec4(disVisibleColor,1.0),mixNum); } }',
+                        'fragmentShader': `
+                            uniform float czzj;
+                            uniform float dis;
+                            uniform float spzj;
+                            uniform vec3 visibleColor;
+                            uniform vec3 disVisibleColor;
+                            uniform float mixNum;
+                            uniform sampler2D colorTexture;
+                            uniform sampler2D marsShadow;
+                            uniform sampler2D depthTexture;
+                            uniform mat4 _shadowMap_matrix;
+                            uniform vec4 shadowMap_lightPositionEC;
+                            uniform vec3 shadowMap_lightPositionWC;
+                            uniform vec4 shadowMap_lightDirectionEC;
+                            uniform vec3 shadowMap_lightUp;
+                            uniform vec3 shadowMap_lightDir;
+                            uniform vec3 shadowMap_lightRight;
+                            uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness;
+                            uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth;
+                            varying vec2 v_textureCoordinates;
+                            vec4 toEye(in vec2 uv, in float depth){
+                                vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));
+                                vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);
+                                posInCamera =posInCamera / posInCamera.w;
+                                return posInCamera; } float getDepth(in vec4 depth){
+                                    float z_window = czm_unpackDepth(depth);
+                                    z_window = czm_reverseLogDepth(z_window);
+                                    float n_range = czm_depthRange.near;
+                                    float f_range = czm_depthRange.far;
+                                    return (2.0 * z_window - n_range - f_range) / (f_range - n_range);
+                                }
+                                float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){
+                                    return texture2D(shadowMap, uv).r;
+                                }
+                                float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){
+                                    return step(depth, _czm_sampleShadowMap(shadowMap, uv));
+                                }
+                                float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){
+                                    float depthBias = shadowParameters.depthBias; float depth = shadowParameters.depth;
+                                    float nDotL = shadowParameters.nDotL;
+                                    float normalShadingSmooth = shadowParameters.normalShadingSmooth;
+                                    float darkness = shadowParameters.darkness;
+                                    vec2 uv = shadowParameters.texCoords;
+                                    depth -= depthBias;
+                                    vec2 texelStepSize = shadowParameters.texelStepSize;
+                                    float radius = 1.0; float dx0 = -texelStepSize.x * radius;
+                                    float dy0 = -texelStepSize.y * radius;
+                                    float dx1 = texelStepSize.x * radius;
+                                    float dy1 = texelStepSize.y * radius;
+                                    float visibility = ( _czm_shadowDepthCompare(shadowMap, uv, depth) +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) + _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth) ) * (1.0 / 9.0) ;
+                                    return visibility;
+                                }
+                                vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){
+                                    vec3 v01 = point -planeOrigin; float d = dot(planeNormal, v01) ;
+                                     return (point - planeNormal * d);
+                                }
+                                float ptm(vec3 pt){
+                                    return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z);
+                                }
+                                void main() {
+                                const float PI = 3.141592653589793;
+                                vec4 color = texture2D(colorTexture, v_textureCoordinates);
+                                vec4 currD = texture2D(depthTexture, v_textureCoordinates);
+                                    // vec4 stcc = texture2D(marsShadow, v_textureCoordinates);
+                                    // gl_FragColor = currD;
+                                    // return;
+                                if(currD.r>=1.0){
+                                    gl_FragColor = color; return;
+                                }
+                                float depth = getDepth(currD);
+                                // gl_FragColor = vec4(depth,0.0,0.0,1.0);
+                                // return;
+                                // float depth = czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates));
+                                vec4 positionEC = toEye(v_textureCoordinates, depth);
+                                vec3 normalEC = vec3(1.0);
+                                czm_shadowParameters shadowParameters;
+                                shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;
+                                shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;
+                                shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;
+                                shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w;
+                                shadowParameters.depthBias *= max(depth * 0.01, 1.0);
+                                vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz);
+                                float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0);
+                                vec4 shadowPosition = _shadowMap_matrix * positionEC;
+                                shadowPosition /= shadowPosition.w;
+                                if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))) {
+                                    gl_FragColor = color; return;
+                                }
+                                //坐标与视点位置距离，大于最大距离则舍弃阴影效果
+                                vec4 lw = vec4(shadowMap_lightPositionWC,1.0);
+                                vec4 vw = czm_inverseView* vec4(positionEC.xyz, 1.0);
+                                if(distance(lw.xyz,vw.xyz)>dis){
+                                    gl_FragColor = color; return;
+                                }
+                                //水平夹角限制
+                                vec3 ptOnSP = pointProjectOnPlane(shadowMap_lightUp,lw.xyz,vw.xyz);
+                                directionEC = ptOnSP - lw.xyz;
+                                float directionECMO = ptm(directionEC.xyz);
+                                float shadowMap_lightDirMO = ptm(shadowMap_lightDir.xyz);
+                                float cosJJ = dot(directionEC,shadowMap_lightDir)/(directionECMO*shadowMap_lightDirMO);
+                                float degJJ = acos(cosJJ)*(180.0 / PI);
+                                degJJ = abs(degJJ); if(degJJ>spzj/2.0){
+                                    gl_FragColor = color; return;
+                                }
+                                //垂直夹角限制
+                                vec3 ptOnCZ = pointProjectOnPlane(shadowMap_lightRight,lw.xyz,vw.xyz);
+                                vec3 dirOnCZ = ptOnCZ - lw.xyz;
+                                float dirOnCZMO = ptm(dirOnCZ);
+                                float cosJJCZ = dot(dirOnCZ,shadowMap_lightDir)/(dirOnCZMO*shadowMap_lightDirMO);
+                                float degJJCZ = acos(cosJJCZ)*(180.0 / PI);
+                                degJJCZ = abs(degJJCZ); if(degJJCZ>czzj/2.0){
+                                    gl_FragColor = color; return;
+                                }
+                                shadowParameters.texCoords = shadowPosition.xy;
+                                shadowParameters.depth = shadowPosition.z;
+                                shadowParameters.nDotL = nDotL;
+                                float visibility = _czm_shadowVisibility(marsShadow, shadowParameters);
+                                if(visibility==1.0){
+                                    gl_FragColor = mix(color,vec4(visibleColor,1.0),mixNum);
+                            }else{
+                                // if(abs(shadowPosition.z-0.0)<0.01){
+                                //     return;
+                                // }
+                                gl_FragColor = mix(color,vec4(disVisibleColor,1.0),mixNum);
+                            }
+                        }`,
                         'uniforms': {
                             'czzj': function () {
                                 return _0x57bdd8.verticalAngle;
@@ -21990,7 +22851,100 @@
             'value': function () {
                 var _0x52ed4e = this;
                 this.postProcess = new Cesium.PostProcessStage({
-                    'fragmentShader': '#extension GL_OES_standard_derivatives : enable uniform sampler2D colorTexture; uniform sampler2D depthTexture; uniform float lineWidth; uniform float height; uniform bvec3 strokeType; uniform vec3 tjxColor; uniform vec3 bjColor; uniform vec3 cameraPos; uniform float mbDis; varying vec2 v_textureCoordinates; vec4 toEye(in vec2 uv, in float depth){ vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0)); vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0); posInCamera =posInCamera / posInCamera.w; return posInCamera; } float getDepth(in vec4 depth){ float z_window = czm_unpackDepth(depth); z_window = czm_reverseLogDepth(z_window); float n_range = czm_depthRange.near; float f_range = czm_depthRange.far; return (2.0 * z_window - n_range - f_range) / (f_range - n_range); } bool isTJX(vec2 uv,float lw){ vec2 pixelSize = lw / czm_viewport.zw; float dx0 = -pixelSize.x; float dy0 = -pixelSize.y; float dx1 = pixelSize.x; float dy1 = pixelSize.y; vec2 currUV = uv + vec2(dx0, dy0); vec4 currDepth = texture2D(depthTexture, currUV); float depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(0.0, dy0); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(dx1, dy0); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(dx0, 0.0); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(dx1, 0.0); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(dx0, dy1); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(0.0, dy1); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; currUV = uv + vec2(dx1, dy1); currDepth = texture2D(depthTexture, currUV); depth = getDepth(currDepth); if(depth>=1.0)return true; return false; } void main(){ vec4 color = texture2D(colorTexture, v_textureCoordinates); if(height>14102.0){ gl_FragColor = color; return; } vec4 currD = texture2D(depthTexture, v_textureCoordinates); if(currD.r>=1.0){ gl_FragColor = color; return; } float depth = getDepth(currD); vec4 positionEC = toEye(v_textureCoordinates, depth); vec3 dx = dFdx(positionEC.xyz); vec3 dy = dFdy(positionEC.xyz); vec3 normal = normalize(cross(dx,dy)); if(strokeType.y||strokeType.z){ vec4 wp = czm_inverseView * positionEC; if(distance(wp.xyz,cameraPos)>mbDis){ gl_FragColor = color; }else{ float dotNum = abs(dot(normal,normalize(positionEC.xyz))); if(dotNum<0.05){ gl_FragColor = vec4(bjColor,1.0); return; } } } if(strokeType.x||strokeType.z){ bool tjx = isTJX(v_textureCoordinates,lineWidth); if(tjx){ gl_FragColor = vec4(tjxColor,1.0); return; } } gl_FragColor = color; }',
+                    'fragmentShader': 
+                    `#extension GL_OES_standard_derivatives : enable uniform sampler2D colorTexture;
+                    uniform sampler2D depthTexture;
+                    uniform float lineWidth;
+                    uniform float height;
+                    uniform bvec3 strokeType;
+                    uniform vec3 tjxColor;
+                    uniform vec3 bjColor;
+                    uniform vec3 cameraPos;
+                    uniform float mbDis;
+                    varying vec2 v_textureCoordinates;
+                    vec4 toEye(in vec2 uv, in float depth){
+                        vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));
+                        vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);
+                        posInCamera =posInCamera / posInCamera.w;
+                        return posInCamera;
+                    }
+                    float getDepth(in vec4 depth){
+                        float z_window = czm_unpackDepth(depth);
+                        z_window = czm_reverseLogDepth(z_window);
+                        float n_range = czm_depthRange.near;
+                        float f_range = czm_depthRange.far;
+                        return (2.0 * z_window - n_range - f_range) / (f_range - n_range);
+                    }
+                    bool isTJX(vec2 uv,float lw){
+                        vec2 pixelSize = lw / czm_viewport.zw;
+                        float dx0 = -pixelSize.x; float dy0 = -pixelSize.y;
+                        float dx1 = pixelSize.x; float dy1 = pixelSize.y;
+                        vec2 currUV = uv + vec2(dx0, dy0);
+                        vec4 currDepth = texture2D(depthTexture, currUV);
+                        float depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(0.0, dy0);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(dx1, dy0);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth); if(depth>=1.0)return true;
+                        currUV = uv + vec2(dx0, 0.0); currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(dx1, 0.0);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(dx0, dy1);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(0.0, dy1);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true;
+                        currUV = uv + vec2(dx1, dy1);
+                        currDepth = texture2D(depthTexture, currUV);
+                        depth = getDepth(currDepth);
+                        if(depth>=1.0)return true; return false;
+                    }
+                    void main(){
+                        vec4 color = texture2D(colorTexture, v_textureCoordinates);
+                        if(height>14102.0){
+                            gl_FragColor = color;
+                            return;
+                        }
+                        vec4 currD = texture2D(depthTexture, v_textureCoordinates);
+                        if(currD.r>=1.0){
+                            gl_FragColor = color; return;
+                        }
+                        float depth = getDepth(currD);
+                        vec4 positionEC = toEye(v_textureCoordinates, depth);
+                        vec3 dx = dFdx(positionEC.xyz);
+                        vec3 dy = dFdy(positionEC.xyz);
+                        vec3 normal = normalize(cross(dx,dy));
+                        if(strokeType.y||strokeType.z){
+                            vec4 wp = czm_inverseView * positionEC;
+                            if(distance(wp.xyz,cameraPos)>mbDis){
+                                gl_FragColor = color;
+                            }else{
+                                float dotNum = abs(dot(normal,normalize(positionEC.xyz)));
+                                if(dotNum<0.05){
+                                    gl_FragColor = vec4(bjColor,1.0); return;
+                                }
+                            }
+                        }
+                        if(strokeType.x||strokeType.z){
+                            bool tjx = isTJX(v_textureCoordinates,lineWidth);
+                            if(tjx){
+                                gl_FragColor = vec4(tjxColor,1.0);
+                                return;
+                            }
+                        }
+                        gl_FragColor = color;
+                    }`,
                     'uniforms': {
                         'height': function () {
                             return _0x52ed4e.viewer.camera.positionCartographic.height;
@@ -23571,7 +24525,96 @@
                     var _0xf1ae24 = this,
                         _0x4d4140 = _0xf1ae24.viewShadowMap['_isPointLight'] ? _0xf1ae24.viewShadowMap._pointBias : _0xf1ae24.viewShadowMap['_primitiveBias'];
                     this.postProcess = new Cesium.PostProcessStage({
-                        'fragmentShader': `uniform float mixNum;uniform sampler2D colorTexture;uniform sampler2D stcshadow; uniform sampler2D videoTexture;uniform sampler2D depthTexture;uniform mat4 _shadowMap_matrix; uniform vec4 shadowMap_lightPositionEC; uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness; uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth; varying vec2 v_textureCoordinates;vec4 toEye(in vec2 uv, in float depth){  vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));  vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);  posInCamera =posInCamera / posInCamera.w;  return posInCamera;}float getDepth(in vec4 depth){  float z_window = czm_unpackDepth(depth);  z_window = czm_reverseLogDepth(z_window);  float n_range = czm_depthRange.near;  float f_range = czm_depthRange.far;  return (2.0 * z_window - n_range - f_range) / (f_range - n_range);}float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){  return texture2D(shadowMap, uv).r;}float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){  return step(depth, _czm_sampleShadowMap(shadowMap, uv));}float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){  float depthBias = shadowParameters.depthBias;  float depth = shadowParameters.depth;  float nDotL = shadowParameters.nDotL;  float normalShadingSmooth = shadowParameters.normalShadingSmooth;  float darkness = shadowParameters.darkness;  vec2 uv = shadowParameters.texCoords;  depth -= depthBias;  vec2 texelStepSize = shadowParameters.texelStepSize;  float radius = 1.0;  float dx0 = -texelStepSize.x * radius;  float dy0 = -texelStepSize.y * radius;  float dx1 = texelStepSize.x * radius;  float dy1 = texelStepSize.y * radius;  float visibility =   (  _czm_shadowDepthCompare(shadowMap, uv, depth)  +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth)  ) * (1.0 / 9.0)  ;  return visibility;}vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){  vec3 v01 = point -planeOrigin;  float d = dot(planeNormal, v01) ;  return (point - planeNormal * d);}float ptm(vec3 pt){  return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z);}void main() {   const float PI = 3.141592653589793;  vec4 color = texture2D(colorTexture, v_textureCoordinates);  vec4 currD = texture2D(depthTexture, v_textureCoordinates);  if(currD.r>=1.0){ gl_FragColor = color; return;  } float depth = getDepth(currD);  vec4 positionEC = toEye(v_textureCoordinates, depth);  vec3 normalEC = vec3(1.0);  czm_shadowParameters shadowParameters;   shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;   shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;   shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;   shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w;   shadowParameters.depthBias *= max(depth * 0.01, 1.0);   vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz);   float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0);   vec4 shadowPosition = _shadowMap_matrix * positionEC;   shadowPosition /= shadowPosition.w;   if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0))))   {  gl_FragColor = color; return;  }  shadowParameters.texCoords = shadowPosition.xy;   shadowParameters.depth = shadowPosition.z;   shadowParameters.nDotL = nDotL;   float visibility = _czm_shadowVisibility(stcshadow, shadowParameters);   vec4 videoColor = texture2D(videoTexture,shadowPosition.xy);  if(visibility==1.0){ gl_FragColor = mix(color,vec4(videoColor.xyz,1.0),mixNum*videoColor.a);  }else{  if(abs(shadowPosition.z-0.0)<0.01){   return; } gl_FragColor = color; }}`,
+                        'fragmentShader': 
+                        `uniform float mixNum;
+                        uniform sampler2D colorTexture;
+                        uniform sampler2D stcshadow;
+                        uniform sampler2D videoTexture;
+                        uniform sampler2D depthTexture;
+                        uniform mat4 _shadowMap_matrix;
+                        uniform vec4 shadowMap_lightPositionEC;
+                        uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness;
+                        uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth;
+                        varying vec2 v_textureCoordinates;
+                        vec4 toEye(in vec2 uv, in float depth){
+                            vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));
+                            vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);
+                            posInCamera =posInCamera / posInCamera.w;
+                            return posInCamera;
+                        }
+                        float getDepth(in vec4 depth){
+                            float z_window = czm_unpackDepth(depth);
+                            z_window = czm_reverseLogDepth(z_window);
+                            float n_range = czm_depthRange.near; 
+                            float f_range = czm_depthRange.far;
+                            return (2.0 * z_window - n_range - f_range) / (f_range - n_range);
+                        }
+                        float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){
+                            return texture2D(shadowMap, uv).r;
+                        }
+                        float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){
+                            return step(depth, _czm_sampleShadowMap(shadowMap, uv));
+                        }
+                        float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){
+                            float depthBias = shadowParameters.depthBias;
+                            float depth = shadowParameters.depth;
+                            float nDotL = shadowParameters.nDotL;
+                            float normalShadingSmooth = shadowParameters.normalShadingSmooth;
+                            float darkness = shadowParameters.darkness; 
+                            vec2 uv = shadowParameters.texCoords;
+                            depth -= depthBias;  vec2 texelStepSize = shadowParameters.texelStepSize;
+                            float radius = 1.0;  float dx0 = -texelStepSize.x * radius;
+                            float dy0 = -texelStepSize.y * radius;
+                            float dx1 = texelStepSize.x * radius;
+                            float dy1 = texelStepSize.y * radius;
+                            float visibility = (_czm_shadowDepthCompare(shadowMap, uv, depth)  +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth)  ) * (1.0 / 9.0) ;
+                            return visibility;
+                        }
+                        vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){
+                            vec3 v01 = point -planeOrigin;
+                            float d = dot(planeNormal, v01);
+                            return (point - planeNormal * d);
+                        }
+                        float ptm(vec3 pt){
+                            return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z);
+                        }
+                        void main() {
+                            const float PI = 3.141592653589793;
+                            vec4 color = texture2D(colorTexture, v_textureCoordinates);
+                            vec4 currD = texture2D(depthTexture, v_textureCoordinates);
+                            if(currD.r>=1.0){
+                                gl_FragColor = color; return;
+                            }
+                            float depth = getDepth(currD);
+                            vec4 positionEC = toEye(v_textureCoordinates, depth);
+                            vec3 normalEC = vec3(1.0);
+                            czm_shadowParameters shadowParameters;
+                            shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;
+                            shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;
+                            shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;
+                            shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w;
+                            shadowParameters.depthBias *= max(depth * 0.01, 1.0);
+                            vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz);
+                            float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0);
+                            vec4 shadowPosition = _shadowMap_matrix * positionEC;
+                            shadowPosition /= shadowPosition.w;
+                            if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))){
+                                gl_FragColor = color; return;
+                            }
+                            shadowParameters.texCoords = shadowPosition.xy;
+                            shadowParameters.depth = shadowPosition.z;
+                            shadowParameters.nDotL = nDotL;
+                            float visibility = _czm_shadowVisibility(stcshadow, shadowParameters);
+                            vec4 videoColor = texture2D(videoTexture,shadowPosition.xy);
+                            if(visibility==1.0){
+                                gl_FragColor = mix(color,vec4(videoColor.xyz,1.0),mixNum*videoColor.a);
+                            }else{
+                                if(abs(shadowPosition.z-0.0)<0.01){
+                                    return;
+                                }
+                                gl_FragColor = color;
+                            }
+                        }`,
                         'uniforms': {
                             'mixNum': function () {
                                 return _0xf1ae24.alpha;
@@ -24638,7 +25681,95 @@
                     var _0x334a5b = this,
                         _0x35ab22 = _0x334a5b.viewShadowMap['_isPointLight'] ? _0x334a5b.viewShadowMap._pointBias : _0x334a5b.viewShadowMap[`_primitiveBias`];
                     this.postProcess = new Cesium.PostProcessStage({
-                        'fragmentShader': `uniform float mixNum;uniform sampler2D colorTexture;uniform sampler2D stcshadow; uniform sampler2D videoTexture;uniform sampler2D depthTexture;uniform mat4 _shadowMap_matrix; uniform vec4 shadowMap_lightPositionEC; uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness; uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth; varying vec2 v_textureCoordinates;vec4 toEye(in vec2 uv, in float depth){  vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));  vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);  posInCamera =posInCamera / posInCamera.w;  return posInCamera;}float getDepth(in vec4 depth){  float z_window = czm_unpackDepth(depth);  z_window = czm_reverseLogDepth(z_window);  float n_range = czm_depthRange.near;  float f_range = czm_depthRange.far;  return (2.0 * z_window - n_range - f_range) / (f_range - n_range);}float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){  return texture2D(shadowMap, uv).r;}float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){  return step(depth, _czm_sampleShadowMap(shadowMap, uv));}float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){  float depthBias = shadowParameters.depthBias;  float depth = shadowParameters.depth;  float nDotL = shadowParameters.nDotL;  float normalShadingSmooth = shadowParameters.normalShadingSmooth;  float darkness = shadowParameters.darkness;  vec2 uv = shadowParameters.texCoords;  depth -= depthBias;  vec2 texelStepSize = shadowParameters.texelStepSize;  float radius = 1.0;  float dx0 = -texelStepSize.x * radius;  float dy0 = -texelStepSize.y * radius;  float dx1 = texelStepSize.x * radius;  float dy1 = texelStepSize.y * radius;  float visibility =   (  _czm_shadowDepthCompare(shadowMap, uv, depth)  +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth)  ) * (1.0 / 9.0)  ;  return visibility;}vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){  vec3 v01 = point -planeOrigin;  float d = dot(planeNormal, v01) ;  return (point - planeNormal * d);}float ptm(vec3 pt){  return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z);}void main() {   const float PI = 3.141592653589793;  vec4 color = texture2D(colorTexture, v_textureCoordinates);  vec4 currD = texture2D(depthTexture, v_textureCoordinates);  if(currD.r>=1.0){ gl_FragColor = color; return;  } float depth = getDepth(currD);  vec4 positionEC = toEye(v_textureCoordinates, depth);  vec3 normalEC = vec3(1.0);  czm_shadowParameters shadowParameters;   shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;   shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;   shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;   shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w;   shadowParameters.depthBias *= max(depth * 0.01, 1.0);   vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz);   float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0);   vec4 shadowPosition = _shadowMap_matrix * positionEC;   shadowPosition /= shadowPosition.w;   if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0))))   {  gl_FragColor = color; return;  }  shadowParameters.texCoords = shadowPosition.xy;   shadowParameters.depth = shadowPosition.z;   shadowParameters.nDotL = nDotL;   float visibility = _czm_shadowVisibility(stcshadow, shadowParameters);   vec4 videoColor = texture2D(videoTexture,shadowPosition.xy);  if(visibility==1.0){ gl_FragColor = mix(color,vec4(videoColor.xyz,1.0),mixNum*videoColor.a);  }else{ if(abs(shadowPosition.z-0.0)<0.01){   return; } gl_FragColor = color;  }} `,
+                        'fragmentShader': 
+                            `uniform float mixNum;
+                            uniform sampler2D colorTexture;
+                            uniform sampler2D stcshadow;
+                            uniform sampler2D videoTexture;
+                            uniform sampler2D depthTexture;
+                            uniform mat4 _shadowMap_matrix;
+                            uniform vec4 shadowMap_lightPositionEC;
+                            uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness;
+                            uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth;
+                            varying vec2 v_textureCoordinates;
+                            vec4 toEye(in vec2 uv, in float depth){
+                                vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));
+                                vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);
+                                posInCamera =posInCamera / posInCamera.w;  return posInCamera;
+                            }
+                            float getDepth(in vec4 depth){
+                                float z_window = czm_unpackDepth(depth);
+                                z_window = czm_reverseLogDepth(z_window);
+                                float n_range = czm_depthRange.near;
+                                float f_range = czm_depthRange.far;
+                                return (2.0 * z_window - n_range - f_range) / (f_range - n_range);
+                            }
+                            float _czm_sampleShadowMap(sampler2D shadowMap, vec2 uv){
+                                return texture2D(shadowMap, uv).r;
+                            }
+                            float _czm_shadowDepthCompare(sampler2D shadowMap, vec2 uv, float depth){
+                                return step(depth, _czm_sampleShadowMap(shadowMap, uv));
+                            }
+                            float _czm_shadowVisibility(sampler2D shadowMap, czm_shadowParameters shadowParameters){
+                                float depthBias = shadowParameters.depthBias;
+                                float depth = shadowParameters.depth;
+                                float nDotL = shadowParameters.nDotL;
+                                float normalShadingSmooth = shadowParameters.normalShadingSmooth;
+                                float darkness = shadowParameters.darkness;
+                                vec2 uv = shadowParameters.texCoords;
+                                depth -= depthBias;
+                                vec2 texelStepSize = shadowParameters.texelStepSize;
+                                float radius = 1.0;
+                                float dx0 = -texelStepSize.x * radius;
+                                float dy0 = -texelStepSize.y * radius;
+                                float dx1 = texelStepSize.x * radius;
+                                float dy1 = texelStepSize.y * radius;
+                                float visibility =   (_czm_shadowDepthCompare(shadowMap, uv, depth)  +_czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, 0.0), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(0.0, dy1), depth) +  _czm_shadowDepthCompare(shadowMap, uv + vec2(dx1, dy1), depth)  ) * (1.0 / 9.0) ;
+                                return visibility;
+                            }
+                            vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point){
+                                vec3 v01 = point -planeOrigin;  float d = dot(planeNormal, v01) ;  return (point - planeNormal * d);
+                            }
+                            float ptm(vec3 pt){
+                                return sqrt(pt.x*pt.x + pt.y*pt.y + pt.z*pt.z);
+                            }
+                            void main() {
+                                const float PI = 3.141592653589793;
+                                vec4 color = texture2D(colorTexture, v_textureCoordinates);
+                                vec4 currD = texture2D(depthTexture, v_textureCoordinates);
+                                if(currD.r>=1.0){
+                                    gl_FragColor = color; return;
+                                }
+                                float depth = getDepth(currD);
+                                vec4 positionEC = toEye(v_textureCoordinates, depth);
+                                vec3 normalEC = vec3(1.0);
+                                czm_shadowParameters shadowParameters;
+                                shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy;
+                                shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z;
+                                shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w;
+                                shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; 
+                                shadowParameters.depthBias *= max(depth * 0.01, 1.0);
+                                vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz);
+                                float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0);
+                                vec4 shadowPosition = _shadowMap_matrix * positionEC;
+                                shadowPosition /= shadowPosition.w;
+                                if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))){
+                                    gl_FragColor = color; return;
+                                }
+                                shadowParameters.texCoords = shadowPosition.xy;
+                                shadowParameters.depth = shadowPosition.z;
+                                shadowParameters.nDotL = nDotL;
+                                float visibility = _czm_shadowVisibility(stcshadow, shadowParameters);
+                                vec4 videoColor = texture2D(videoTexture,shadowPosition.xy);
+                                if(visibility==1.0){
+                                    gl_FragColor = mix(color,vec4(videoColor.xyz,1.0),mixNum*videoColor.a);
+                                }else{
+                                    if(abs(shadowPosition.z-0.0)<0.01){
+                                        return;
+                                    }
+                                    gl_FragColor = color;
+                                }
+                            }`,
                         'uniforms': {
                             'mixNum': function () {
                                 return _0x334a5b.alpha;
@@ -24964,7 +26095,14 @@
             },
             Cesium.Material.GradientType = 'Gradient',
             Cesium.Material.GradientImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKTWlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVN3WJP3Fj7f92UPVkLY8LGXbIEAIiOsCMgQWaIQkgBhhBASQMWFiApWFBURnEhVxILVCkidiOKgKLhnQYqIWotVXDjuH9yntX167+3t+9f7vOec5/zOec8PgBESJpHmomoAOVKFPDrYH49PSMTJvYACFUjgBCAQ5svCZwXFAADwA3l4fnSwP/wBr28AAgBw1S4kEsfh/4O6UCZXACCRAOAiEucLAZBSAMguVMgUAMgYALBTs2QKAJQAAGx5fEIiAKoNAOz0ST4FANipk9wXANiiHKkIAI0BAJkoRyQCQLsAYFWBUiwCwMIAoKxAIi4EwK4BgFm2MkcCgL0FAHaOWJAPQGAAgJlCLMwAIDgCAEMeE80DIEwDoDDSv+CpX3CFuEgBAMDLlc2XS9IzFLiV0Bp38vDg4iHiwmyxQmEXKRBmCeQinJebIxNI5wNMzgwAABr50cH+OD+Q5+bk4eZm52zv9MWi/mvwbyI+IfHf/ryMAgQAEE7P79pf5eXWA3DHAbB1v2upWwDaVgBo3/ldM9sJoFoK0Hr5i3k4/EAenqFQyDwdHAoLC+0lYqG9MOOLPv8z4W/gi372/EAe/tt68ABxmkCZrcCjg/1xYW52rlKO58sEQjFu9+cj/seFf/2OKdHiNLFcLBWK8ViJuFAiTcd5uVKRRCHJleIS6X8y8R+W/QmTdw0ArIZPwE62B7XLbMB+7gECiw5Y0nYAQH7zLYwaC5EAEGc0Mnn3AACTv/mPQCsBAM2XpOMAALzoGFyolBdMxggAAESggSqwQQcMwRSswA6cwR28wBcCYQZEQAwkwDwQQgbkgBwKoRiWQRlUwDrYBLWwAxqgEZrhELTBMTgN5+ASXIHrcBcGYBiewhi8hgkEQcgIE2EhOogRYo7YIs4IF5mOBCJhSDSSgKQg6YgUUSLFyHKkAqlCapFdSCPyLXIUOY1cQPqQ28ggMor8irxHMZSBslED1AJ1QLmoHxqKxqBz0XQ0D12AlqJr0Rq0Hj2AtqKn0UvodXQAfYqOY4DRMQ5mjNlhXIyHRWCJWBomxxZj5Vg1Vo81Yx1YN3YVG8CeYe8IJAKLgBPsCF6EEMJsgpCQR1hMWEOoJewjtBK6CFcJg4Qxwicik6hPtCV6EvnEeGI6sZBYRqwm7iEeIZ4lXicOE1+TSCQOyZLkTgohJZAySQtJa0jbSC2kU6Q+0hBpnEwm65Btyd7kCLKArCCXkbeQD5BPkvvJw+S3FDrFiOJMCaIkUqSUEko1ZT/lBKWfMkKZoKpRzame1AiqiDqfWkltoHZQL1OHqRM0dZolzZsWQ8ukLaPV0JppZ2n3aC/pdLoJ3YMeRZfQl9Jr6Afp5+mD9HcMDYYNg8dIYigZaxl7GacYtxkvmUymBdOXmchUMNcyG5lnmA+Yb1VYKvYqfBWRyhKVOpVWlX6V56pUVXNVP9V5qgtUq1UPq15WfaZGVbNQ46kJ1Bar1akdVbupNq7OUndSj1DPUV+jvl/9gvpjDbKGhUaghkijVGO3xhmNIRbGMmXxWELWclYD6yxrmE1iW7L57Ex2Bfsbdi97TFNDc6pmrGaRZp3mcc0BDsax4PA52ZxKziHODc57LQMtPy2x1mqtZq1+rTfaetq+2mLtcu0W7eva73VwnUCdLJ31Om0693UJuja6UbqFutt1z+o+02PreekJ9cr1Dund0Uf1bfSj9Rfq79bv0R83MDQINpAZbDE4Y/DMkGPoa5hpuNHwhOGoEctoupHEaKPRSaMnuCbuh2fjNXgXPmasbxxirDTeZdxrPGFiaTLbpMSkxeS+Kc2Ua5pmutG003TMzMgs3KzYrMnsjjnVnGueYb7ZvNv8jYWlRZzFSos2i8eW2pZ8ywWWTZb3rJhWPlZ5VvVW16xJ1lzrLOtt1ldsUBtXmwybOpvLtqitm63Edptt3xTiFI8p0in1U27aMez87ArsmuwG7Tn2YfYl9m32zx3MHBId1jt0O3xydHXMdmxwvOuk4TTDqcSpw+lXZxtnoXOd8zUXpkuQyxKXdpcXU22niqdun3rLleUa7rrStdP1o5u7m9yt2W3U3cw9xX2r+00umxvJXcM970H08PdY4nHM452nm6fC85DnL152Xlle+70eT7OcJp7WMG3I28Rb4L3Le2A6Pj1l+s7pAz7GPgKfep+Hvqa+It89viN+1n6Zfgf8nvs7+sv9j/i/4XnyFvFOBWABwQHlAb2BGoGzA2sDHwSZBKUHNQWNBbsGLww+FUIMCQ1ZH3KTb8AX8hv5YzPcZyya0RXKCJ0VWhv6MMwmTB7WEY6GzwjfEH5vpvlM6cy2CIjgR2yIuB9pGZkX+X0UKSoyqi7qUbRTdHF09yzWrORZ+2e9jvGPqYy5O9tqtnJ2Z6xqbFJsY+ybuIC4qriBeIf4RfGXEnQTJAntieTE2MQ9ieNzAudsmjOc5JpUlnRjruXcorkX5unOy553PFk1WZB8OIWYEpeyP+WDIEJQLxhP5aduTR0T8oSbhU9FvqKNolGxt7hKPJLmnVaV9jjdO31D+miGT0Z1xjMJT1IreZEZkrkj801WRNberM/ZcdktOZSclJyjUg1plrQr1zC3KLdPZisrkw3keeZtyhuTh8r35CP5c/PbFWyFTNGjtFKuUA4WTC+oK3hbGFt4uEi9SFrUM99m/ur5IwuCFny9kLBQuLCz2Lh4WfHgIr9FuxYji1MXdy4xXVK6ZHhp8NJ9y2jLspb9UOJYUlXyannc8o5Sg9KlpUMrglc0lamUycturvRauWMVYZVkVe9ql9VbVn8qF5VfrHCsqK74sEa45uJXTl/VfPV5bdra3kq3yu3rSOuk626s91m/r0q9akHV0IbwDa0b8Y3lG19tSt50oXpq9Y7NtM3KzQM1YTXtW8y2rNvyoTaj9nqdf13LVv2tq7e+2Sba1r/dd3vzDoMdFTve75TsvLUreFdrvUV99W7S7oLdjxpiG7q/5n7duEd3T8Wej3ulewf2Re/ranRvbNyvv7+yCW1SNo0eSDpw5ZuAb9qb7Zp3tXBaKg7CQeXBJ9+mfHvjUOihzsPcw83fmX+39QjrSHkr0jq/dawto22gPaG97+iMo50dXh1Hvrf/fu8x42N1xzWPV56gnSg98fnkgpPjp2Snnp1OPz3Umdx590z8mWtdUV29Z0PPnj8XdO5Mt1/3yfPe549d8Lxw9CL3Ytslt0utPa49R35w/eFIr1tv62X3y+1XPK509E3rO9Hv03/6asDVc9f41y5dn3m978bsG7duJt0cuCW69fh29u0XdwruTNxdeo94r/y+2v3qB/oP6n+0/rFlwG3g+GDAYM/DWQ/vDgmHnv6U/9OH4dJHzEfVI0YjjY+dHx8bDRq98mTOk+GnsqcTz8p+Vv9563Or59/94vtLz1j82PAL+YvPv655qfNy76uprzrHI8cfvM55PfGm/K3O233vuO+638e9H5ko/ED+UPPR+mPHp9BP9z7nfP78L/eE8/sl0p8zAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAz3SURBVHja7J1Jltw4DEQV9fL+d/RJ0Au7q9xuZ0mUABIA/195UVZyCARBaoDM7ACAPflgCAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAADAAAAAAwAADAAAMAAAwAAAAAMAAAwAADAAAMAAAAADAAAMAAAwAAB4wOvHjx+a/Jt22HEcYvBzk32SItr365qfl+4v1NeC3xTBXyFusk+S4q6pKmPgYwCKERBsEzcQadcTDeBKcCvvSKHthCPrMTFvrzF4cR+R2MTB11wDKBxBBH9UjOpZ3OjbX7Enk2uju0khtedbAGiX6TgnfTZwFRGJJQ1gQsL9dsHYe9oX9t6IyxoqHGnfTQPQIqWrzgSvUsn47xLYzTKPkfZN2gLk8cxp55w1gv+spUa4z1G3V4RYiAE8bp3SjLo6K8m/c8IYzudIgQM9KpTRtlwzgIxR0zEhFS1NbzLq1YiN7wKs35ZwpLk01Nje7G0A2r4FdhyH9nUhDOaXAXyU61ymU5fC+YKOgxQkbuxLGMzdDEBL50AOg6Rq0lJWoZMsZG/UN9NaZwugW1pVgW4ZQodV01r3DEBt1rAqzbWlv4w3hQxiu0NAdBIWb9pkUpveHdDbDOCjgV6J1m4mum7V32kNsQ4ZgDYSqG0jVyWeiqxbkvF26bEBbLs9Y3Waa3TfCG36/RH10eSbLcCSm1M8mQXvZbU46AIfmFqq+zcZgHJMestNuZuSbG67saSOut/8i0A/Re8r/WkfVZx/9LfOI8gOAw3go3F82/eC1VYb65xr1SVXWfwhpHL1B2zEANRYsMT2qtWa+gPn14w7VdSIAXykEg5b0h55AnNXYnuzJgP4e3CrwsLQzJeszcjWrT+w/BBwfgagbOI7asxW8e4srD/waDR+qz9g3UTilwHceAqJtXmvVX/O/ZHQDyOqjQLknQFotfiUZ1RZ9SvHROJtkr8CZp8BNBaf0ik3VMDNEi5tapguGcC0Z9+etcRaanjFR1HYbaXdZo1OnUsG4La3i60/oFvt6ij2efUHdn2CT8vn6GLDTjKAyerPWX/AssVf9Dg7tu/t2TxJRFgsDOn1xAC0u5M72NL/pb7xs28zx4Ds46IBaJEmmI+d9qPzl3w0+zwDaLfznS/ak/tLShcIEW9IbheO5i6WZAZQMb3S8BwEV32Uo9q8X2dWeHwIrSVwSd/CIB1OdpS2T9ZncVXuqNhop/SZAbj8sEqNc7U+saetG32WdZJfx3F8OLyHVS0NIJjqxpOFtanoZ7+ejPPrOA7JtXPEVqHdkUV2QAmDSQ23rU+av9NdgKXBpCdXzbAyUX8g06rhdjB6zwBquKa1kBIJ1VydZNK24lVx1QDsz5/3GafQ0SZ0mmZTzmobekwz3B8mG9DtJwFFjCY/VfjPJ2cLtdtXGBMf6yi5bHEGMF/0Nkcpzz85G7MYza0/kPexjhzZFAbgEZCnqlLJtEetfvjnJCmt3sLqD+i7+gNZDcD8pnyC3NjJrNNJvfoDE0ucntcfuHcIWGQN2PaDH/tkZZR+ebg48jowApqWkTEr+WTPGQABSUBurJO/G0DmtHh5274tH0NAQq4t0i0DUOJg1eqB1uKWcWhROSNzmr3pTwJmCVZS37z1Bzr6nXlPSjZBZTkDsIt/pAL1B3qu2TmCnwWgigH8mjtXBy1Sf+DeX+9df8AuDhx7H3cDsJh7qRqaMOoPRH05Y3H9AbvYPkX1mROTMwNQhi0AUxQR7rq/p50ysU3qD7AFgOWRf1R7HjbBtmNjrWAAFUQ7dn6yvv7ArU5Tf8A/qM9H52vUMYBVE3b+orrbSSP1B1oHtu6OfV0DyDev9lj5BbTavP5A0tU6NoSmG0Cx+gM2rUXsW3dIw+UXBD5ym2oAvv1O8VIA9E4Iby8Ai+oPDDNkAE8H2rffWh3U2iwY0nZg4cPRTo5QxABUW1ZbJOJJ6w9UsdW4BSCpsn4aQNZl47xd2wR288DbbwFIEnM/DUB5RXlznCrWK4Qm2zWPD5/Pqj+Q/jagXJyc4I+Tc0pztdntqlp/oNTrwETyirxS4VMy0OoBnVB/4PoWoE+qt3l81/RHrdJJ7/oDl0S0ygAK325b6O08515gdLJPUobCIN/HkC0P7oinOHhRfdPM0GOivV6cWlsZyC7G0MKwUFwLeFHdO7CLjKDfkWDE8+bVDgGBwAZHIg3ALv2Fkk563voDpPJQwgDOJ536A4kb8HhQWfELzJ63AayZdCRUzYAsXeLTLOG62pU1h4DF3ZP6A6HKNYK/zhZg+X3a1M++UX9gjk5yvafOGcBfJz1IeFpuF8WEla/+gEX3KWLWuzzWcccA7u3z1VT922FXpzbNISCPdczLALil0x6hk0bnBlcMoPxnssBRtO+vYQOX1+xOU38gJgOwLWyyS9DLYY7fX0PUH+hjAE77N/UJni4Zu/+nmUvs2eudMuTNAKxCDBWrP5BJq2z5Ntry/WsAYZNe/6EutjHRKz4JYVCbLjT29evP1Gmgec44LLDVxhbr1B8Ya9Ngv1J+Eoz1Nr85UH+gx3HEXAOoW39g51SehKpxpjPXAPrVH8jmJLyCS2xfmelPnbzsOD60vJVdMkIR2GFCIX3889fkoJOXojMA1prpq/6XSCrtbVRUSIq2A/v9X/reI5XzDODtqHCLLWKPrglBw8ydTIaZ47ORb6fz6lOaiw2gQqH0dHv03CFG8J8NUI3PqVWoDJR9mbqxWlN/gMzOO7DvTfQfBhBXgKDgMhU4WdQfYLuWQ+x/GEBcAYI9XBhYrWvRZQtgAwmJ0rWc+gObrdZ7GMDMF0fmFBuj/kCETGxiG8jqHhqADcREv8FGPgHmLy1rIfUHhl8HFjExTwsJ6w/Yxb/OLwuC/9MARBznzP51MSAn1h/QcaSuP5BbBAnHo99zAD3qD4xlZNQfSNGnBfUHDAOY47I2uRFkZNfrD3SUnr27ppx/sveTgN4rLTTfpHstAI6dD057shmA7awytmHXrmHHYUqnk5r1B7wLgyzqLg+8Jwh6e1h/4LIS5FieaPf6A6+j7ovYfRbyvP5lA1OgIn0qrBr/Fl/cAuSfzQLPdVhBJWqj6Oq4EfMyAKX3BwUOklO38w8ipMimnJQgRwOIeXV98XnD8fSbLXwut3xmZxM7oIxKeF39Pc2ZmalRQMjlD6bg+gPaXWT3bwMquRT5gOzet1Rx92ADyBwlShpMc08BCAEyqZQGYAV1qzY/st/hQbWCplM/CPtaoDt03mR1Sl1/QJX1dq2Gu5wM4GP46uX22CkbXLHUtmbHGDdHTybiWv0BGzOAec8GWpw82VZ0CLGELctl3NKjYXwtHuMe5p42hkLrD9im9Qda9fLGIaDfq17UH4heVULrD6hvWLTGHhqA36teehwIbVRH+Oyeyi/S2iuZ+FReUirXNtt0cDDdgy8C+QZCzfoD2iPeWh5SuHwTUFV6qt4K3XFtsvaDGitcPf3dMhmACIQwDS6sP6D2a3a+j1RYhAHseqDiLpOk9QecGif/v77fpryaja0/EHIIuN+BSo76AzZ16HvVH1DazGPiS2OfGcBJAQJW/ZTBIE6yH6/6W9cf+MoANP4jiK/ZWcGetr23jL/OAM6XfMRH3lFtG2ZPrpHzENK3/sDXGYAQn/PGH8OMngIPzSpe8JnrD7w5BOQlTAdJKHXwVN3eqJ5UMzfvzW1A7ahQy9xCl99VwzhhnYrIAJJqYNVTVYv15tttt6uxxWmwmxp5EMiWi111B7ph/QF1CwZVNrobItNgBtD4w5ghqYU97xNnMQlyT1XvQNItwD1xF6pHoqTtippM4AwgXtwJ98LbbUm6bwd2Mrvu3wMwNEvPQ4ev9Dpidb4HgNb3TcOL1B8oGR6nBhA65NQfQIpDHVOY0e26ITw1gMECBL6SVXpFklzPD7GsJ7YlM7LrZwAxb55yetximQqtP3AUrT9QoZWWuDBImvoD1qj+QGzDNKHPJFmuo5v4EDC0/sDgRUKHiCwI8p4BQEKnG09I5pnM8mSJpycxACzj2v/wixXLk6JTfwADYP2YHSuaMC3bDeoM4T43gGYRgxvGSeGBVDRmDmO/tHP9gX8GABdT4aBM6LURAAAAAElFTkSuQmCC',
-            Cesium.Material.GradientSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t)); material.alpha = colorImage.a * color.a; material.diffuse =  2.5 * color.rgb  ; return material; }`,
+            Cesium.Material.GradientSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t));
+                    material.alpha = colorImage.a * color.a;
+                    material.diffuse =  2.5 * color.rgb  ; return material;
+                }`,
             Cesium.Material['_materialCache'].addMaterial(Cesium.Material.GradientType, {
                 'fabric': {
                     'type': Cesium.Material.GradientType,
@@ -25033,7 +26171,14 @@
                 return this === _0x162d9d || _0x162d9d instanceof _0x284d10 && Cesium.Property.equals(this[`_color`], _0x162d9d[`_color`]);
             },
             Cesium.Material.LinearGradientType = `LinearGradient`,
-            Cesium.Material.LinearGradientSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t)); material.alpha = colorImage.a; material.diffuse = colorImage.rgb * 1.3 ; return material; }`,
+            Cesium.Material.LinearGradientSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(st.t - time), st.t));
+                    material.alpha = colorImage.a; material.diffuse = colorImage.rgb * 1.3;
+                    return material;
+                }`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.LinearGradientType, {
                 'fabric': {
                     'type': Cesium.Material.LinearGradientType,
@@ -25087,7 +26232,7 @@
             ,
             Cesium.Material.LineFlowWallType = 'LineFlowWall',
             Cesium.Material.LineFlowWallImage = `data:image/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAABCAYAAAAo2wu9AAAAOklEQVQoU2P8//+/McMoIDsEfv/+zcLKysrOwMDAAcVg9t+/fzmYmZkxxP/9+8fBxMSEIc7AwAAWAwD/kwzHVTmPqQAAAABJRU5ErkJggg==`,
-            Cesium.Material.LineFlowWallSource = 'czm_material czm_getMaterial(czm_materialInput materialInput)',
+            Cesium.Material.LineFlowWallSource = `czm_material czm_getMaterial(czm_materialInput materialInput)`,
             Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.LineFlowWallType, {
                 'fabric': {
                     'type': Cesium.Material.LineFlowWallType,
@@ -25131,7 +26276,7 @@
             _0x4d65e1.prototype.getValue = function (_0x3b4ca2, _0x34bef0) {
                 return Cesium.defined(_0x34bef0) || (_0x34bef0 = {}),
                     _0x34bef0.color = Cesium.Property.getValueOrClonedDefault(this[`_color`], _0x3b4ca2, Cesium.Color.WHITE, _0x34bef0.color),
-                    _0x34bef0.image = Cesium.Material['ScrollWallImage'],
+                    _0x34bef0.image = Cesium.Material.ScrollWallImage,
                     _0x34bef0.time = (new Date().getTime() - this[`_time`]) % this.duration / this.duration,
                     _0x34bef0.count = this.count,
                     _0x34bef0;
@@ -25142,13 +26287,20 @@
             Cesium.ScrollWallMaterialProperty = _0x4d65e1,
             Cesium.Material.ScrollWallType = 'ScrollWall',
             Cesium.Material.ScrollWallImage = `data:image/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAUCAYAAAB7wJiVAAACgklEQVRoQ9WZi27DIAxFIeGX9n53//9FBTy5rSNESDC2U2mVqkQRgc7X1wczDwC/zrmQUgrzPM+3a3DOzeVzvL99L89zzmGapss953k5pnG/rAcAwXuP83rH+AAAeO+Tc27km3POaZqmRNfB9/G9rHmf1osx5hDC8ts9AJzqoHKD1xm3Eos7/iYKSxDnHBTBzKOBbYxXz5FSypjbkt/iz+fzKYSwCh45pifWqFO2xhfOIMdNDIPQkO4fDwAZnaR0htpZJFaMMZXOIPHQIT/czKUyxnXQVvCZ62GScD+arNa8WyaCyTwoyDcGKMYYNE4hsbgiNBxxcWn1XCwIOQIAkoAxS6BrVgiZk1NK6Yro63WrnKEgX0VZWuBaZjG3fDEdtMUWMdgrjnTL1y0YFhltMUcqwU6CjAJ4CZ4VQ+oyJgW7kTPMWMF1RsmQT2ZNb7qnB32la0zB7pyzyOhD50CHfBzAkK6DmAxhg13pDLUjqAzWjOkxo2YJCTJasqzG77mO1hCD3cgRSxMo6StGeyQU5L0sK1sA33o+yhDulnm0Y5eCXdmXmHfsKMibkCGc7FaNkYLdyBmHsmJv2/tqwRArp9yrY6eASPsKrbO2OnZ0CApixYRyni7Ymc5kg13pDAtHYA+0bBAkzEFBXsrAjHbsWmcwd1tisNe7L2nnfq+OHQV53jsOZ2axihWVQ1tzSU5+/13Hju5CQZ72mrvOsUm3LHHPtkiU2jFSsCv7EhJzVX5GmUOs4HbsJIgVQ5pOGRWl4UrTjp3EktT40b6is8aKWyjIo4Yh3L5i4P8grVNfNtiVzjisY+eKj4I8HHwexXEfh0FisCt3X6ujeG5wN8bt7ub+ANZIqbIlvAh5AAAAAElFTkSuQmCC`,
-            Cesium.Material.ScrollWallSource = `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; vec4 colorImage = texture2D(image, vec2(fract(count*st.t - time), fract(st.s))); material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb  ; return material; }`,
-            Cesium.Material[`_materialCache`].addMaterial(Cesium.Material['ScrollWallType'], {
+            Cesium.Material.ScrollWallSource = 
+                `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                    czm_material material = czm_getDefaultMaterial(materialInput);
+                    vec2 st = materialInput.st;
+                    vec4 colorImage = texture2D(image, vec2(fract(count*st.t - time), fract(st.s)));
+                    material.alpha = colorImage.a * color.a; material.diffuse =  1.5* color.rgb;
+                    return material;
+                }`,
+            Cesium.Material[`_materialCache`].addMaterial(Cesium.Material.ScrollWallType, {
                 'fabric': {
                     'type': Cesium.Material.ScrollWallType,
                     'uniforms': {
                         'color': new Cesium.Color(1, 0, 0, 0.5),
-                        'image': Cesium.Material['ScrollWallImage'],
+                        'image': Cesium.Material.ScrollWallImage,
                         'time': 0,
                         'count': 1
                     },
@@ -25410,7 +26562,15 @@
                                     'uniforms': {
                                         'color': this.color
                                     },
-                                    'source': 'uniform vec4 color; czm_material czm_getMaterial(czm_materialInput materialInput){ czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; material.diffuse = color.rgb * 2.5; material.alpha = color.a * (1.0-fract(st.t)) * 0.8; return material; }'
+                                    'source': 
+                                        `uniform vec4 color;
+                                        czm_material czm_getMaterial(czm_materialInput materialInput){
+                                            czm_material material = czm_getDefaultMaterial(materialInput);
+                                            vec2 st = materialInput.st;
+                                            material.diffuse = color.rgb * 2.5;
+                                            material.alpha = color.a * (1.0-fract(st.t)) * 0.8;
+                                            return material;
+                                        }`
                                 },
                                 'translucent': function (_0x2f3546) {
                                     return !0;
@@ -25756,19 +26916,66 @@
             'value': function (_0x997cc9) {
                 _0x997cc9 = this.createGeometry(_0x997cc9),
                     (this.primitive = new Cesium.Primitive({
-                        'geometryInstances': _0x997cc9,
-                        'appearance': new Cesium.MaterialAppearance({
-                            'material': new Cesium.Material({
-                                'translucent': !0,
-                                'fabric': {
+                        geometryInstances: _0x997cc9,
+                        appearance: new Cesium.MaterialAppearance({
+                            material: new Cesium.Material({
+                                translucent: !0,
+                                fabric: {
                                     'uniforms': {
-                                        'u_color': this.color,
-                                        'speed': this.speed,
-                                        'direction': this.direction
+                                        u_color: this.color,
+                                        speed: this.speed,
+                                        direction: this.direction
                                     },
-                                    'source': `uniform float direction;uniform float speed;uniform vec4 u_color;czm_material czm_getMaterial( czm_materialInput cmi ) { czm_material material = czm_getDefaultMaterial(cmi); vec2 st = cmi.st; float t = fract(speed*czm_frameNumber/1000.0) * direction; vec2 st1 = vec2(fract(st.s - t),st.t); vec4 color = vec4(0.,0.,0.,0.); float alpha = 1.-st.t; float value = fract(st1.s/0.25); alpha *= sin(value * 3.1415926); color = vec4(u_color.rgb * u_color.a, alpha * 1.2); material.diffuse = color.rgb; material.alpha = color.a; return material; }`
+                                    source: 
+                                        `uniform float direction;
+                                        uniform float speed;
+                                        uniform vec4 u_color;
+                                        czm_material czm_getMaterial( czm_materialInput cmi ) {
+                                            czm_material material = czm_getDefaultMaterial(cmi);
+                                            vec2 st = cmi.st;
+                                            float t = fract(speed*czm_frameNumber/1000.0) * direction;
+                                            vec2 st1 = vec2(fract(st.s - t),st.t);
+                                            vec4 color = vec4(0.,0.,0.,0.);
+                                            float alpha = 1.-st.t;
+                                            float value = fract(st1.s/0.25);
+                                            alpha *= sin(value * 3.1415926);
+                                            color = vec4(u_color.rgb * u_color.a, alpha * 1.2);
+                                            material.diffuse = color.rgb;
+                                            material.alpha = color.a;
+                                            return material;
+                                        }`
                                 }
-                            }), 'vertexShaderSource': ` attribute vec3 position3DHigh; attribute vec3 position3DLow; attribute vec3 normal; attribute vec2 st; attribute float batchId; varying vec2 v_st; varying vec3 v_normalEC; varying vec3 v_positionEC; void main() { vec4 p = czm_translateRelativeToEye(position3DHigh,position3DLow); v_positionEC = (czm_modelViewRelativeToEye * p).xyz; v_normalEC = czm_normal * normal; v_st=st; gl_Position = czm_modelViewProjectionRelativeToEye * p; }`, 'fragmentShaderSource': ` varying vec3 v_positionEC; varying vec3 v_normalEC; varying vec2 v_st; void main() { vec3 positionToEyeEC = -v_positionEC; vec3 normalEC = normalize(v_normalEC); #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC); #endif czm_materialInput materialInput; materialInput.normalEC = normalEC; materialInput.positionToEyeEC = positionToEyeEC; materialInput.st = v_st; czm_material material = czm_getMaterial(materialInput); gl_FragColor = vec4(material.diffuse + material.emission, material.alpha); }`
+                            }),
+                            vertexShaderSource: 
+                                `attribute vec3 position3DHigh;
+                                attribute vec3 position3DLow;
+                                attribute vec3 normal;
+                                attribute vec2 st;
+                                attribute float batchId;
+                                varying vec2 v_st;
+                                varying vec3 v_normalEC;
+                                varying vec3 v_positionEC;
+                                void main() {
+                                    vec4 p = czm_translateRelativeToEye(position3DHigh,position3DLow);
+                                    v_positionEC = (czm_modelViewRelativeToEye * p).xyz;
+                                    v_normalEC = czm_normal * normal; v_st=st;
+                                    gl_Position = czm_modelViewProjectionRelativeToEye * p;
+                                }`,
+                                fragmentShaderSource: 
+                                    ` varying vec3 v_positionEC;
+                                    varying vec3 v_normalEC;
+                                    varying vec2 v_st;
+                                    void main() {
+                                        vec3 positionToEyeEC = -v_positionEC;
+                                        vec3 normalEC = normalize(v_normalEC);
+                                        #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC);
+                                        #endif czm_materialInput materialInput;
+                                        materialInput.normalEC = normalEC;
+                                        materialInput.positionToEyeEC = positionToEyeEC;
+                                        materialInput.st = v_st;
+                                        czm_material material = czm_getMaterial(materialInput);
+                                        gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);
+                                    }`
                         }),
                         'asynchronous': !1
                     }),
@@ -26099,9 +27306,41 @@
                         new Cesium.Primitive({
                             'geometryInstances': _0x44d247,
                             'appearance': new Cesium.Appearance({
-                                'material': this.material,
-                                'renderState': _0x2ae942,
-                                'vertexShaderSource': `attribute vec3 position3DHigh; attribute vec3 position3DLow; attribute vec2 st; attribute float batchId; varying vec3 v_positionMC; varying vec3 v_positionEC; varying vec2 v_st; void main() { vec4 p = czm_computePosition(); v_positionMC = position3DHigh + position3DLow;           // position in model coordinates v_positionEC = (czm_modelViewRelativeToEye * p).xyz;     // position in eye coordinates v_st = st; gl_Position = czm_modelViewProjectionRelativeToEye * p; } `, 'fragmentShaderSource': `varying vec3 v_positionMC; varying vec3 v_positionEC; varying vec2 v_st; void main() { czm_materialInput materialInput; vec3 normalEC = normalize(czm_normal3D * czm_geodeticSurfaceNormal(v_positionMC, vec3(0.0), vec3(1.0))); #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC); #endif materialInput.s = v_st.s; materialInput.st = v_st; materialInput.str = vec3(v_st, 0.0); // Convert tangent space material normal to eye space materialInput.normalEC = normalEC; materialInput.tangentToEyeMatrix = czm_eastNorthUpToEyeCoordinates(v_positionMC, materialInput.normalEC); // Convert view vector to world space vec3 positionToEyeEC = -v_positionEC; materialInput.positionToEyeEC = positionToEyeEC; czm_material material = czm_getMaterial(materialInput); #ifdef FLAT gl_FragColor = vec4(material.diffuse + material.emission, material.alpha); #else gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC); #endif } `
+                                material: this.material,
+                                renderState: _0x2ae942,
+                                vertexShaderSource: 
+                                    `attribute vec3 position3DHigh;
+                                    attribute vec3 position3DLow;
+                                    attribute vec2 st;
+                                    attribute float batchId;
+                                    varying vec3 v_positionMC;
+                                    varying vec3 v_positionEC;
+                                    varying vec2 v_st; void main() {
+                                        vec4 p = czm_computePosition();
+                                        v_positionMC = position3DHigh + position3DLow;
+                                        // position in model coordinates v_positionEC = (czm_modelViewRelativeToEye * p).xyz;
+                                        // position in eye coordinates v_st = st; gl_Position = czm_modelViewProjectionRelativeToEye * p;
+                                    } `,
+                                fragmentShaderSource:
+                                    `varying vec3 v_positionMC;
+                                    varying vec3 v_positionEC;
+                                    varying vec2 v_st;
+                                    void main() {
+                                        czm_materialInput materialInput;
+                                        vec3 normalEC = normalize(czm_normal3D * czm_geodeticSurfaceNormal(v_positionMC, vec3(0.0), vec3(1.0)));
+                                        #ifdef FACE_FORWARD normalEC = faceforward(normalEC, vec3(0.0, 0.0, 1.0), -normalEC);
+                                        #endif materialInput.s = v_st.s;
+                                        materialInput.st = v_st;
+                                        materialInput.str = vec3(v_st, 0.0);
+                                        // Convert tangent space material normal to eye space materialInput.normalEC = normalEC;
+                                        materialInput.tangentToEyeMatrix = czm_eastNorthUpToEyeCoordinates(v_positionMC, materialInput.normalEC);
+                                        // Convert view vector to world space vec3 positionToEyeEC = -v_positionEC;
+                                        materialInput.positionToEyeEC = positionToEyeEC;
+                                        czm_material material = czm_getMaterial(materialInput);
+                                        #ifdef FLAT gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);
+                                        #else gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC);
+                                        #
+                                } `
                             })
                         }));
             }
@@ -26120,7 +27359,26 @@
                             'move': this.move,
                             'flipY': this.flipY
                         },
-                        'source': `czm_material czm_getMaterial(czm_materialInput materialInput) { czm_material material = czm_getDefaultMaterial(materialInput); vec2 st = materialInput.st; if(move){ float r = sqrt((st.x-0.8)*(st.x-0.8) + (st.y-0.8)*(st.y-0.8)); float r2 = sqrt((st.x-0.2)*(st.x-0.2) + (st.y-0.2)*(st.y-0.2)); float z = cos(moveVar.x*r + czm_frameNumber/100.0*moveVar.y)/moveVar.z; float z2 = cos(moveVar.x*r2 + czm_frameNumber/100.0*moveVar.y)/moveVar.z; st += sqrt(z*z+z2*z2); st.s += reflux * czm_frameNumber/1000.0 * speed; st.s = mod(st.s,1.0); } if(flipY){ st = vec2(st.t,st.s); } vec4 colorImage = texture2D(image, st); material.alpha = alpha; material.diffuse = colorImage.rgb; return material; }`
+                        'source': 
+                            `czm_material czm_getMaterial(czm_materialInput materialInput) {
+                                czm_material material = czm_getDefaultMaterial(materialInput);
+                                vec2 st = materialInput.st;
+                                if(move){
+                                    float r = sqrt((st.x-0.8)*(st.x-0.8) + (st.y-0.8)*(st.y-0.8));
+                                    float r2 = sqrt((st.x-0.2)*(st.x-0.2) + (st.y-0.2)*(st.y-0.2));
+                                    float z = cos(moveVar.x*r + czm_frameNumber/100.0*moveVar.y)/moveVar.z;
+                                    float z2 = cos(moveVar.x*r2 + czm_frameNumber/100.0*moveVar.y)/moveVar.z;
+                                    st += sqrt(z*z+z2*z2); st.s += reflux * czm_frameNumber/1000.0 * speed;
+                                    st.s = mod(st.s,1.0);
+                                }
+                                if(flipY){
+                                    st = vec2(st.t,st.s);
+                                }
+                                vec4 colorImage = texture2D(image, st);
+                                material.alpha = alpha;
+                                material.diffuse = colorImage.rgb;
+                                return material;
+                            }`
                     }
                 }) : ((_0x24c794 = Cesium.Material.fromType(`Color`)).uniforms.color = new Cesium.Color(0, 1, 0, this.alpha),
                     _0x24c794);

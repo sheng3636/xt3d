@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="https://unpkg.com/cesium@1.84.0/Build/Cesium/Widgets/widgets.css">
 
     <!--  引入xt3d -->
-    <script src="./bbb1.js"></script>
+    <!-- <script src="./bbb1.js"></script> -->
+    <!-- <script src="./constant.js"></script> -->
+    <script src="./xt3d/xt3d.js"></script>
     <style>
         html,
         body,
@@ -120,7 +122,7 @@
 
         let walkMan = new xt3d.TrackRoam.WalkMan(xt3dInit.viewer, positions, {
             speed: 10,
-            modelUrl: "/static/gltf/man/walk.gltf",
+            modelUrl: "/static/gltf/police.glb",
             scale: 10,
             waveCircleShow: true,
         });

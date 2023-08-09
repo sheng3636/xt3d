@@ -23,7 +23,7 @@
             margin: 0px;
             padding: 0px;
         }
-        
+
         .btn-container {
             position: absolute;
             left: 10px;
@@ -36,7 +36,7 @@
             box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
             max-width: 300px;
         }
-        
+
         button {
             background: transparent;
             border: 1px solid #00d0ffb8;
@@ -46,7 +46,7 @@
             margin: 3px;
             cursor: pointer
         }
-        
+
         .tip-item {
             margin: 2px 0px;
             padding: 5px 1px;
@@ -161,7 +161,7 @@
             load3dtiles() {
                 var tileset = this.viewer.scene.primitives.add(
                     new Cesium.Cesium3DTileset({
-                        url: "http://localhost:9003/model/XUNICt4K/tileset.json",
+                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
                     })
                 );
                 tileset.readyPromise
@@ -171,7 +171,7 @@
                         );
                         xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
                     })
-                    .otherwise(function(error) {
+                    .otherwise(function (error) {
                         console.log(error);
                     });
             },

@@ -33,7 +33,8 @@
         let xt3dInit = {
             init(el) {
                 this.initViewer(el);
-                this.load3dtiles();
+                // this.load3dtiles();
+                this.setView();
                 this.initMonitors();
                 this.viewer.selectedEntityChanged.addEventListener(e => {
                     this.selectedEntityChanged(e);
@@ -100,6 +101,23 @@
                 }
                 if (!e) return;
                 this.videoWindow = new xt3d.VideoPlugin.HlsVideoWindow(this.viewer, e.position._value, e.info);
+            },
+            //设置视角
+            setView() {
+                let flyToOpts = {
+                    destination: {
+                        x: -1573727.2305734043,
+                        y: 5327677.711104301,
+                        z: 3123174.6440329007
+                    },
+                    orientation: {
+                        heading: 0.0017152397352511173,
+                        pitch: -1.3684829958213167,
+                        roll: 0.00001633010703372406
+                    },
+                    duration: 1
+                };
+                this.viewer.scene.camera.setView(flyToOpts);
             },
 
             //加载3dtiles数据
