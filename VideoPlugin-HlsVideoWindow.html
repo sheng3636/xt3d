@@ -100,6 +100,7 @@
                     this.videoWindow = undefined;
                 }
                 if (!e) return;
+                console.log(e.position);
                 this.videoWindow = new xt3d.VideoPlugin.HlsVideoWindow(this.viewer, e.position._value, e.info);
             },
             //设置视角

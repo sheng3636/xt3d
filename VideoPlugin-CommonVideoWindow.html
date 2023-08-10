@@ -31,7 +31,7 @@
         let xt3dInit = {
             init(el) {
                 this.initViewer(el);
-                this.load3dtiles();
+                // this.load3dtiles();
                 this.initMonitors();
                 this.viewer.selectedEntityChanged.addEventListener(e => {
                     this.selectedEntityChanged(e);
@@ -74,10 +74,10 @@
                     name: "监控3",
                     url: "/static/lukou.mp4"
                 }, ];
-
+                let aaa = null
                 monitors.forEach(item => {
                     const point = item.point;
-                    this.viewer.entities.add({
+                    aaa = this.viewer.entities.add({
                         position: Cesium.Cartesian3.fromDegrees(point[0], point[1], point[2]),
                         info: item,
                         billboard: {
@@ -88,6 +88,7 @@
                         }
                     })
                 })
+                this.viewer.flyTo(aaa)
             },
 
             //实体选中事件
@@ -98,26 +99,6 @@
                 }
                 if (!e) return;
                 this.videoWindow = new xt3d.VideoPlugin.CommonVideoWindow(this.viewer, e.position._value, e.info);
-            },
-
-            //加载3dtiles数据
-            load3dtiles() {
-                var tileset = this.viewer.scene.primitives.add(
-                    new Cesium.Cesium3DTileset({
-                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
-                    })
-                );
-
-                tileset.readyPromise
-                    .then(tileset => {
-                        this.viewer.zoomTo(
-                            tileset,
-                        );
-                        xt3d.TilesetPlugin.setTilesetHeight(tileset, 55);
-                    })
-                    .otherwise(function(error) {
-                        console.log(error);
-                    });
             },
 
             destroy() {

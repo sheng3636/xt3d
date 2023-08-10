@@ -30,7 +30,7 @@
             padding: 0px;
             overflow: hidden;
         }
-        
+
         .form-container {
             position: absolute;
             left: 10px;
@@ -43,7 +43,7 @@
             box-shadow: 0 3px 14px rgb(128 128 128 / 50%);
             width: 300px;
         }
-        
+
         button {
             background: transparent;
             border: 1px solid #00d0ffb8;
@@ -53,7 +53,7 @@
             margin: 3px;
             cursor: pointer
         }
-        
+
         .el-form-item__label {
             color: white;
         }
@@ -67,20 +67,25 @@
         <div id="formContainer">
             <el-form ref="form" :model="form" label-width="60px" label-position="left" size="mini">
                 <el-form-item label="翻转">
-                    <el-slider v-model="form.rotation.x" :show-tooltip="true" @input="valueChange" :min="-180" :max="180"></el-slider>
+                    <el-slider v-model="form.rotation.x" :show-tooltip="true" @input="valueChange" :min="-180"
+                        :max="180"></el-slider>
                 </el-form-item>
                 <el-form-item label="旋转">
-                    <el-slider v-model="form.rotation.y" :show-tooltip="true" @input="valueChange" :min="-360" :max="360"></el-slider>
+                    <el-slider v-model="form.rotation.y" :show-tooltip="true" @input="valueChange" :min="-360"
+                        :max="360"></el-slider>
                 </el-form-item>
                 <el-form-item label="夹角">
-                    <el-slider v-model="form.fov" :show-tooltip="true" @input="valueChange" :min="1" :max="90"></el-slider>
+                    <el-slider v-model="form.fov" :show-tooltip="true" @input="valueChange" :min="1"
+                        :max="90"></el-slider>
                 </el-form-item>
 
                 <el-form-item label="透明">
-                    <el-slider v-model="form.alpha" :show-tooltip="true" @input="valueChange" :step="0.1" :min="0" :max="1"></el-slider>
+                    <el-slider v-model="form.alpha" :show-tooltip="true" @input="valueChange" :step="0.1" :min="0"
+                        :max="1"></el-slider>
                 </el-form-item>
                 <el-form-item label="投影线">
-                    <el-switch v-model="form.debugFrustum" @change="setFrustumVisible" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                    <el-switch v-model="form.debugFrustum" @change="setFrustumVisible" active-color="#13ce66"
+                        inactive-color="#ff4949"></el-switch>
                 </el-form-item>
             </el-form>
         </div>
@@ -90,7 +95,6 @@
             init(el) {
                 this.initViewer(el);
                 this.load3dtiles();
-                this.setView();
             },
 
             //初始化viewer
@@ -127,27 +131,10 @@
                     .then(tileset => {
                         xt3d.TilesetPlugin.setTilesetHeight(tileset, 20);
                     })
-                    .otherwise(function(error) {
+                    .otherwise(function (error) {
                         console.log(error);
                     });
-            },
-
-            //设置视角
-            setView() {
-                let flyToOpts = {
-                    destination: {
-                        x: -1715375.6515015732,
-                        y: 4993270.903152683,
-                        z: 3566717.849726583
-                    },
-                    orientation: {
-                        heading: 4.413320171352302,
-                        pitch: -1.4548315525288644,
-                        roll: 6.257627743128779
-                    },
-                    duration: 1
-                };
-                this.viewer.scene.camera.setView(flyToOpts);
+                this.viewer.flyTo(tileset)
             },
 
 

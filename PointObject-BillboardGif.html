@@ -13,7 +13,6 @@
 
     <!--  引入xt3d -->
     <script src="./bbb1.js"></script>
-    <!-- <script src="./xt3d/xt3d.js"></script> -->
     <style>
         html,
         body,
@@ -32,7 +31,6 @@
         let xt3dInit = {
             init(el) {
                 this.initViewer(el);
-                // this.load3dtiles();
                 this.setView();
                 this.addBillboardGifs();
             },
@@ -59,18 +57,17 @@
                 this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
                     url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
                 }));
-
             },
 
             //添加BillboardGif
             addBillboardGifs() {
-                let position = Cesium.Cartesian3.fromDegrees(108.970458,34.224538, 68);
+                let position = Cesium.Cartesian3.fromDegrees(106.45369964187564, 29.506519369988975, 68);
                 let billboardGif = new xt3d.PointObject.BillboardGif(this.viewer, position, "/static/images/marker/bgif0.gif");
 
-                position = Cesium.Cartesian3.fromDegrees(108.970781,34.224542, 67);
+                position = Cesium.Cartesian3.fromDegrees(106.45551315829987, 29.507635519892798, 67);
                 billboardGif = new xt3d.PointObject.BillboardGif(this.viewer, position, "/static/images/marker/tf.gif");
 
-                position = Cesium.Cartesian3.fromDegrees(108.970606,34.224214, 26);
+                position = Cesium.Cartesian3.fromDegrees(106.4572625082757, 29.506150903331505, 26);
                 billboardGif = new xt3d.PointObject.BillboardGif(this.viewer, position, "/static/images/marker/bgif0.gif");
             },
             //设置视角
@@ -95,7 +92,7 @@
             load3dtiles() {
                 var tileset = this.viewer.scene.primitives.add(
                     new Cesium.Cesium3DTileset({
-                        url: "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json"
+                        url: "http://www.xt3d.cn/data/offset_3dtiles/tileset.json",
                     })
                 );
 

@@ -38,12 +38,6 @@
 
             //初始化viewer
             initViewer(el) {
-                let imageryProvider =
-                    new Cesium.UrlTemplateImageryProvider({
-                        url: "https://api.mapbox.com/styles/v1/marsgis/cki0a0ire3jvh19r92vwfau1e/tiles/512/{z}/{x}/{y}@2x?access_token=sk.eyJ1IjoibWFyc2dpcyIsImEiOiJjbDFhYXQ3a2EwaHF6M2NvdnhmdjR6ajZ2In0.-sahm9R0QuPP3pAihJHC4A"
-                    })
-                imageryProvider.defaultBrightness = 0.1;
-
                 this.viewer = new Cesium.Viewer(el, {
                     infoBox: false,
                     selectionIndicator: false,
@@ -56,8 +50,16 @@
                     sceneModePicker: false,
                     navigationHelpButton: false,
                     shouldAnimate: true,
-                    imageryProvider: imageryProvider
+                    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+                        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7",
+                        defaultBrightness:0.1
+                    })
                 });
+
+                //默认添加注记图层
+                this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+                    url: "https://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=0bdb6cce700e0b551eb38ec78ba824a7"
+                }));
 
                 this.viewer.scene.fxaa = true;
                 this.viewer.scene.postProcessStages.fxaa.enabled = true;
